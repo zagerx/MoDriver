@@ -1,0 +1,5 @@
+{
+        "cmake.sourceDirectory": "/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/Modrive",
+        "clangd.path": "clangd",
+        "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json"        
+}
