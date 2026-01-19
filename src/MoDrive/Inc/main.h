@@ -60,6 +60,8 @@ void Error_Handler(void);
 #define M_TIM_ARR 8000
 #define LED_RUN_Pin GPIO_PIN_14
 #define LED_RUN_GPIO_Port GPIOC
+#define LED01_Pin GPIO_PIN_15
+#define LED01_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
