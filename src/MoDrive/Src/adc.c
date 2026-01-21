@@ -53,13 +53,13 @@ void MX_ADC1_Init(void)
 	hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
 	hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
 	hadc1.Init.LowPowerAutoWait = DISABLE;
-	hadc1.Init.ContinuousConvMode = DISABLE;
+	hadc1.Init.ContinuousConvMode = ENABLE;
 	hadc1.Init.NbrOfConversion = 1;
 	hadc1.Init.DiscontinuousConvMode = DISABLE;
 	hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
 	hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
 	hadc1.Init.DMAContinuousRequests = DISABLE;
-	hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+	hadc1.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
 	hadc1.Init.OversamplingMode = DISABLE;
 	if (HAL_ADC_Init(&hadc1) != HAL_OK) {
 		Error_Handler();
@@ -76,7 +76,7 @@ void MX_ADC1_Init(void)
 
 	/** Configure Regular Channel
 	 */
-	sConfig.Channel = ADC_CHANNEL_15;
+	sConfig.Channel = ADC_CHANNEL_9;
 	sConfig.Rank = ADC_REGULAR_RANK_1;
 	sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
 	sConfig.SingleDiff = ADC_SINGLE_ENDED;
@@ -124,7 +124,6 @@ void MX_ADC2_Init(void)
 
 	/* USER CODE END ADC2_Init 0 */
 
-	ADC_ChannelConfTypeDef sConfig = {0};
 	ADC_InjectionConfTypeDef sConfigInjected = {0};
 
 	/* USER CODE BEGIN ADC2_Init 1 */
@@ -138,28 +137,16 @@ void MX_ADC2_Init(void)
 	hadc2.Init.Resolution = ADC_RESOLUTION_12B;
 	hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	hadc2.Init.GainCompensation = 0;
-	hadc2.Init.ScanConvMode = ADC_SCAN_ENABLE;
+	hadc2.Init.ScanConvMode = ADC_SCAN_DISABLE;
 	hadc2.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
 	hadc2.Init.LowPowerAutoWait = DISABLE;
-	hadc2.Init.ContinuousConvMode = DISABLE;
+	hadc2.Init.ContinuousConvMode = ENABLE;
 	hadc2.Init.NbrOfConversion = 1;
 	hadc2.Init.DiscontinuousConvMode = DISABLE;
 	hadc2.Init.DMAContinuousRequests = DISABLE;
 	hadc2.Init.Overrun = ADC_OVR_DATA_PRESERVED;
 	hadc2.Init.OversamplingMode = DISABLE;
 	if (HAL_ADC_Init(&hadc2) != HAL_OK) {
-		Error_Handler();
-	}
-
-	/** Configure Regular Channel
-	 */
-	sConfig.Channel = ADC_CHANNEL_1;
-	sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
-	sConfig.SingleDiff = ADC_SINGLE_ENDED;
-	sConfig.OffsetNumber = ADC_OFFSET_NONE;
-	sConfig.Offset = 0;
-	if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK) {
 		Error_Handler();
 	}
 
@@ -171,19 +158,11 @@ void MX_ADC2_Init(void)
 	sConfigInjected.InjectedSingleDiff = ADC_SINGLE_ENDED;
 	sConfigInjected.InjectedOffsetNumber = ADC_OFFSET_NONE;
 	sConfigInjected.InjectedOffset = 0;
-	sConfigInjected.InjectedNbrOfConversion = 2;
+	sConfigInjected.InjectedNbrOfConversion = 1;
 	sConfigInjected.InjectedDiscontinuousConvMode = DISABLE;
 	sConfigInjected.AutoInjectedConv = DISABLE;
 	sConfigInjected.QueueInjectedContext = DISABLE;
 	sConfigInjected.InjecOversamplingMode = DISABLE;
-	if (HAL_ADCEx_InjectedConfigChannel(&hadc2, &sConfigInjected) != HAL_OK) {
-		Error_Handler();
-	}
-
-	/** Configure Injected Channel
-	 */
-	sConfigInjected.InjectedChannel = ADC_CHANNEL_9;
-	sConfigInjected.InjectedRank = ADC_INJECTED_RANK_2;
 	if (HAL_ADCEx_InjectedConfigChannel(&hadc2, &sConfigInjected) != HAL_OK) {
 		Error_Handler();
 	}
@@ -218,11 +197,18 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *adcHandle)
 			__HAL_RCC_ADC12_CLK_ENABLE();
 		}
 
+		__HAL_RCC_GPIOC_CLK_ENABLE();
 		__HAL_RCC_GPIOB_CLK_ENABLE();
 		/**ADC1 GPIO Configuration
+		PC3     ------> ADC1_IN9
 		PB0     ------> ADC1_IN15
 		PB1     ------> ADC1_IN12
 		*/
+		GPIO_InitStruct.Pin = GPIO_PIN_3;
+		GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+		GPIO_InitStruct.Pull = GPIO_NOPULL;
+		HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
 		GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;
 		GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -253,17 +239,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *adcHandle)
 			__HAL_RCC_ADC12_CLK_ENABLE();
 		}
 
-		__HAL_RCC_GPIOC_CLK_ENABLE();
 		__HAL_RCC_GPIOA_CLK_ENABLE();
 		/**ADC2 GPIO Configuration
-		PC3     ------> ADC2_IN9
 		PA0     ------> ADC2_IN1
 		*/
-		GPIO_InitStruct.Pin = GPIO_PIN_3;
-		GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
 		GPIO_InitStruct.Pin = GPIO_PIN_0;
 		GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -292,9 +271,12 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *adcHandle)
 		}
 
 		/**ADC1 GPIO Configuration
+		PC3     ------> ADC1_IN9
 		PB0     ------> ADC1_IN15
 		PB1     ------> ADC1_IN12
 		*/
+		HAL_GPIO_DeInit(GPIOC, GPIO_PIN_3);
+
 		HAL_GPIO_DeInit(GPIOB, GPIO_PIN_0 | GPIO_PIN_1);
 
 		/* ADC1 interrupt Deinit */
@@ -320,11 +302,8 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *adcHandle)
 		}
 
 		/**ADC2 GPIO Configuration
-		PC3     ------> ADC2_IN9
 		PA0     ------> ADC2_IN1
 		*/
-		HAL_GPIO_DeInit(GPIOC, GPIO_PIN_3);
-
 		HAL_GPIO_DeInit(GPIOA, GPIO_PIN_0);
 
 		/* ADC2 interrupt Deinit */
@@ -344,6 +323,8 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *adcHandle)
 
 /* USER CODE BEGIN 1 */
 #include "stdint.h"
+extern void test_main(void);
+
 void adc_start(void)
 {
 	HAL_ADC_Start(&hadc1);
@@ -363,20 +344,21 @@ void adc_stop(void)
 
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-	// uint32_t raw_uvw[4];
+	static volatile uint32_t raw_uvw[4];
 	if (hadc->Instance == ADC1) {
-		// raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
-		// raw_uvw[1] = (uint32_t)(hadc2.Instance->JDR1);
-		// raw_uvw[2] = (uint32_t)(hadc->Instance->JDR2);
-		// raw_uvw[3] = (uint32_t)(hadc->Instance->DR);
+		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
+		raw_uvw[1] = (uint32_t)(hadc2.Instance->JDR1);
+		raw_uvw[2] = (uint32_t)(hadc->Instance->JDR2);
+		raw_uvw[3] = (uint32_t)(hadc->Instance->DR);
 
-		static uint32_t cout;
-		if (cout++ > 800) {
+		static uint32_t cout; // 0.0001
+		if (cout++ > 10000) {
 			cout = 0;
 			HAL_GPIO_TogglePin(LED01_GPIO_Port, LED01_Pin);
 		}
 
 		// foc_curr_regulator(raw_uvw);
+		test_main();
 	}
 }
 

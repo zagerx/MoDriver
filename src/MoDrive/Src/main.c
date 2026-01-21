@@ -19,8 +19,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
-#include "gpio.h"
 #include "tim.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -72,8 +72,7 @@ int main(void)
 
 	/* MCU Configuration--------------------------------------------------------*/
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick.
-	 */
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	HAL_Init();
 
 	/* USER CODE BEGIN Init */
@@ -93,8 +92,11 @@ int main(void)
 	MX_ADC2_Init();
 	MX_TIM1_Init();
 	/* USER CODE BEGIN 2 */
+	HAL_Delay(2000);
 	adc_start();
 	tim_tigger_adc();
+	tim_pwm_enable();
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -102,7 +104,7 @@ int main(void)
 	while (1) {
 
 		HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
-		HAL_Delay(50);
+		HAL_Delay(1000);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
