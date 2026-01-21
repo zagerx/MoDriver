@@ -28,8 +28,7 @@ include("cmake/gcc-arm-none-eabi.cmake")
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # Enable CMake support for ASM and C languages
-enable_language(C ASM)
-
+project(MoDrive C ASM)
 # Core project settings
 project(${CMAKE_PROJECT_NAME})
 message("Build type: " ${CMAKE_BUILD_TYPE})
@@ -53,6 +52,19 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+    motorlib/
+)
+add_subdirectory(motorlib)
+add_subdirectory(CMSIS-DSP-1.16.2)
+
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    Drivers/CMSIS/Core/Include
+    CMSIS-DSP-1.16.2/Include
+)
+target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
+    -Wall
+    -Wextra
+    -Werror=implicit-function-declaration
 )
 
 # Add project symbols (macros)
