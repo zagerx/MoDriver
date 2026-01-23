@@ -1,8 +1,5 @@
 # STM32CUBEMX配置FDCAN外设
-
-## 波特率设置
-
-- 1M
+<img src="./imags/fdcan配置.png" alt="fdcan配置" width="300"/>
 
 ## 过滤器
 - 过滤器总数28个

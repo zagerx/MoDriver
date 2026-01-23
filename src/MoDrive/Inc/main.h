@@ -57,7 +57,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define M_TIM_ARR 8000
+#define M_TIM_ARR 8400
 #define LED_RUN_Pin GPIO_PIN_14
 #define LED_RUN_GPIO_Port GPIOC
 #define LED01_Pin GPIO_PIN_15
