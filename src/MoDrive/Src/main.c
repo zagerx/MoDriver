@@ -20,14 +20,15 @@
 #include "main.h"
 #include "adc.h"
 #include "fdcan.h"
-#include "stm32g473xx.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "CO_app_STM32.h"
 #include <stdint.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,11 +37,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim->Instance == TIM6) {
 		canopen_app_interrupt();
-		static uint32_t test_count;
-		if (test_count++ > 500) {
-			test_count = 0;
-			HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
-		}
 	}
 }
 /* USER CODE END PTD */
@@ -106,6 +102,7 @@ int main(void)
 	MX_TIM1_Init();
 	MX_FDCAN2_Init();
 	MX_TIM6_Init();
+	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
 	HAL_Delay(2000);
 	adc_start();
@@ -119,7 +116,13 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 
-		canopen_app_process();
+		// canopen_app_process();
+		static uint32_t test_count;
+		if (test_count++ > 500) {
+			test_count = 0;
+			HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
+		}
+
 		HAL_Delay(1);
 		/* USER CODE END WHILE */
 
