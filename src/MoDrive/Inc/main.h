@@ -62,6 +62,8 @@ void Error_Handler(void);
 #define LED_RUN_GPIO_Port GPIOC
 #define LED01_Pin GPIO_PIN_15
 #define LED01_GPIO_Port GPIOC
+#define AS5047_CS_Pin GPIO_PIN_4
+#define AS5047_CS_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

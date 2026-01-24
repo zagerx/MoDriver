@@ -1,6 +1,7 @@
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/openloop.c
     ${CMAKE_CURRENT_SOURCE_DIR}/svpwm.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/stm32_as5047.c
     ${CMAKE_CURRENT_SOURCE_DIR}/test.c
 )
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE

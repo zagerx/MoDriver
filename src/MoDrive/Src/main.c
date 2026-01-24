@@ -20,6 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "fdcan.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -103,13 +104,13 @@ int main(void)
 	MX_FDCAN2_Init();
 	MX_TIM6_Init();
 	MX_USART1_UART_Init();
+	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
 	HAL_Delay(2000);
 	adc_start();
 	tim_tigger_adc();
 	tim_pwm_enable();
 	canopen_app_init();
-
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -122,7 +123,6 @@ int main(void)
 			test_count = 0;
 			HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
 		}
-
 		HAL_Delay(1);
 		/* USER CODE END WHILE */
 
