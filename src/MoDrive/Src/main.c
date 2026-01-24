@@ -20,17 +20,29 @@
 #include "main.h"
 #include "adc.h"
 #include "fdcan.h"
+#include "stm32g473xx.h"
 #include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "CO_app_STM32.h"
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if (htim->Instance == TIM6) {
+		canopen_app_interrupt();
+		static uint32_t test_count;
+		if (test_count++ > 500) {
+			test_count = 0;
+			HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
+		}
+	}
+}
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -93,11 +105,13 @@ int main(void)
 	MX_ADC2_Init();
 	MX_TIM1_Init();
 	MX_FDCAN2_Init();
+	MX_TIM6_Init();
 	/* USER CODE BEGIN 2 */
 	HAL_Delay(2000);
 	adc_start();
 	tim_tigger_adc();
 	tim_pwm_enable();
+	canopen_app_init();
 
 	/* USER CODE END 2 */
 
@@ -105,8 +119,8 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 
-		HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
-		HAL_Delay(1000);
+		canopen_app_process();
+		HAL_Delay(1);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */

@@ -41,6 +41,9 @@ extern FDCAN_HandleTypeDef hfdcan2;
 void MX_FDCAN2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void fdcan1_configFilter_start(void);
+HAL_StatusTypeDef fdcan1_send_std(uint16_t std_id, uint8_t *data, uint8_t len);
+
 
 /* USER CODE END Prototypes */
 

@@ -1,0 +1,7 @@
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/CO_driver_STM32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/CO_app_STM32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/OD.c       
+)
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+)

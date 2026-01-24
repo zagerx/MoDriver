@@ -56,10 +56,13 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 )
 add_subdirectory(motorlib)
 add_subdirectory(CMSIS-DSP-1.16.2)
-
+add_subdirectory(CANopenNode)
+add_subdirectory(CANpenDriverSTM32)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     Drivers/CMSIS/Core/Include
     CMSIS-DSP-1.16.2/Include
+    CANopenNode/
+    CANpenDriverSTM32/
 )
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
     -Wall
