@@ -1,2 +1,4 @@
-src/
 .vscode/
+src/
+src/build/
+src/.cache/
