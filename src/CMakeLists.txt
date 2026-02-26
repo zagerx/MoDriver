@@ -62,14 +62,18 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
-    stm32cubemx
-
     # Add user defined libraries
 )
 
+# 增加hardware_driver目标
+add_subdirectory(Hardware)
+
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user sources here
-    Src/main.c
+    main.c
 )
 
+# 工程依赖
+target_link_libraries(${CMAKE_PROJECT_NAME} 
+    hardware_driver
+)
