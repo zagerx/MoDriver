@@ -1,6 +1,6 @@
 #ifndef ENCODER_H
 #define ENCODER_H
-
-void encoder_getraw(void);
+#include <stdint.h>
+uint16_t encoder_getraw(void);
 
 #endif

@@ -67,6 +67,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 
 # 增加hardware_driver目标
 add_subdirectory(Hardware)
+add_subdirectory(motorlib)
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
@@ -76,4 +77,5 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 # 工程依赖
 target_link_libraries(${CMAKE_PROJECT_NAME} 
     hardware_driver
+    motor
 )
