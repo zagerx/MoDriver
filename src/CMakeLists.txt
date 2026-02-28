@@ -68,6 +68,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 # 增加hardware_driver目标
 add_subdirectory(Hardware)
 add_subdirectory(motorlib)
+add_subdirectory(CMSIS-DSP)
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE

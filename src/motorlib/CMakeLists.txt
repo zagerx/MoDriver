@@ -21,5 +21,6 @@ target_include_directories(motor PUBLIC
 )
 
 # motor 依赖 CMSIS-DSP
-target_link_libraries(motor PUBLIC
+target_link_libraries(motor PRIVATE
+        cmsis-dsp-v1.10.0
 )

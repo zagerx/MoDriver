@@ -16,13 +16,11 @@ void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
 		inverter_bind_inverter(motor->inverter, hw->inverter);
 	}
 }
-
 void motor_highfreq_task(struct motor *motor)
 {
 	if (!motor || !motor->config) {
 		return;
 	}
-
 	if (motor->feedback) {
 		feedback_update(motor->feedback);
 	}
