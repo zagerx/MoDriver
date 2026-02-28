@@ -1,17 +1,29 @@
 #include "motor.h"
 #include "_motorlib_internal.h"
-
-void motor_higfre_task(struct motor *motor)
+#include "inverter.h"
+#include "feedback.h"
+void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
 {
-	(void)motor;
-	feedback_update(motor->config->feedback);
+	if (!motor || !hw) {
+		return;
+	}
+
+	if (hw->encoder) {
+		feedback_bind_encoder(motor->feedback, hw->encoder);
+	}
+
+	if (hw->inverter) {
+		inverter_bind_inverter(motor->inverter, hw->inverter);
+	}
 }
 
-void motor_register_callback(struct motor *motor, uint16_t (*cb)(void), void (*disable)(void),
-			     void (*enable)(void), void (*set)(float, float, float))
+void motor_highfreq_task(struct motor *motor)
 {
-	struct feedback *feedback = motor->config->feedback;
-	struct inverter *inverter = motor->config->inverter;
-	feedback_register_callback(feedback, cb);
-	inverter_register_callback(inverter, disable, enable, set);
+	if (!motor || !motor->config) {
+		return;
+	}
+
+	if (motor->feedback) {
+		feedback_update(motor->feedback);
+	}
 }

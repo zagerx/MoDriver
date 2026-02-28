@@ -1,5 +1,5 @@
 # 指定CMake最低版本
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
 add_library(motor STATIC)
 
@@ -16,8 +16,8 @@ target_include_directories(motor PRIVATE
 )
 
 target_include_directories(motor PUBLIC
-
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/interface
 )
 
 # motor 依赖 CMSIS-DSP

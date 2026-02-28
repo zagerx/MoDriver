@@ -1,8 +1,8 @@
 #include "inverter.h"
-void inverter_register_callback(struct inverter *inverter, void (*disable)(void),
-				void (*enable)(void), void (*set)(float, float, float))
+
+void inverter_bind_inverter(struct inverter *inverter, const struct inverter_ops *ops)
 {
-	inverter->phase_volteage_enable = enable;
-	inverter->phase_volteage_disable = disable;
-	inverter->phase_volteage_set = set;
+	if (inverter) {
+		inverter->ops = ops;
+	}
 }

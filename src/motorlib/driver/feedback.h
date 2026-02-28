@@ -1,11 +1,27 @@
 #ifndef FEEDBACK_H
 #define FEEDBACK_H
+
 #include <stdint.h>
+#include "motor_driver.h"
+/**
+ * @brief 编码器反馈结构体
+ */
 struct feedback {
-	uint16_t (*get_raw)(void);
+	const struct encoder_ops *ops;
+	uint16_t raw;
 };
 
-void feedback_register_callback(struct feedback *feedback, uint16_t (*cb)(void));
+/**
+ * @param feedback 反馈实例
+ * @param cb 读取函数
+ */
+void feedback_bind_encoder(struct feedback *feedback, const struct encoder_ops *ops);
+
+/**
+ * @brief 更新反馈数据
+ *
+ * @param feedback 反馈实例
+ */
 void feedback_update(struct feedback *feedback);
 
-#endif
+#endif /* FEEDBACK_H */

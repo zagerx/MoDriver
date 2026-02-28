@@ -71,7 +71,7 @@ add_subdirectory(motorlib)
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    main.c
+    App/main.c
 )
 
 # 工程依赖

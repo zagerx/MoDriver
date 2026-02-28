@@ -1,5 +1,5 @@
 # 指定CMake最低版本
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
 # ------------------------------------------------------------
 # 定义静态库目标
