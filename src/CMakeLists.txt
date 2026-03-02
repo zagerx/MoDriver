@@ -69,6 +69,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 add_subdirectory(Hardware)
 add_subdirectory(motorlib)
 add_subdirectory(CMSIS-DSP)
+add_subdirectory(statemachine)
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
@@ -80,3 +81,71 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     hardware_driver
     motor
 )
+
+
+
+
+##################### 生成hex ##############################
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+                                    ${CMAKE_PROJECT_NAME}.hex
+    COMMENT "Creating ${CMAKE_PROJECT_NAME}.hex")
+
+
+# ==================================================
+# 添加 JLink 下载目标（兼容多配置构建）
+#cmake --build build/ --target jlink_down
+# ==================================================
+# MCU 型号（用于 JLink 下载）
+set(CHIP "STM32G431CB")
+
+# ==================================================
+# 必须指定 chip 型号，否则 JLink 下载无法工作
+# ==================================================
+if(NOT DEFINED CHIP)
+    message(FATAL_ERROR 
+        "CHIP is not defined!\n"
+        "Please specify the MCU model used by JLink.\n"
+        "For example:\n"
+        "    set(CHIP \"STM32G431CB\")\n"
+    )
+endif()
+
+# 寻找 JLink 工具（兼容 Windows / Linux）
+if(WIN32)
+    find_program(JLINKEXE NAMES JLink.exe)
+else()
+    find_program(JLINKEXE NAMES JLinkExe)
+endif()
+
+if(NOT JLINKEXE)
+    message(WARNING "JLink not found, JLink-based download target will NOT be available")
+else()
+    message(STATUS "Found JLink: ${JLINKEXE}")
+
+    # 生成 jlink.jlink 脚本
+    set(JLINK_SCRIPT ${CMAKE_BINARY_DIR}/jlink.jlink)
+
+    add_custom_command(
+        OUTPUT ${JLINK_SCRIPT}
+        COMMAND ${CMAKE_COMMAND} -E echo "h" > ${JLINK_SCRIPT}
+        COMMAND ${CMAKE_COMMAND} -E echo "loadfile $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/${CMAKE_PROJECT_NAME}${OUTPUT_SUFFIX}.hex" >> ${JLINK_SCRIPT}
+        COMMAND ${CMAKE_COMMAND} -E echo "r" >> ${JLINK_SCRIPT}
+        COMMAND ${CMAKE_COMMAND} -E echo "q" >> ${JLINK_SCRIPT}
+        COMMENT "Generating JLink download script"
+    )
+
+    # jlink_down 目标（CMake 多配置构建下可用）
+    add_custom_target(jlink_down
+        COMMAND ${JLINKEXE}
+                -device ${CHIP}
+                -Speed 4000
+                -IF SWD
+                -CommanderScript ${JLINK_SCRIPT}
+        DEPENDS ${CMAKE_PROJECT_NAME} ${JLINK_SCRIPT}
+        COMMENT "Downloading ${CMAKE_PROJECT_NAME}${OUTPUT_SUFFIX}.hex using JLink"
+        USES_TERMINAL
+    )
+endif()
+
+

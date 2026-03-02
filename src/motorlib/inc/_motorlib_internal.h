@@ -2,7 +2,7 @@
 #define _MOTOR_INTERNAL_H
 
 #include "motor_driver.h"
-
+struct statemachine;
 struct inverter;
 struct feedback;
 
@@ -17,7 +17,7 @@ struct motor_config {
 struct motor {
 	struct inverter *inverter;
 	struct feedback *feedback;
-
+	struct statemachine *sm;
 	struct motor_data *data;
 	struct motor_config *config;
 };

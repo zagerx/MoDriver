@@ -16,6 +16,6 @@ target_include_directories(hardware_driver
         ${CMAKE_CURRENT_SOURCE_DIR}/inc 
 )
 
-target_link_libraries(hardware_driver PRIVATE
+target_link_libraries(hardware_driver PUBLIC 
    stm32cubemx 
 )

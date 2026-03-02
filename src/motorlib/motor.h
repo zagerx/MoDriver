@@ -28,4 +28,6 @@ void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw);
  */
 void motor_highfreq_task(struct motor *motor);
 
+void motor_init(struct motor *motor);
+
 #endif /* MOTOR_H */
