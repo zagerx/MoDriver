@@ -8,6 +8,8 @@ target_sources(motor PRIVATE
         driver/feedback.c
         lib/motor_state.c
         lib/svpwm.c
+        lib/foc_data.c
+        lib/foc.c
         motor_config.c
         motor.c
 )

@@ -7,6 +7,7 @@
 #include "statemachine.h"
 #include <stdint.h>
 #include "motor_state.h"
+#include "foc.h"
 #undef NULL
 #define NULL (0)
 
@@ -93,6 +94,9 @@ void motor_init(struct motor *motor)
 	} else {
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
 	}
+	struct feedback *fb = motor->feedback;
+	struct foc *foc = &motor->foc;
+	foc_bind(foc, &fb->output);
 }
 
 /**
