@@ -11,9 +11,9 @@ static const struct encoder_ops m1_encoder_ops = {
 };
 
 static const struct inverter_ops m1_inverter_ops = {
-	.enable = NULL,
-	.disable = NULL,
-	.set_voltage = NULL,
+	.enable = tim1_pwm_enable,
+	.disable = tim1_pwm_disable,
+	.set_voltage = tim1_pwm_set_duty,
 };
 
 static const struct motor_hw_ops m1_hw_ops = {
@@ -46,10 +46,31 @@ int main(void)
 	motor_bind_param_ext(motor_1, &m1_param_ext);
 
 	motor_init(motor_1);
+
+	/*开启中断*/
+	adc_start();
+	tim1_set_adc();
 	/* 主循环 */
 	while (1) {
-		motor_highfreq_task(motor_1);
+		// motor_highfreq_task(motor_1);
 		HAL_Delay(1);
 		/* TODO: 添加低速任务 */
+	}
+}
+void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	static volatile uint32_t raw_uvw[4];
+	if (hadc->Instance == ADC1) {
+		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
+		raw_uvw[1] = (uint32_t)(hadc2.Instance->JDR1);
+		raw_uvw[2] = (uint32_t)(hadc->Instance->JDR2);
+		raw_uvw[3] = (uint32_t)(hadc->Instance->DR);
+
+		static uint32_t cout; // 0.0001
+		if (cout++ > 10000) {
+			cout = 0;
+			// HAL_GPIO_TogglePin(LED01_GPIO_Port, LED01_Pin);
+		}
+		motor_highfreq_task(motor_1);
 	}
 }

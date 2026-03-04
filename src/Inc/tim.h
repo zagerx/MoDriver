@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file    gpio.h
+ * @file    tim.h
  * @brief   This file contains all the function prototypes for
- *          the gpio.c file
+ *          the tim.c file
  ******************************************************************************
  * @attention
  *
@@ -18,37 +18,39 @@
  */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __GPIO_H__
-#define __GPIO_H__
+#ifndef __TIM_H__
+#define __TIM_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "stm32g4xx_hal.h"
+
+/* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
-/* USER CODE BEGIN Private defines */
-#define M_TIM_ARR           8400
-#define LED_RUN_Pin         GPIO_PIN_14
-#define LED_RUN_GPIO_Port   GPIOC
-#define LED01_Pin           GPIO_PIN_15
-#define LED01_GPIO_Port     GPIOC
-#define AS5047_CS_Pin       GPIO_PIN_4
-#define AS5047_CS_GPIO_Port GPIOA
+extern TIM_HandleTypeDef htim1;
 
+extern TIM_HandleTypeDef htim6;
+
+/* USER CODE BEGIN Private defines */
+#define M_TIM_ARR 8400
 /* USER CODE END Private defines */
 
-void MX_GPIO_Init(void);
+void MX_TIM1_Init(void);
+void MX_TIM6_Init(void);
+
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN Prototypes */
-
+void tim1_set_adc(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ GPIO_H__ */
+
+#endif /* __TIM_H__ */

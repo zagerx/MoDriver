@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file    gpio.h
+ * @file    usart.h
  * @brief   This file contains all the function prototypes for
- *          the gpio.c file
+ *          the usart.c file
  ******************************************************************************
  * @attention
  *
@@ -18,31 +18,27 @@
  */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __GPIO_H__
-#define __GPIO_H__
+#ifndef __USART_H__
+#define __USART_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "stm32g4xx_hal.h"
+
+/* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
+extern UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN Private defines */
-#define M_TIM_ARR           8400
-#define LED_RUN_Pin         GPIO_PIN_14
-#define LED_RUN_GPIO_Port   GPIOC
-#define LED01_Pin           GPIO_PIN_15
-#define LED01_GPIO_Port     GPIOC
-#define AS5047_CS_Pin       GPIO_PIN_4
-#define AS5047_CS_GPIO_Port GPIOA
 
 /* USER CODE END Private defines */
 
-void MX_GPIO_Init(void);
+void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -51,4 +47,5 @@ void MX_GPIO_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ GPIO_H__ */
+
+#endif /* __USART_H__ */

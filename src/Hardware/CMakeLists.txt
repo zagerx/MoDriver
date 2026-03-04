@@ -9,6 +9,7 @@ add_library(hardware_driver STATIC)
 target_sources(hardware_driver PRIVATE
     src/hardware.c
     src/as5047.c
+    src/stm32_pwm.c
 )
 
 target_include_directories(hardware_driver
