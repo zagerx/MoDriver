@@ -7,6 +7,7 @@ target_sources(motor PRIVATE
         driver/inverter.c
         driver/feedback.c
         lib/motor_state.c
+        lib/svpwm.c
         motor_config.c
         motor.c
 )

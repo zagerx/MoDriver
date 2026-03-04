@@ -2,6 +2,8 @@
 #define _MOTOR_INTERNAL_H
 
 #include "motor_driver.h"
+#include "motor_error.h"
+
 struct statemachine;
 struct inverter;
 struct feedback;
@@ -10,7 +12,7 @@ struct feedback;
  * @brief 电机数据结构体
  */
 struct motor_data {
-	int16_t error_code; /**< @brief 错误码 */
+	uint32_t error_code; /**< @brief 错误码（位组合，使用 enum motor_error_bits + MOTOR_ERR_BIT()） */
 };
 
 /**
