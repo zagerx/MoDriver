@@ -6,12 +6,14 @@ add_library(motor STATIC)
 target_sources(motor PRIVATE
         driver/inverter.c
         driver/feedback.c
+        lib/motor_state.c
         motor_config.c
         motor.c
 )
 
 target_include_directories(motor PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/driver
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/inc
 )
 

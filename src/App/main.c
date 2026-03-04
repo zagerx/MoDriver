@@ -38,6 +38,11 @@ int main(void)
 
 	/* 绑定电机硬件接口 */
 	motor_bind_hardware(motor_1, &m1_hw_ops);
+
+	/*从外部flash读取参数*/
+	// flash_read(&m1_param_ext, sizeof(m1_param_ext));//TODO: 实现flash读写接口并使用
+
+	/* 绑定电机参数 */
 	motor_bind_param_ext(motor_1, &m1_param_ext);
 
 	motor_init(motor_1);
