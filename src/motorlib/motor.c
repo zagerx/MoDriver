@@ -6,8 +6,12 @@
 #include <stdint.h>
 #undef NULL
 #define NULL (0)
-volatile static uint16_t test_value2;
-volatile static uint16_t test_value = 0;
+
+/* 控制周期 100us (10kHz) */
+#define CONTROL_PERIOD_DT 0.0001f
+
+static volatile uint16_t test_value2;
+static volatile uint16_t test_value = 0;
 
 void motor_idle_state(struct statemachine *sm)
 {
@@ -76,7 +80,7 @@ void motor_highfreq_task(struct motor *motor)
 		return;
 	}
 	if (motor->feedback) {
-		feedback_update(motor->feedback);
+		feedback_update(motor->feedback, CONTROL_PERIOD_DT);
 	}
 	struct statemachine *sm = motor->sm;
 
