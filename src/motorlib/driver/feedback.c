@@ -2,10 +2,15 @@
 #include <stdint.h>
 #include <math.h>
 
-/* 低通滤波系数（0~1，越大响应越快） */
+/** @brief 低通滤波系数（0~1，越大响应越快） */
 #define VELOCITY_LPF_ALPHA 0.08f
 
-/* 角度归一化到 [0, 2PI] */
+/**
+ * @brief 角度归一化到 [0, 2PI]
+ * @param[in] angle 输入角度 rad
+ * @return float 归一化后的角度 rad
+ * @note 将任意角度映射到 [0, 2π] 范围内
+ */
 static float normalize_angle(float angle)
 {
 	angle = fmodf(angle, 2.0f * M_PI);
@@ -15,20 +20,41 @@ static float normalize_angle(float angle)
 	return angle;
 }
 
-/* 绑定编码器操作接口 */
+/**
+ * @brief 绑定编码器操作接口
+ * @param[in] feedback 反馈实例
+ * @param[in] ops 编码器操作接口
+ * @return 无
+ */
 void feedback_bind_encoder(struct feedback *feedback, const struct encoder_ops *ops)
 {
 	if (feedback) {
 		feedback->ops = ops;
 	}
 }
+
+/**
+ * @brief 绑定反馈参数
+ * @param[in] feedback 反馈实例
+ * @param[in] param 反馈参数
+ * @return 无
+ */
 void feedback_bind_encoder_param(struct feedback *feedback, struct feedback_param *param)
 {
 	if (feedback) {
 		feedback->param = param;
 	}
 }
-/* 初始化反馈模块，校验参数合法性 */
+
+/**
+ * @brief 初始化反馈模块，校验参数合法性
+ * @param[in] feedback 反馈实例
+ * @return feedback_error_code 错误码
+ * @retval FEEDBACK_ERROR_NONE 初始化成功
+ * @retval FEEDBACK_ERROR_PARAM 参数错误
+ * @retval FEEDBACK_ERROR_HW_FAILURE 硬件故障
+ * @note 校验轮子半径、减速比、极对数、方向、编码器分辨率等参数
+ */
 enum feedback_error_code feedback_init(struct feedback *feedback)
 {
 	if (!feedback) {
@@ -62,7 +88,13 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
 	return FEEDBACK_ERROR_NONE;
 }
 
-/* 计算累积机械角度，处理编码器溢出 */
+/**
+ * @brief 计算累积机械角度，处理编码器溢出
+ * @param[in] feedback 反馈实例
+ * @param[in] adjusted_raw 偏移校正后的编码器读数
+ * @return 无
+ * @details 检测越过CPR边界的溢出并计算累积机械角度
+ */
 static void feedback_calc_accumulated_mangle(struct feedback *feedback, int32_t adjusted_raw)
 {
 	struct feedback_param *param = feedback->param;
@@ -90,14 +122,26 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, int32_t 
 	data->prev_raw = (uint16_t)adjusted_raw;
 }
 
-/* 计算电角度（机械角度 * 极对数，归一化到 [0, 2π]） */
+/**
+ * @brief 计算电角度（机械角度 * 极对数，归一化到 [0, 2π]）
+ * @param[in] feedback 反馈实例
+ * @param[in] mangle 机械角度 rad
+ * @return float 电角度 rad
+ */
 static float feedback_calc_elec_angle(struct feedback *feedback, float mangle)
 {
 	struct feedback_param *param = feedback->param;
 	return normalize_angle(mangle * param->pole_pairs);
 }
 
-/* 差分法计算机械角速度，带低通滤波 */
+/**
+ * @brief 差分法计算机械角速度，带低通滤波
+ * @param[in] feedback 反馈实例
+ * @param[in] dt 采样周期 s
+ * @param[in] cur_mangle 当前机械角度 rad
+ * @return float 机械角速度 rad/s
+ * @note 使用差分法计算速度，并应用一阶低通滤波
+ */
 static float feedback_calc_velocity(struct feedback *feedback, float dt, float cur_mangle)
 {
 	struct feedback_data *data = &feedback->data;
@@ -127,7 +171,13 @@ static float feedback_calc_velocity(struct feedback *feedback, float dt, float c
 	return data->mech_omega_rad_s;
 }
 
-/* 更新反馈数据（编码器读取 + 角度/速度/电角度计算） */
+/**
+ * @brief 更新反馈数据（编码器读取 + 角度/速度/电角度计算）
+ * @param[in] feedback 反馈实例
+ * @param[in] dt 采样周期 s
+ * @return 无
+ * @details 执行编码器读取、零位偏移校正、累积角度计算、电角度计算、速度计算和里程更新
+ */
 void feedback_update(struct feedback *feedback, float dt)
 {
 	if (!feedback || feedback->state != FEEDBACK_STATE_OK) {

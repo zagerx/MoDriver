@@ -6,21 +6,30 @@ struct statemachine;
 struct inverter;
 struct feedback;
 
+/**
+ * @brief 电机数据结构体
+ */
 struct motor_data {
-	int16_t error_code;
+	int16_t error_code; /**< @brief 错误码 */
 };
 
+/**
+ * @brief 电机配置结构体
+ */
 struct motor_config {
-	uint16_t pairs;
+	uint16_t pairs; /**< @brief 极对数 */
 };
 
+/**
+ * @brief 电机实例结构体
+ */
 struct motor {
-	struct inverter *inverter;
-	struct feedback *feedback;
-	struct statemachine *sm;
-	struct motor_data *data;
-	struct motor_config *config;
-	struct motor_param_ext *param_ext;
+	struct inverter *inverter;              /**< @brief 逆变器实例 */
+	struct feedback *feedback;              /**< @brief 反馈实例 */
+	struct statemachine *sm;                /**< @brief 状态机实例 */
+	struct motor_data *data;                /**< @brief 数据 */
+	struct motor_config *config;            /**< @brief 配置 */
+	struct motor_param_ext *param_ext;      /**< @brief 扩展参数 */
 };
 
 #endif
