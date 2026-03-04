@@ -20,6 +20,7 @@ struct motor {
 	struct statemachine *sm;
 	struct motor_data *data;
 	struct motor_config *config;
+	struct motor_param_ext *param_ext;
 };
 
 #endif

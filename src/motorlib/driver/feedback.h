@@ -15,16 +15,6 @@ struct feedback_output {
 	float odometer;       // 里程（累积线位移）m
 };
 
-/* 反馈参数配置 */
-struct feedback_param {
-	float wheel_radius;          // 轮子半径 m
-	float gear_ratio;            // 减速比
-	float pole_pairs;            // 极对数
-	float direction;             // 旋转方向，1或-1
-	uint16_t encoder_resolution; // 编码器分辨率（CPR）
-	uint16_t encoder_offset;     // 编码器零位偏移
-};
-
 /* 反馈原始数据与中间计算数据 */
 struct feedback_data {
 	uint16_t raw;                 // 原始编码器读数
@@ -37,15 +27,15 @@ struct feedback_data {
 
 /* 反馈状态 */
 enum feedback_state {
-	FEEDBACK_STATE_OK = 0,           // 正常
+	FEEDBACK_STATE_OK = 0,             // 正常
 	FEEDBACK_STATE_NOT_CALIBRATED = 1, // 未校准
 };
 
 /* 反馈错误码 */
 enum feedback_error_code {
-	FEEDBACK_ERROR_NONE = 0,      // 无错误
+	FEEDBACK_ERROR_NONE = 0,       // 无错误
 	FEEDBACK_ERROR_HW_FAILURE = 1, // 硬件故障
-	FEEDBACK_ERROR_PARAM = 2,     // 参数错误
+	FEEDBACK_ERROR_PARAM = 2,      // 参数错误
 };
 
 /**
@@ -53,7 +43,7 @@ enum feedback_error_code {
  */
 struct feedback {
 	const struct encoder_ops *ops;
-	struct feedback_param param;
+	struct feedback_param *param;
 	struct feedback_output output;
 	struct feedback_data data;
 	enum feedback_state state;
@@ -65,6 +55,7 @@ struct feedback {
  * @param ops 编码器操作接口
  */
 void feedback_bind_encoder(struct feedback *feedback, const struct encoder_ops *ops);
+void feedback_bind_encoder_param(struct feedback *feedback, struct feedback_param *param);
 
 /**
  * @brief 初始化反馈模块
@@ -101,7 +92,7 @@ static inline float feedback_get_velocity(struct feedback *fb)
 /* 获取线速度 m/s */
 static inline float feedback_get_line_velocity(struct feedback *fb)
 {
-	return fb->output.velocity_rad_s * fb->param.wheel_radius / fb->param.gear_ratio;
+	return fb->output.velocity_rad_s * fb->param->wheel_radius / fb->param->gear_ratio;
 }
 
 /* 更新轮子半径参数 */
@@ -111,7 +102,7 @@ static inline void _feedback_update_param_wheel_radius(struct feedback *feedback
 	if (!feedback) {
 		return;
 	}
-	feedback->param.wheel_radius = wheel_radius;
+	feedback->param->wheel_radius = wheel_radius;
 }
 
 /* 更新减速比参数 */
@@ -120,7 +111,7 @@ static inline void _feedback_update_param_gear_ratio(struct feedback *feedback, 
 	if (!feedback) {
 		return;
 	}
-	feedback->param.gear_ratio = gear_ratio;
+	feedback->param->gear_ratio = gear_ratio;
 }
 
 /* 更新极对数参数 */
@@ -129,7 +120,7 @@ static inline void _feedback_update_param_pole_pairs(struct feedback *feedback, 
 	if (!feedback) {
 		return;
 	}
-	feedback->param.pole_pairs = pole_pairs;
+	feedback->param->pole_pairs = pole_pairs;
 }
 
 /* 更新旋转方向参数 */
@@ -138,7 +129,7 @@ static inline void _feedback_update_param_direction(struct feedback *feedback, f
 	if (!feedback) {
 		return;
 	}
-	feedback->param.direction = direction;
+	feedback->param->direction = direction;
 }
 
 /* 更新编码器分辨率参数 */
@@ -148,7 +139,7 @@ static inline void _feedback_update_param_encoder_resolution(struct feedback *fe
 	if (!feedback) {
 		return;
 	}
-	feedback->param.encoder_resolution = encoder_resolution;
+	feedback->param->encoder_resolution = encoder_resolution;
 }
 
 /* 更新编码器零位偏移参数 */
@@ -158,7 +149,7 @@ static inline void _feedback_update_param_encoder_offset(struct feedback *feedba
 	if (!feedback) {
 		return;
 	}
-	feedback->param.encoder_offset = encoder_offset;
+	feedback->param->encoder_offset = encoder_offset;
 }
 
 #endif /* FEEDBACK_H */

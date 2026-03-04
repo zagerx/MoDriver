@@ -1,18 +1,50 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #include "motor.h"
 #include "_motorlib_internal.h"
 #include "inverter.h"
 #include "feedback.h"
 #include "statemachine.h"
 #include <stdint.h>
+
 #undef NULL
 #define NULL (0)
 
 /* 控制周期 100us (10kHz) */
 #define CONTROL_PERIOD_DT 0.0001f
 
-static volatile uint16_t test_value2;
-static volatile uint16_t test_value = 0;
+/**
+ * motor_carib_state - 校准状态
+ * @sm: 状态机实例
+ *
+ * 电机参数异常时进入的校准状态，用于参数标定
+ */
+void motor_carib_state(struct statemachine *sm)
+{
+	enum {
+		CALIBRATING = USER_STATUS,
+	};
+	struct motor *motor = (struct motor *)(sm->data);
+	(void)motor;
+	switch (sm->phase) {
+	case ENTER:
+		sm->phase = CALIBRATING;
+		break;
+	case CALIBRATING:
+		break;
+	case EXIT:
+		break;
+	default:
+		break;
+	}
+}
 
+/**
+ * motor_idle_state - 空闲状态
+ * @sm: 状态机实例
+ *
+ * 电机初始化后的默认状态，等待运行指令
+ */
 void motor_idle_state(struct statemachine *sm)
 {
 	enum {
@@ -22,19 +54,23 @@ void motor_idle_state(struct statemachine *sm)
 	(void)motor;
 	switch (sm->phase) {
 	case ENTER:
-		test_value = 1;
 		sm->phase = RUNING;
 		break;
 	case RUNING:
-		test_value = 2;
 		break;
 	case EXIT:
-		test_value = 3;
 		break;
 	default:
 		break;
 	}
 }
+
+/**
+ * motor_runing_state - 运行状态
+ * @sm: 状态机实例
+ *
+ * 电机正常运行状态，执行FOC控制循环
+ */
 void motor_runing_state(struct statemachine *sm)
 {
 	enum {
@@ -42,7 +78,6 @@ void motor_runing_state(struct statemachine *sm)
 	};
 	switch (sm->phase) {
 	case ENTER:
-		test_value = 0;
 		sm->phase = RUNING;
 		break;
 	case RUNING:
@@ -69,11 +104,39 @@ void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
 	}
 }
 
+void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext)
+{
+	if (!motor || !param_ext || !param_ext->feedback_param) {
+		return;
+	}
+	feedback_bind_encoder_param(motor->feedback, param_ext->feedback_param);
+}
+
+int16_t motor_param_check(struct motor *motor)
+{
+	if (!motor) {
+		return -1; /* 电机实例为空 */
+	}
+	struct motor_param_ext *param_ext = motor->param_ext;
+	/* CRC 校验伪代码 */
+	// uint16_t calc_crc = crc16_calculate((uint8_t *)param_ext, sizeof(*param_ext));
+	// if (calc_crc != param_ext->crc_16) {
+	//     return -20; /* CRC 校验失败 */
+	// }
+	(void)param_ext->crc_16; /* 暂时标记为已使用，避免警告 */
+	return 0;                /* 参数检查通过 */
+}
+
 void motor_init(struct motor *motor)
 {
 	struct statemachine *sm = motor->sm;
-	statemachine_init(sm, motor, motor_idle_state, NULL, 0);
+	if (motor_param_check(motor)) {
+		statemachine_init(sm, motor, motor_carib_state, NULL, 0);
+	} else {
+		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
+	}
 }
+
 void motor_highfreq_task(struct motor *motor)
 {
 	if (!motor || !motor->config) {
@@ -84,8 +147,5 @@ void motor_highfreq_task(struct motor *motor)
 	}
 	struct statemachine *sm = motor->sm;
 
-	if (test_value2++ > 3000 && test_value != 0) {
-		TRAN_STATE(sm, motor_runing_state);
-	}
 	sm_dispatch(sm);
 }

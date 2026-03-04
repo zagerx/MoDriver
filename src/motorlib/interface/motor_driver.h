@@ -33,4 +33,24 @@ struct motor_hw_ops {
 	const struct inverter_ops *inverter;
 };
 
+/**
+ * @brief 反馈参数配置
+ */
+struct feedback_param {
+	float wheel_radius;          /**< 轮子半径 m */
+	float gear_ratio;            /**< 减速比 */
+	float pole_pairs;            /**< 极对数 */
+	float direction;             /**< 旋转方向，1或-1 */
+	uint16_t encoder_resolution; /**< 编码器分辨率（CPR） */
+	uint16_t encoder_offset;     /**< 编码器零位偏移 */
+};
+
+/**
+ * @brief 电机扩展参数
+ */
+struct motor_param_ext {
+	struct feedback_param *feedback_param; /**< 反馈参数指针 */
+	uint16_t crc_16;                       /**< 参数完整性校验 */
+};
+
 #endif /* MOTOR_DRIVER_H */
