@@ -15,6 +15,7 @@ struct foc_measurement {
 
 struct foc_data {
 	struct foc_measurement meas; /**< @brief FOC测量数据 */
+	float self_eangle;           /**< @brief 电机开环强托自增角度 */
 };
 
 void foc_data_bind(struct foc_data *data, struct feedback_output *fb_out);

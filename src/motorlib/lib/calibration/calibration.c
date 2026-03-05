@@ -3,6 +3,7 @@
 #include "encoder_calibration.h"
 #include "_motorlib_internal.h"
 #include "inverter.h"
+#include <stdint.h>
 
 void calibration_init(struct motor *motor)
 {
@@ -19,11 +20,16 @@ void calibration_init(struct motor *motor)
 }
 
 /* 电流校准阶段处理 */
-static enum calibration_status current_phase_handle(struct motor *motor)
+/**
+0:校准成功
+-1:校准失败
+1:校准进行中
+*/
+static int16_t current_phase_handle(struct motor *motor)
 {
 	struct calibration *calib = &motor->calib;
-	bool done;
-
+	int16_t ret;
+	ret = 1;
 	switch (calib->curr_state) {
 	case CURRENT_STATE_IDLE:
 		current_calib_init(motor, 0);
@@ -31,30 +37,31 @@ static enum calibration_status current_phase_handle(struct motor *motor)
 		break;
 
 	case CURRENT_STATE_SAMPLING:
-		done = current_calib_run(motor);
-		if (done) {
+		if (current_calib_run(motor)) {
+			current_calib_apply(motor);
 			calib->curr_state = CURRENT_STATE_FINISH;
 		}
+		ret = 1;
 		break;
 
 	case CURRENT_STATE_FINISH:
-		current_calib_apply(motor);
-		calib->curr_state = CURRENT_STATE_IDLE; /* 重置 */
-		return CALIBRATION_STATUS_ENCODER;
-
+		ret = 0;
+		break;
 	default:
-		return CALIBRATION_STATUS_FAILED;
+		ret = -1;
+		break;
 	}
 
-	return CALIBRATION_STATUS_CURRENT;
+	return ret;
 }
 
 /* 编码器校准阶段处理 */
-static enum calibration_status encoder_phase_handle(struct motor *motor)
+static int16_t encoder_phase_handle(struct motor *motor)
 {
 	struct calibration *calib = &motor->calib;
 	bool done;
-
+	int16_t ret;
+	ret = 1;
 	switch (calib->enc_phase) {
 	case ENCODER_PHASE_INIT:
 		encoder_calib_init(motor);
@@ -64,20 +71,21 @@ static enum calibration_status encoder_phase_handle(struct motor *motor)
 	case ENCODER_PHASE_RUNNING:
 		done = encoder_calib_run(motor);
 		if (done) {
+			encoder_calib_apply(motor);
 			calib->enc_phase = ENCODER_PHASE_FINISH;
 		}
+		ret = 1;
 		break;
 
 	case ENCODER_PHASE_FINISH:
-		encoder_calib_apply(motor);
-		calib->enc_phase = ENCODER_PHASE_INIT; /* 重置 */
-		return CALIBRATION_STATUS_SUCCESS;
-
+		ret = 0;
+		break;
 	default:
-		return CALIBRATION_STATUS_FAILED;
+		ret = -1;
+		break;
 	}
 
-	return CALIBRATION_STATUS_ENCODER;
+	return ret;
 }
 
 enum calibration_status calibration_task(struct motor *motor)
@@ -97,12 +105,16 @@ enum calibration_status calibration_task(struct motor *motor)
 		break;
 
 	case CALIBRATION_STATUS_CURRENT:
-		calib->status = current_phase_handle(motor);
+		if (!current_phase_handle(motor)) {
+			calib->status = CALIBRATION_STATUS_ENCODER;
+		}
 		break;
 
 	case CALIBRATION_STATUS_ENCODER:
 		/* 执行编码器校准 */
-		calib->status = encoder_phase_handle(motor);
+		if (!encoder_phase_handle(motor)) {
+			calib->status = CALIBRATION_STATUS_SUCCESS;
+		}
 		break;
 
 	case CALIBRATION_STATUS_SUCCESS:

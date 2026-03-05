@@ -33,8 +33,8 @@ void motor_carib_state(struct statemachine *sm)
 		if (calib_status == CALIBRATION_STATUS_SUCCESS) {
 			TRAN_STATE(sm, motor_idle_state);
 		} else if (calib_status == CALIBRATION_STATUS_FAILED) {
-			/* 校准失败，可进入错误状态或回空闲 */
-			TRAN_STATE(sm, motor_idle_state);
+			/* 校准失败 */
+			TRAN_STATE(sm, motor_init_state);
 		}
 		break;
 
@@ -46,6 +46,31 @@ void motor_carib_state(struct statemachine *sm)
 		}
 		break;
 
+	default:
+		break;
+	}
+}
+/**
+ * motor_idle_state - 空闲状态
+ * @sm: 状态机实例
+ *
+ * 电机初始化后的默认状态，等待运行指令
+ */
+void motor_init_state(struct statemachine *sm)
+{
+	enum {
+		RUNING = USER_STATUS,
+	};
+	struct motor *motor = (struct motor *)(sm->data);
+	(void)motor;
+	switch (sm->phase) {
+	case ENTER:
+		sm->phase = RUNING;
+		break;
+	case RUNING:
+		break;
+	case EXIT:
+		break;
 	default:
 		break;
 	}

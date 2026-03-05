@@ -3,14 +3,6 @@
 #include "arm_math.h"
 #include <float.h>
 
-// =========================== 常量定义 ===========================
-#define clarke_f32   arm_clarke_f32
-#define park_f32     arm_park_f32
-#define inv_park_f32 arm_inv_park_f32
-#define sin_cos_f32  arm_sin_cos_f32
-#define atan_f32     arm_atan2_f32
-#define sqrt_f32     arm_sqrt_f32
-
 #define SQRT3_OVER_2   0.8660254037844386f // sqrt(3)/2
 #define ONE_OVER_SQRT3 0.5773502691896258f // 1/sqrt(3)
 #define SQRT3          1.7320508075688772f // sqrt(3)
@@ -116,8 +108,8 @@ void svpwm_normalize(float eangle, float vbus, float ud, float uq, float *ualpha
 	float alpha, beta;
 
 	// 1. 逆Park变换（dq -> αβ）
-	sin_cos_f32(eangle * RAD_TO_DEG, &sin_val, &cos_val);
-	inv_park_f32(ud, uq, &alpha, &beta, sin_val, cos_val);
+	arm_sin_cos_f32(eangle * RAD_TO_DEG, &sin_val, &cos_val);
+	arm_inv_park_f32(ud, uq, &alpha, &beta, sin_val, cos_val);
 
 	// 2. 电压归一化到线性调制区
 	if (vbus > 0.001f) {
