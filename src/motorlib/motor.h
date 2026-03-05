@@ -42,6 +42,6 @@ void motor_init(struct motor *motor);
  * @return 无
  * @note 应在定时器中断中周期性调用（默认10kHz），执行反馈更新和状态机调度
  */
-void motor_highfreq_task(struct motor *motor);
+void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw);
 
 #endif /* MOTOR_H */

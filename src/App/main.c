@@ -59,18 +59,13 @@ int main(void)
 }
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-	static volatile uint32_t raw_uvw[4];
+	volatile uint32_t raw_uvw[5];
 	if (hadc->Instance == ADC1) {
 		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
 		raw_uvw[1] = (uint32_t)(hadc2.Instance->JDR1);
 		raw_uvw[2] = (uint32_t)(hadc->Instance->JDR2);
 		raw_uvw[3] = (uint32_t)(hadc->Instance->DR);
-
-		static uint32_t cout; // 0.0001
-		if (cout++ > 10000) {
-			cout = 0;
-			// HAL_GPIO_TogglePin(LED01_GPIO_Port, LED01_Pin);
-		}
-		motor_highfreq_task(motor_1);
+		raw_uvw[4] = 0;
+		motor_highfreq_task(motor_1, (uint16_t *)raw_uvw);
 	}
 }

@@ -6,6 +6,7 @@ add_library(motor STATIC)
 target_sources(motor PRIVATE
         driver/inverter.c
         driver/feedback.c
+        driver/currsmp.c
         lib/motor_state.c
         lib/svpwm.c
         lib/foc_data.c
@@ -17,6 +18,7 @@ target_sources(motor PRIVATE
 target_include_directories(motor PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/driver
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/calibration
         ${CMAKE_CURRENT_SOURCE_DIR}/inc
 )
 

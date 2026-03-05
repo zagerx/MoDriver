@@ -4,6 +4,7 @@
 #include "_motorlib_internal.h"
 #include "inverter.h"
 #include "feedback.h"
+#include "currsmp.h"
 #include "statemachine.h"
 #include <stdint.h>
 #include "motor_state.h"
@@ -49,6 +50,7 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
 		return;
 	}
 	feedback_bind_encoder_param(motor->feedback, param_ext->feedback_param);
+	currsmp_bind_param(motor->currsmp, param_ext->currsmp_param);
 }
 
 /**
@@ -106,15 +108,22 @@ void motor_init(struct motor *motor)
  * @note 应在定时器中断中周期性调用（默认10kHz）
  * @details 执行反馈更新和状态机调度
  */
-void motor_highfreq_task(struct motor *motor)
+void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 {
-	if (!motor || !motor->config) {
+	if (!motor) {
 		return;
 	}
-	if (motor->feedback) {
-		feedback_update(motor->feedback, CONTROL_PERIOD_DT);
-	}
+
+	struct feedback *feedback = motor->feedback;
+	struct currsmp *currsmp = motor->currsmp;
 	struct statemachine *sm = motor->sm;
 
+	currsmp_update_raw(currsmp, adc_raw);
+	feedback_update_raw(feedback);
+	/* 仅在非校准状态下执行完整的反馈更新和状态机调度，校准状态下可能需要特殊处理 */
+	if (sm->current_state != motor_carib_state) {
+		currsmp_update(currsmp);
+		feedback_update(feedback, CONTROL_PERIOD_DT);
+	}
 	sm_dispatch(sm);
 }

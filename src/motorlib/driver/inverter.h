@@ -18,5 +18,7 @@ struct inverter {
  * @return 无
  */
 void inverter_bind_inverter(struct inverter *inverter, const struct inverter_ops *ops);
-
+void inverter_enable(struct inverter *inverter);
+void inverter_disable(struct inverter *inverter);
+void inverter_set_voltage(struct inverter *inverter, float u, float v, float w);
 #endif /* INVERTER_H */

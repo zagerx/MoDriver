@@ -87,6 +87,7 @@ enum feedback_error_code feedback_init(struct feedback *feedback);
  * @details 执行编码器读取、角度计算、速度计算
  */
 void feedback_update(struct feedback *feedback, float dt);
+void feedback_update_raw(struct feedback *feedback);
 
 /**
  * @brief 获取编码器原始值

@@ -7,7 +7,7 @@
 struct statemachine;
 struct inverter;
 struct feedback;
-
+struct currsmp;
 /**
  * @brief 电机数据结构体
  */
@@ -29,6 +29,7 @@ struct motor_config {
 struct motor {
 	struct inverter *inverter; /**< @brief 逆变器实例 */
 	struct feedback *feedback; /**< @brief 反馈实例 */
+	struct currsmp *currsmp;   /**< @brief 电流采样实例 */
 	struct statemachine *sm;   /**< @brief 状态机实例 */
 
 	struct foc foc;                    /**< @brief FOC相关数据 */

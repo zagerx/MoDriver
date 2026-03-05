@@ -16,8 +16,8 @@ struct encoder_ops {
  * @details 由Hardware层实现，通过main.c注册到motorlib
  */
 struct inverter_ops {
-	void (*enable)(void);           /**< @brief 使能逆变器 */
-	void (*disable)(void);          /**< @brief 禁用逆变器 */
+	void (*enable)(void);                           /**< @brief 使能逆变器 */
+	void (*disable)(void);                          /**< @brief 禁用逆变器 */
 	void (*set_voltage)(float u, float v, float w); /**< @brief 设置三相电压 */
 };
 
@@ -47,7 +47,16 @@ struct feedback_param {
  */
 struct motor_param_ext {
 	struct feedback_param *feedback_param; /**< @brief 反馈参数指针 */
+	struct currsmp_param *currsmp_param;   /**< @brief 电流采样参数指针 */
 	uint16_t crc_16;                       /**< @brief 参数完整性校验 */
 };
+struct currsmp_param {
+	uint16_t a_chn_offset; /**< @brief a轴电流采样通道偏移 */
+	uint16_t b_chn_offset; /**< @brief b轴电流采样通道偏移 */
+	uint16_t c_chn_offset; /**< @brief c轴电流采样通道偏移 */
 
+	float gain_phase; /**< @brief 相电流增益 */
+	float gain_i_bus; /**< @brief 母线电流增益 */
+	float gain_v_bus; /**< @brief 母线电压增益 */
+};
 #endif /* MOTOR_DRIVER_H */

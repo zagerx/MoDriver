@@ -170,7 +170,13 @@ static float feedback_calc_velocity(struct feedback *feedback, float dt, float c
 
 	return data->mech_omega_rad_s;
 }
-
+void feedback_update_raw(struct feedback *feedback)
+{
+	if (!feedback || feedback->state != FEEDBACK_STATE_OK) {
+		return;
+	}
+	feedback->data.raw = feedback_get_raw(feedback);
+}
 /**
  * @brief 更新反馈数据（编码器读取 + 角度/速度/电角度计算）
  * @param[in] feedback 反馈实例
@@ -188,8 +194,7 @@ void feedback_update(struct feedback *feedback, float dt)
 	struct feedback_data *data = &feedback->data;
 
 	/* 1. 读取原始编码器值 */
-	uint16_t raw = feedback_get_raw(feedback);
-	data->raw = raw;
+	uint16_t raw = data->raw;
 
 	/* 2. 应用零位偏移 */
 	int32_t adjusted_raw = (int32_t)raw - (int32_t)param->encoder_offset;
