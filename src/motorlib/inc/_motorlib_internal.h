@@ -4,6 +4,7 @@
 #include "motor_driver.h"
 #include "motor_error.h"
 #include "foc.h"
+#include "calibration.h"
 struct statemachine;
 struct inverter;
 struct feedback;
@@ -32,10 +33,12 @@ struct motor {
 	struct currsmp *currsmp;   /**< @brief 电流采样实例 */
 	struct statemachine *sm;   /**< @brief 状态机实例 */
 
-	struct foc foc;                    /**< @brief FOC相关数据 */
 	struct motor_data *data;           /**< @brief 数据 */
 	struct motor_config *config;       /**< @brief 配置 */
 	struct motor_param_ext *param_ext; /**< @brief 扩展参数 */
+
+	struct calibration calib; /**< @brief 校准实例 */
+	struct foc foc;           /**< @brief FOC相关数据 */
 };
 
 #endif

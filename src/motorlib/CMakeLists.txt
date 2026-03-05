@@ -7,6 +7,8 @@ target_sources(motor PRIVATE
         driver/inverter.c
         driver/feedback.c
         driver/currsmp.c
+        lib/calibration/calibration.c
+        lib/calibration/current_calibration.c
         lib/motor_state.c
         lib/svpwm.c
         lib/foc_data.c

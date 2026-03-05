@@ -1,10 +1,14 @@
 #include "statemachine.h"
-
+#include "_motorlib_internal.h"
+#include "calibration.h"
+#include "inverter.h"
+#include "motor_state.h"
 /**
  * motor_carib_state - 校准状态
  * @sm: 状态机实例
  *
- * 电机参数异常时进入的校准状态，用于参数标定
+ * 电机参数异常时进入的校准状态。
+ * 调用 calibration_task 执行校准，校准模块内部直接操作逆变器。
  */
 void motor_carib_state(struct statemachine *sm)
 {
@@ -12,15 +16,36 @@ void motor_carib_state(struct statemachine *sm)
 		CALIBRATING = USER_STATUS,
 	};
 	struct motor *motor = (struct motor *)(sm->data);
-	(void)motor;
+	enum calibration_status calib_status;
+
 	switch (sm->phase) {
 	case ENTER:
+		/* 进入校准状态 */
+		calibration_init(motor);
 		sm->phase = CALIBRATING;
 		break;
+
 	case CALIBRATING:
+		/* 调用校准任务，由校准模块自主控制逆变器等硬件 */
+		calib_status = calibration_task(motor);
+
+		/* 根据校准结果迁移状态 */
+		if (calib_status == CALIBRATION_STATUS_SUCCESS) {
+			TRAN_STATE(sm, motor_idle_state);
+		} else if (calib_status == CALIBRATION_STATUS_FAILED) {
+			/* 校准失败，可进入错误状态或回空闲 */
+			TRAN_STATE(sm, motor_idle_state);
+		}
 		break;
+
 	case EXIT:
+		/* 退出校准状态，确保逆变器禁用（安全考虑） */
+		/* 注：即使校准模块内部已禁用，这里再禁一次确保万无一失 */
+		if (motor->inverter) {
+			inverter_disable(motor->inverter);
+		}
 		break;
+
 	default:
 		break;
 	}
