@@ -41,15 +41,6 @@ struct feedback_param {
 	uint16_t encoder_resolution; /**< @brief 编码器分辨率（CPR） */
 	uint16_t encoder_offset;     /**< @brief 编码器零位偏移 */
 };
-
-/**
- * @brief 电机扩展参数结构体
- */
-struct motor_param_ext {
-	struct feedback_param *feedback_param; /**< @brief 反馈参数指针 */
-	struct currsmp_param *currsmp_param;   /**< @brief 电流采样参数指针 */
-	uint16_t crc_16;                       /**< @brief 参数完整性校验 */
-};
 struct currsmp_param {
 	uint16_t a_chn_offset; /**< @brief a轴电流采样通道偏移 */
 	uint16_t b_chn_offset; /**< @brief b轴电流采样通道偏移 */
@@ -59,4 +50,13 @@ struct currsmp_param {
 	float gain_i_bus; /**< @brief 母线电流增益 */
 	float gain_v_bus; /**< @brief 母线电压增益 */
 };
+/**
+ * @brief 电机扩展参数结构体
+ */
+struct motor_param_ext {
+	struct feedback_param *feedback_param; /**< @brief 反馈参数指针 */
+	struct currsmp_param *currsmp_param;   /**< @brief 电流采样参数指针 */
+	uint16_t crc_16;                       /**< @brief 参数完整性校验 */
+};
+
 #endif /* MOTOR_DRIVER_H */

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "current_calibration.h"
+#include "encoder_calibration.h"
 
 /* 校准状态 */
 enum calibration_status {
@@ -13,14 +14,22 @@ enum calibration_status {
 	CALIBRATION_STATUS_FAILED       /* 校准失败 */
 };
 
+/* 编码器校准阶段 */
+enum encoder_calib_phase {
+	ENCODER_PHASE_INIT = 0,
+	ENCODER_PHASE_RUNNING,
+	ENCODER_PHASE_FINISH
+};
+
 /* 总校准对象（嵌入在 motor 中） */
 struct calibration {
 	enum calibration_status status;
 	enum current_calib_state curr_state;  /* 电流校准阶段状态 */
+	enum encoder_calib_phase enc_phase;   /* 编码器校准阶段 */
 
 	/* 子校准对象 */
 	struct current_calib current;         /* 电流校准数据 */
-	/* 后续添加: struct encoder_calib encoder; */
+	struct encoder_calib encoder;         /* 编码器校准数据 */
 };
 
 struct motor;

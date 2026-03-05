@@ -21,15 +21,26 @@ static const struct motor_hw_ops m1_hw_ops = {
 	.inverter = &m1_inverter_ops,
 };
 static struct feedback_param m1_feedback_param = {
-	.wheel_radius = 0.05f,      // 轮子半径 5cm
-	.gear_ratio = 10.0f,        // 减速比 10:1
-	.pole_pairs = 7.0f,         // 极对数 7
-	.direction = 1.0f,          // 正向旋转
-	.encoder_resolution = 4096, // 编码器分辨率 4096 CPR
-	.encoder_offset = 0,        // 编码器零位偏移
+	0
+	// .wheel_radius = 0.05f,      // 轮子半径 5cm
+	// .gear_ratio = 10.0f,        // 减速比 10:1
+	// .pole_pairs = 7.0f,         // 极对数 7
+	// .direction = 1.0f,          // 正向旋转
+	// .encoder_resolution = 4096, // 编码器分辨率 4096 CPR
+	// .encoder_offset = 0,        // 编码器零位偏移
+};
+static struct currsmp_param m1_currsmp_param = {
+	0
+	// .a_chn_offset = 2048, // A相ADC通道偏移
+	// .b_chn_offset = 2048, // B相ADC通道偏移
+	// .c_chn_offset = 2048, // C相ADC通道偏移
+	// .gain_phase = 0.01f,  // 电流采样增益（A/LSB）
+	// .gain_i_bus = 0.01f,  // 母线电流采样增益（A/LSB）
+	// .gain_v_bus = 0.01f,  // 母线电压采样增益（V/LSB）
 };
 static struct motor_param_ext m1_param_ext = {
 	.feedback_param = &m1_feedback_param,
+	.currsmp_param = &m1_currsmp_param,
 };
 int main(void)
 {
@@ -59,7 +70,7 @@ int main(void)
 }
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-	volatile uint32_t raw_uvw[5];
+	volatile uint16_t raw_uvw[5];
 	if (hadc->Instance == ADC1) {
 		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
 		raw_uvw[1] = (uint32_t)(hadc2.Instance->JDR1);

@@ -79,7 +79,7 @@ static int16_t motor_param_check(struct motor *motor)
 	//     return -20; /* CRC 校验失败 */
 	// }
 	(void)param_ext->crc_16;
-	return 0;
+	return -1;
 }
 
 /**

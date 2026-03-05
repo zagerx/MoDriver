@@ -134,6 +134,7 @@ void MX_ADC2_Init(void)
 	/* USER CODE END ADC2_Init 0 */
 
 	ADC_InjectionConfTypeDef sConfigInjected = {0};
+	ADC_ChannelConfTypeDef sConfig = {0};
 
 	/* USER CODE BEGIN ADC2_Init 1 */
 
@@ -173,6 +174,18 @@ void MX_ADC2_Init(void)
 	sConfigInjected.QueueInjectedContext = DISABLE;
 	sConfigInjected.InjecOversamplingMode = DISABLE;
 	if (HAL_ADCEx_InjectedConfigChannel(&hadc2, &sConfigInjected) != HAL_OK) {
+		Error_Handler();
+	}
+
+	/** Configure Regular Channel
+	 */
+	sConfig.Channel = ADC_CHANNEL_1;
+	sConfig.Rank = ADC_REGULAR_RANK_1;
+	sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+	sConfig.SingleDiff = ADC_SINGLE_ENDED;
+	sConfig.OffsetNumber = ADC_OFFSET_NONE;
+	sConfig.Offset = 0;
+	if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK) {
 		Error_Handler();
 	}
 	/* USER CODE BEGIN ADC2_Init 2 */
