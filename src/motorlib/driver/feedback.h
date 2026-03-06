@@ -21,12 +21,12 @@ struct feedback_output {
  * @brief 反馈原始数据与中间计算数据结构体
  */
 struct feedback_data {
-	uint16_t raw;                 /**< @brief 原始编码器读数 */
-	uint16_t prev_raw;            /**< @brief 上一次原始读数（用于差分） */
-	int32_t total_counts;         /**< @brief 累积计数（考虑溢出） */
-	float accumulated_mangle_rad; /**< @brief 累积机械角度 rad */
-	float prev_mangle_rad;        /**< @brief 上一次机械角度（用于速度差分） */
-	float mech_omega_rad_s;       /**< @brief 机械角速度 rad/s */
+	volatile uint16_t raw;                 /**< @brief 原始编码器读数 */
+	volatile uint16_t prev_raw;            /**< @brief 上一次原始读数（用于差分） */
+	volatile int32_t total_counts;         /**< @brief 累积计数（考虑溢出） */
+	volatile float accumulated_mangle_rad; /**< @brief 累积机械角度 rad */
+	volatile float prev_mangle_rad;        /**< @brief 上一次机械角度（用于速度差分） */
+	volatile float mech_omega_rad_s;       /**< @brief 机械角速度 rad/s */
 };
 
 /** @brief 反馈状态枚举 */

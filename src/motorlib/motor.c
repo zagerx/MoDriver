@@ -9,11 +9,12 @@
 #include <stdint.h>
 #include "motor_state.h"
 #include "foc.h"
+#include "motorlib_control_param.h"
 #undef NULL
 #define NULL (0)
 
 /** @brief 控制周期 100us (10kHz) */
-#define CONTROL_PERIOD_DT 0.0001f
+// #define CONTROL_PERIOD_DT 0.0001f
 
 /**
  * @brief 绑定硬件接口
@@ -97,8 +98,10 @@ void motor_init(struct motor *motor)
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
 	}
 	struct feedback *fb = motor->feedback;
+	struct currsmp *currsmp = motor->currsmp;
 	struct foc *foc = &motor->foc;
-	foc_bind(foc, &fb->output);
+
+	foc_bind(foc, &fb->output, &currsmp->output);
 }
 
 /**
@@ -124,6 +127,9 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 	if (sm->current_state != motor_carib_state) {
 		currsmp_update(currsmp);
 		feedback_update(feedback, CONTROL_PERIOD_DT);
+		foc_update_idiq(&motor->foc);
+	} else {
+		currsmp_update_bus(currsmp);
 	}
 	sm_dispatch(sm);
 }

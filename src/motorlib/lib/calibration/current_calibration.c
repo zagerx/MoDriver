@@ -4,7 +4,7 @@
 #include "currsmp.h"
 #include "inverter.h"
 
-#define CURRENT_CALIB_DEFAULT_SAMPLES  1000u
+#define CURRENT_CALIB_DEFAULT_SAMPLES 1000u
 
 void current_calib_init(struct motor *motor, uint16_t samples)
 {

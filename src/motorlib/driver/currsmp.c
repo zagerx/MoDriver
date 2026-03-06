@@ -49,3 +49,11 @@ void currsmp_update(struct currsmp *currsmp)
 	currsmp->output.i_bus = (currsmp->input.i_bus_raw) * currsmp->param->gain_i_bus;
 	currsmp->output.v_bus = (currsmp->input.v_bus_raw) * currsmp->param->gain_v_bus;
 }
+void currsmp_update_bus(struct currsmp *currsmp)
+{
+	if (!currsmp) {
+		return;
+	}
+	currsmp->output.v_bus = (currsmp->input.v_bus_raw) * currsmp->param->gain_v_bus;
+	currsmp->output.i_bus = (currsmp->input.i_bus_raw) * currsmp->param->gain_i_bus;
+}

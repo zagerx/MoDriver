@@ -3,6 +3,8 @@
 #include "calibration.h"
 #include "inverter.h"
 #include "motor_state.h"
+void motor_openloop_encoder_state(struct statemachine *sm);
+
 /**
  * motor_carib_state - 校准状态
  * @sm: 状态机实例
@@ -31,7 +33,7 @@ void motor_carib_state(struct statemachine *sm)
 
 		/* 根据校准结果迁移状态 */
 		if (calib_status == CALIBRATION_STATUS_SUCCESS) {
-			TRAN_STATE(sm, motor_idle_state);
+			TRAN_STATE(sm, motor_openloop_encoder_state);
 		} else if (calib_status == CALIBRATION_STATUS_FAILED) {
 			/* 校准失败 */
 			TRAN_STATE(sm, motor_init_state);
@@ -120,6 +122,29 @@ void motor_runing_state(struct statemachine *sm)
 	case RUNING:
 		break;
 	case EXIT:
+		break;
+	default:
+		break;
+	}
+}
+void motor_openloop_encoder_state(struct statemachine *sm)
+{
+	enum {
+		RUNING = USER_STATUS,
+	};
+	struct motor *motor = (struct motor *)(sm->data);
+	struct inverter *inverter = motor->inverter;
+	// struct feedback *feedback = motor->feedback;
+	switch (sm->phase) {
+	case ENTER:
+		inverter_enable(inverter);
+		sm->phase = RUNING;
+		break;
+	case RUNING:
+		open_loop_encoder(motor, 0.4f); // 施加0V保持静止，读取编码器反馈
+		break;
+	case EXIT:
+		inverter_disable(inverter);
 		break;
 	default:
 		break;

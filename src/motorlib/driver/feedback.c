@@ -3,7 +3,7 @@
 #include <math.h>
 
 /** @brief 低通滤波系数（0~1，越大响应越快） */
-#define VELOCITY_LPF_ALPHA 0.08f
+#define VELOCITY_LPF_ALPHA 0.8f
 
 /**
  * @brief 角度归一化到 [0, 2PI]
@@ -91,11 +91,13 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
 /**
  * @brief 计算累积机械角度，处理编码器溢出
  * @param[in] feedback 反馈实例
- * @param[in] adjusted_raw 偏移校正后的编码器读数
+ * @param[in] raw 原始编码器读数
+ * @param[in] adjusted_raw 偏移校正后的编码器读数（未使用，保留用于接口兼容）
  * @return 无
  * @details 检测越过CPR边界的溢出并计算累积机械角度
+ * @note 使用原始值计算差分，偏移量在角度计算时处理，避免负数存入uint16_t
  */
-static void feedback_calc_accumulated_mangle(struct feedback *feedback, int32_t adjusted_raw)
+static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t raw, int32_t adjusted_raw)
 {
 	struct feedback_param *param = feedback->param;
 	struct feedback_data *data = &feedback->data;
@@ -103,8 +105,8 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, int32_t 
 	const float two_pi = 2.0f * M_PI;
 	const int32_t cpr = (int32_t)param->encoder_resolution;
 
-	/* 计算原始差值（带溢出处理） */
-	int32_t delta = (int32_t)adjusted_raw - (int32_t)data->prev_raw;
+	/* 计算原始差值（使用原始值，偏移在差分中抵消） */
+	int32_t delta = (int32_t)raw - (int32_t)data->prev_raw;
 
 	/* 处理越过CPR边界的溢出 */
 	if (delta > cpr / 2) {
@@ -113,13 +115,17 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, int32_t 
 		delta += cpr;
 	}
 
-	/* 更新累积计数和机械角度 */
+	/* 更新累积计数 */
 	data->total_counts += delta;
+	
+	/* 计算累积机械角度（考虑编码器零位偏移） */
 	data->accumulated_mangle_rad =
-		(two_pi / (float)cpr) * (float)data->total_counts * param->direction;
+		(two_pi / (float)cpr) * (float)(data->total_counts - (int32_t)param->encoder_offset) * param->direction;
 
-	/* 保存当前值供下次使用 */
-	data->prev_raw = (uint16_t)adjusted_raw;
+	/* 保存原始值供下次使用（避免负数存入uint16_t导致的抖动问题） */
+	data->prev_raw = raw;
+	
+	(void)adjusted_raw; /* 显式标记未使用，避免编译器警告 */
 }
 
 /**
@@ -200,7 +206,7 @@ void feedback_update(struct feedback *feedback, float dt)
 	int32_t adjusted_raw = (int32_t)raw - (int32_t)param->encoder_offset;
 
 	/* 3. 计算累积机械角度（处理溢出） */
-	feedback_calc_accumulated_mangle(feedback, adjusted_raw);
+	feedback_calc_accumulated_mangle(feedback, raw, adjusted_raw);
 	float cur_mangle = data->accumulated_mangle_rad;
 
 	/* 4. 计算电角度 */

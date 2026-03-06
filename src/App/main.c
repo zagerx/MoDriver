@@ -30,13 +30,12 @@ static struct feedback_param m1_feedback_param = {
 	// .encoder_offset = 0,        // 编码器零位偏移
 };
 static struct currsmp_param m1_currsmp_param = {
-	0
 	// .a_chn_offset = 2048, // A相ADC通道偏移
 	// .b_chn_offset = 2048, // B相ADC通道偏移
 	// .c_chn_offset = 2048, // C相ADC通道偏移
-	// .gain_phase = 0.01f,  // 电流采样增益（A/LSB）
-	// .gain_i_bus = 0.01f,  // 母线电流采样增益（A/LSB）
-	// .gain_v_bus = 0.01f,  // 母线电压采样增益（V/LSB）
+	.gain_phase = 0.006011f,  // 电流采样增益（A/LSB）
+	.gain_i_bus = 0.01f,      // 母线电流采样增益（A/LSB）
+	.gain_v_bus = 0.0112793f, // 母线电压采样增益（V/LSB） 130V(130+10)
 };
 static struct motor_param_ext m1_param_ext = {
 	.feedback_param = &m1_feedback_param,
@@ -73,10 +72,10 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 	volatile uint16_t raw_uvw[5];
 	if (hadc->Instance == ADC1) {
 		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
-		raw_uvw[1] = (uint32_t)(hadc2.Instance->JDR1);
-		raw_uvw[2] = (uint32_t)(hadc->Instance->JDR2);
-		raw_uvw[3] = (uint32_t)(hadc->Instance->DR);
-		raw_uvw[4] = 0;
+		raw_uvw[1] = (uint32_t)(hadc->Instance->JDR2);
+		raw_uvw[2] = (uint32_t)(hadc2.Instance->JDR1);
+		raw_uvw[4] = (uint32_t)(hadc->Instance->DR);
+		raw_uvw[3] = 0;
 		motor_highfreq_task(motor_1, (uint16_t *)raw_uvw);
 	}
 }

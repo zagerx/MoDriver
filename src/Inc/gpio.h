@@ -32,7 +32,6 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
-#define M_TIM_ARR           8400
 #define LED_RUN_Pin         GPIO_PIN_14
 #define LED_RUN_GPIO_Port   GPIOC
 #define LED01_Pin           GPIO_PIN_15

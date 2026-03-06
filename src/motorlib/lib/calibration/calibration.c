@@ -100,7 +100,6 @@ enum calibration_status calibration_task(struct motor *motor)
 
 	switch (calib->status) {
 	case CALIBRATION_STATUS_IDLE:
-		calibration_init(motor);
 		calib->status = CALIBRATION_STATUS_CURRENT;
 		break;
 

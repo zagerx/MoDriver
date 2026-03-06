@@ -65,6 +65,13 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     # Add user defined libraries
 )
 
+# 配置 motorlib_cfg.h 的路径（可由用户通过 -DMOTORLIB_CFG_PATH=... 覆盖）
+if(NOT DEFINED MOTORLIB_PARAMCONFIG_PATH)
+    set(MOTORLIB_PARAMCONFIG_PATH ${CMAKE_SOURCE_DIR}/App)
+endif()
+get_filename_component(MOTORLIB_PARAMCONFIG_PATH "${MOTORLIB_PARAMCONFIG_PATH}" ABSOLUTE)
+message(STATUS "motorlib_cfg.h path: ${MOTORLIB_PARAMCONFIG_PATH}")
+
 # 增加hardware_driver目标
 add_subdirectory(Hardware)
 add_subdirectory(motorlib)

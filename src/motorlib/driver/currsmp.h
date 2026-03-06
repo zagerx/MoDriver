@@ -32,6 +32,8 @@ struct currsmp {
 void currsmp_bind_param(struct currsmp *currsmp, struct currsmp_param *param);
 void currsmp_update_raw(struct currsmp *currsmp, uint16_t *adc_raw);
 void currsmp_update(struct currsmp *currsmp);
+void currsmp_update_bus(struct currsmp *currsmp);
+
 static inline void currsmp_get_output(struct currsmp *currsmp, struct currsmp_output *output)
 {
 	if (!currsmp || !output) {

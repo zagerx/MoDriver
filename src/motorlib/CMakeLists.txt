@@ -23,6 +23,7 @@ target_include_directories(motor PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/calibration
         ${CMAKE_CURRENT_SOURCE_DIR}/inc
+        ${MOTORLIB_PARAMCONFIG_PATH}
 )
 
 target_include_directories(motor PUBLIC
