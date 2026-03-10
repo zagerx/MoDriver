@@ -5,6 +5,12 @@
 #include "inverter.h"
 #include <stdint.h>
 
+/**
+ * @brief 初始化校准模块
+ * @param[in] motor 电机实例
+ * @return 无
+ * @details 重置校准状态，准备开始校准流程
+ */
 void calibration_init(struct motor *motor)
 {
 	struct calibration *calib;
@@ -88,6 +94,13 @@ static int16_t encoder_phase_handle(struct motor *motor)
 	return ret;
 }
 
+/**
+ * @brief 校准任务主入口
+ * @param[in] motor 电机实例
+ * @return 当前校准状态
+ * @note 应在主循环中周期性调用
+ * @details 按顺序执行电流校准和编码器校准
+ */
 enum calibration_status calibration_task(struct motor *motor)
 {
 	struct calibration *calib;

@@ -10,12 +10,25 @@
 #include "arm_math.h"
 #undef RAD_TO_DEG
 #define RAD_TO_DEG (180.0f / M_PI)
+/**
+ * @brief 绑定FOC数据源
+ * @param[in] foc FOC实例
+ * @param[in] fb_out 反馈输出数据
+ * @param[in] currsmp_out 电流采样输出数据
+ * @return 无
+ */
 void foc_bind(struct foc *foc, struct feedback_output *fb_out, struct currsmp_output *currsmp_out)
 {
 	if (foc) {
 		foc_data_bind(&foc->data, fb_out, currsmp_out);
 	}
 }
+/**
+ * @brief 更新id/iq电流
+ * @param[in] foc FOC实例
+ * @return 无
+ * @details 使用Clarke和Park变换计算d/q轴电流
+ */
 void foc_update_idiq(struct foc *foc)
 {
 	if (!foc) {
@@ -36,6 +49,14 @@ void foc_update_idiq(struct foc *foc)
 	arm_sin_cos_f32(eangle * RAD_TO_DEG, &sin_val, &cos_val);
 	arm_park_f32(meas->i_alpha, meas->i_beta, &meas->i_d, &meas->i_q, sin_val, cos_val);
 }
+/**
+ * @brief 开环强制对齐（固定角度）
+ * @param[in] motor 电机实例
+ * @param[in] d_axis_voltage d轴电压
+ * @param[in] eangle 电角度
+ * @return 无
+ * @details 输出固定电角度的d轴电压，用于电机初始对齐
+ */
 void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eangle)
 {
 	if (!motor) {
@@ -52,6 +73,15 @@ void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eang
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }
 
+/**
+ * @brief 开环强制拖动（角速度控制）
+ * @param[in] motor 电机实例
+ * @param[in] dt 时间间隔
+ * @param[in] d_axis_voltage d轴电压
+ * @param[in] omega 角速度
+ * @return 无
+ * @details 根据角速度积分更新电角度，输出对应电压
+ */
 void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, float omega)
 {
 	if (!motor) {
@@ -69,6 +99,11 @@ void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, f
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }
 
+/**
+ * @brief 获取开环强制角度
+ * @param[in] motor 电机实例
+ * @return 当前电角度
+ */
 float open_loop_get_force_angle(struct motor *motor)
 {
 	if (!motor) {
@@ -77,6 +112,13 @@ float open_loop_get_force_angle(struct motor *motor)
 	return motor->foc.data.self_eangle;
 }
 
+/**
+ * @brief 开环编码器模式（使用编码器反馈）
+ * @param[in] motor 电机实例
+ * @param[in] q_axis_voltage q轴电压
+ * @return 无
+ * @details 使用编码器反馈的电角度，输出q轴电压
+ */
 void open_loop_encoder(struct motor *motor, float q_axis_voltage)
 {
 	if (!motor) {

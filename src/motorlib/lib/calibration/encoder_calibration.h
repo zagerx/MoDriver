@@ -26,15 +26,28 @@ enum encoder_calib_state {
 	ENC_CALIB_ERROR
 };
 
-/* 初始化编码器校准 */
+/**
+ * @brief 初始化编码器校准
+ * @param[in] motor 电机实例
+ * @return 无
+ * @details 重置校准状态，禁用逆变器，准备开始校准
+ */
 void encoder_calib_init(struct motor *motor);
 
-/* 执行一次编码器校准步进（10kHz调用）
- * @return true-完成, false-继续
+/**
+ * @brief 执行一次编码器校准步进
+ * @param[in] motor 电机实例
+ * @return true 校准完成，false 需要继续执行
+ * @note 应在10kHz高频任务中周期性调用
  */
 bool encoder_calib_run(struct motor *motor);
 
-/* 应用结果到 feedback（极对数、方向、偏置） */
+/**
+ * @brief 应用编码器校准结果
+ * @param[in] motor 电机实例
+ * @return 无
+ * @note 结果已在校准过程中实时应用，此函数保留用于后续扩展
+ */
 void encoder_calib_apply(struct motor *motor);
 
 #endif

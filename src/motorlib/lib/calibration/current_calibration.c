@@ -6,6 +6,13 @@
 
 #define CURRENT_CALIB_DEFAULT_SAMPLES 1000u
 
+/**
+ * @brief 初始化电流校准
+ * @param[in] motor 电机实例
+ * @param[in] samples 目标采样数（0表示使用默认值）
+ * @return 无
+ * @details 禁用逆变器，清零累加器，准备电流采样
+ */
 void current_calib_init(struct motor *motor, uint16_t samples)
 {
 	struct current_calib *curr;
@@ -29,6 +36,12 @@ void current_calib_init(struct motor *motor, uint16_t samples)
 	}
 }
 
+/**
+ * @brief 执行一次电流采样
+ * @param[in] motor 电机实例
+ * @return true 校准完成，false 需要继续采样
+ * @note 应在高频任务中周期性调用
+ */
 bool current_calib_run(struct motor *motor)
 {
 	struct current_calib *curr;
@@ -49,6 +62,12 @@ bool current_calib_run(struct motor *motor)
 	return (curr->sample_cnt >= curr->target_samples);
 }
 
+/**
+ * @brief 应用电流校准结果
+ * @param[in] motor 电机实例
+ * @return 无
+ * @details 计算平均ADC值并设置为电流采样偏移量
+ */
 void current_calib_apply(struct motor *motor)
 {
 	struct current_calib *curr;
