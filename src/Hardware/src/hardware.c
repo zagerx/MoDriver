@@ -5,6 +5,7 @@
 #include "usart.h"
 #include "adc.h"
 #include "tim.h"
+#include "dma.h"
 static void SystemClock_Config(void);
 static void Error_Handler(void);
 
@@ -13,12 +14,13 @@ void hardware_init(void)
 	HAL_Init();
 	SystemClock_Config();
 	MX_GPIO_Init();
-	MX_FDCAN2_Init();
-	MX_TIM6_Init();
-	MX_USART1_UART_Init();
+	MX_DMA_Init();
 	MX_ADC1_Init();
 	MX_ADC2_Init();
 	MX_TIM1_Init();
+	MX_FDCAN2_Init();
+	MX_TIM6_Init();
+	MX_USART1_UART_Init();
 	MX_SPI1_Init();
 }
 
