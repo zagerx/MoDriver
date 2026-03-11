@@ -84,6 +84,7 @@ add_subdirectory(statemachine)
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     App/main.c
+    App/it.c
 )
 
 # 工程依赖

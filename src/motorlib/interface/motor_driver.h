@@ -56,9 +56,10 @@ typedef struct trajectory_param {
 } trajectory_param_t;
 
 struct foc_pid_param {
-	float kp; /**< @brief 比例增益 */
-	float ki; /**< @brief 积分增益 */
-	float kd; /**< @brief 微分增益 */
+	float kp;    /**< @brief 比例增益 */
+	float ki;    /**< @brief 积分增益 */
+	float kd;    /**< @brief 微分增益 */
+	float limit; /**< @brief 输出限幅 */
 };
 
 struct foc_param {

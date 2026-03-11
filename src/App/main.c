@@ -5,6 +5,7 @@
 #include "motor.h"
 #include "motor_driver.h"
 #include "stm32g4xx_hal.h"
+#include "motorlib_control_param.h"
 /* 电机1硬件接口定义 */
 static const struct encoder_ops m1_encoder_ops = {
 	.read = encoder_getraw,
@@ -20,28 +21,8 @@ static const struct motor_hw_ops m1_hw_ops = {
 	.encoder = &m1_encoder_ops,
 	.inverter = &m1_inverter_ops,
 };
-static struct feedback_param m1_feedback_param = {
-	0
-	// .wheel_radius = 0.05f,      // 轮子半径 5cm
-	// .gear_ratio = 10.0f,        // 减速比 10:1
-	// .pole_pairs = 7.0f,         // 极对数 7
-	// .direction = 1.0f,          // 正向旋转
-	// .encoder_resolution = 4096, // 编码器分辨率 4096 CPR
-	// .encoder_offset = 0,        // 编码器零位偏移
-};
-static struct currsmp_param m1_currsmp_param = {
-	// .a_chn_offset = 2048, // A相ADC通道偏移
-	// .b_chn_offset = 2048, // B相ADC通道偏移
-	// .c_chn_offset = 2048, // C相ADC通道偏移
-	.gain_phase = 0.006011f,  // 电流采样增益（A/LSB）
-	.gain_i_bus = 0.01f,      // 母线电流采样增益（A/LSB）
-	.gain_v_bus = 0.0112793f, // 母线电压采样增益（V/LSB） 130V(130+10)
-};
-static struct trajectory_param m1_traj_param = {
-	.acc_max = 10.0f, // 最大加速度 10 m/s^2
-	.vmax = 5.0f,     // 最大速度 5 m/s
-};
-static struct motor_param_ext m1_param_ext = {
+
+struct motor_param_ext m1_param_ext = {
 	.feedback_param = {0},
 	.currsmp_param =
 		{
@@ -56,10 +37,14 @@ static struct motor_param_ext m1_param_ext = {
 		},
 	.foc_param =
 		{
-			.d_axis = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f},
-			.q_axis = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f},
-			.vel = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f},
-			.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f},
+			.d_axis = {.kp = CURRMENT_LOOP_KP,
+				   .ki = CURRMENT_LOOP_KI,
+				   .kd = 0.0f,
+				   .limit = CURRMENT_LOOP_LIMIT},
+			.q_axis =
+				{.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = CURRMENT_LOOP_LIMIT},
+			.vel = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = 100.0f},
+			.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = 100.0f},
 			.target_pos = 0.0f,
 			.target_vel = 0.0f,
 			.target_torque = 0.0f,

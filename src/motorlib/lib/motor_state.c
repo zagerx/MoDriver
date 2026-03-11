@@ -3,6 +3,7 @@
 #include "calibration.h"
 #include "inverter.h"
 #include "motor_state.h"
+#include <stdint.h>
 void motor_openloop_encoder_state(struct statemachine *sm);
 
 /**
@@ -134,14 +135,27 @@ void motor_openloop_encoder_state(struct statemachine *sm)
 	};
 	struct motor *motor = (struct motor *)(sm->data);
 	struct inverter *inverter = motor->inverter;
+	static float target;
 	// struct feedback *feedback = motor->feedback;
+	static uint32_t debug_cnt = 0;
+
 	switch (sm->phase) {
 	case ENTER:
 		inverter_enable(inverter);
+		target = 1.0f;
 		sm->phase = RUNING;
 		break;
 	case RUNING:
-		open_loop_encoder(motor, 0.4f); // 施加0V保持静止，读取编码器反馈
+		// motor->param_ext->foc_param.target_pos = -motor->param_ext->foc_param.target_pos;
+		// target = motor->param_ext->foc_param.target_pos;
+		// open_loop_encoder(motor, target); // 施加0V保持静止，读取编码器反馈
+		if (++debug_cnt % 50000 == 0) {
+			debug_cnt = 0;
+			target = -target;                            // 反转目标位置
+			foc_pid_reset(&motor->foc.data.ctrl.d_axis); // 重置PID控制器状态
+		}
+		currment_debug(motor, target);
+
 		break;
 	case EXIT:
 		inverter_disable(inverter);

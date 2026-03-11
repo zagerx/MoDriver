@@ -30,7 +30,7 @@ static void Error_Handler(void)
 	}
 	/* USER CODE END Error_Handler_Debug */
 }
-static uint8_t sg_uartreceive_buff[125];
+uint8_t sg_uartreceive_buff[125];
 
 /* USER CODE END 0 */
 
@@ -165,18 +165,5 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void USER_UART_IRQHandler(UART_HandleTypeDef *huart)
-{
-	if (USART1 == huart->Instance) {
-		if (RESET != __HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE)) {
-			__HAL_UART_CLEAR_IDLEFLAG(huart);
-			HAL_UART_DMAStop(huart);
-			volatile unsigned short data_length =
-				sizeof(sg_uartreceive_buff) - __HAL_DMA_GET_COUNTER(huart->hdmarx);
-			// memset(sg_uartreceive_buff, 0, 125);
-			HAL_UART_Receive_DMA(huart, (uint8_t *)sg_uartreceive_buff,
-					     sizeof(sg_uartreceive_buff));
-		}
-	}
-}
+
 /* USER CODE END 1 */

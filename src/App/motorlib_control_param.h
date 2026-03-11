@@ -28,4 +28,7 @@
 #define ROTATE_TIMEOUT_TICKS                                                                       \
 	((uint32_t)(ROTATE_TIMEOUT / (CONTROL_PERIOD_DT * 1000.0f))) /* 3000ms / 0.1ms = 30000 */
 
-#endif /* MOTORLIB_CONTROL_PARAM_H */
+#define CURRMENT_LOOP_KP    (0.4f)   /* 电流环P增益 */
+#define CURRMENT_LOOP_KI    (400.0f) /* 电流环I增益 */
+#define CURRMENT_LOOP_LIMIT (13.0f)  /* 电流调试输出间隔，单位为控制周期数 */
+#endif                               /* MOTORLIB_CONTROL_PARAM_H */

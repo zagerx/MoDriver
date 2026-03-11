@@ -3,11 +3,13 @@
 #include "foc.h"
 
 #include "foc_data.h"
+#include "foc_pid.h"
 #include "inverter.h"
 #include "feedback.h"
 #include "currsmp.h"
 #include "svpwm.h"
 #include "arm_math.h"
+#include "motorlib_control_param.h"
 #undef RAD_TO_DEG
 #define RAD_TO_DEG (180.0f / M_PI)
 /**
@@ -17,10 +19,13 @@
  * @param[in] currsmp_out 电流采样输出数据
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback_output *feeback, struct currsmp_output *currsmp_out)
+void foc_bind(struct foc *foc, struct feedback_output *feeback, struct currsmp_output *currsmp_out,
+	      struct foc_pid_param *d_axis_pid_param, struct foc_pid_param *q_axis_pid_param,
+	      struct foc_pid_param *vel_pid_param, struct foc_pid_param *pos_pid_param)
 {
 	if (foc) {
-		foc_data_bind(&foc->data, feeback, currsmp_out);
+		foc_data_bind(&foc->data, feeback, currsmp_out, d_axis_pid_param, q_axis_pid_param,
+			      vel_pid_param, pos_pid_param);
 	}
 }
 /**
@@ -135,6 +140,29 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage)
 	float vbus = meas->currsmp->v_bus;
 	svpwm_limit_voltage(vbus, &ud, &q_axis_voltage);
 	svpwm_normalize(eangle, vbus, ud, q_axis_voltage, &ualpha, &ubeta);
+	svpwm_calc_duty(ualpha, ubeta, duty);
+	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
+}
+void currment_debug(struct motor *motor, float tar)
+{
+	if (!motor) {
+		return;
+	}
+	struct feedback *feedback = motor->feedback;
+	float eangle = feedback_get_elec_angle(feedback);
+	float ud, uq; // d轴电压为0，保持固定角度
+	float ualpha, ubeta;
+	float duty[3];
+
+	struct foc_data *foc_data = &motor->foc.data;
+	struct foc_measurement *meas = &foc_data->meas;
+	float vbus = meas->currsmp->v_bus;
+
+	ud = foc_currentloop_pid_run(&foc_data->ctrl.d_axis, tar, meas->i_d, CONTROL_PERIOD_DT);
+	uq = 0.0f;
+	svpwm_limit_voltage(vbus, &ud, &uq);
+	foc_currentpid_saturation(&foc_data->ctrl.d_axis, ud, ud);
+	svpwm_normalize(eangle, vbus, ud, uq, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }

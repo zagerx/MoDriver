@@ -47,6 +47,7 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
 	if (!motor || !param_ext) {
 		return;
 	}
+	motor->param_ext = param_ext;
 	feedback_bind_encoder_param(motor->feedback, &param_ext->feedback_param);
 	currsmp_bind_param(motor->currsmp, &param_ext->currsmp_param);
 	trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param);
@@ -99,7 +100,9 @@ void motor_init(struct motor *motor)
 	struct currsmp *currsmp = motor->currsmp;
 	struct foc *foc = &motor->foc;
 
-	foc_bind(foc, &fb->output, &currsmp->output);
+	foc_bind(foc, &fb->output, &currsmp->output, &motor->param_ext->foc_param.d_axis,
+		 &motor->param_ext->foc_param.q_axis, &motor->param_ext->foc_param.vel,
+		 &motor->param_ext->foc_param.pos);
 }
 
 /**

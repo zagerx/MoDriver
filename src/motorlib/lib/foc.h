@@ -12,7 +12,9 @@ struct foc {
  * @param[in] currsmp_out 电流采样输出数据
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback_output *feeback, struct currsmp_output *currsmp_out);
+void foc_bind(struct foc *foc, struct feedback_output *feeback, struct currsmp_output *currsmp_out,
+	      struct foc_pid_param *d_axis_pid_param, struct foc_pid_param *q_axis_pid_param,
+	      struct foc_pid_param *vel_pid_param, struct foc_pid_param *pos_pid_param);
 /**
  * @brief 开环强制对齐（固定角度）
  * @param[in] motor 电机实例
@@ -49,5 +51,6 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage);
  * @return 无
  */
 void foc_update_idiq(struct foc *foc);
+void currment_debug(struct motor *motor, float tar);
 
 #endif
