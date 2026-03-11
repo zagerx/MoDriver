@@ -12,6 +12,9 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
 
+# 将特定警告设置为错误（全局生效）
+add_compile_options(-Werror=implicit-int)
+
 
 # Define the build type
 if(NOT CMAKE_BUILD_TYPE)

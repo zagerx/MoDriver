@@ -10,6 +10,7 @@ target_sources(motor PRIVATE
         lib/calibration/calibration.c
         lib/calibration/current_calibration.c
         lib/calibration/encoder_calibration.c
+        lib/trajectory_plan.c
         lib/motor_state.c
         lib/svpwm.c
         lib/foc_data.c

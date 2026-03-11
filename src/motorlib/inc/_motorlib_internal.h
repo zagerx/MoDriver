@@ -5,6 +5,7 @@
 #include "motor_error.h"
 #include "foc.h"
 #include "calibration.h"
+#include "trajectory_plan.h"
 struct statemachine;
 struct inverter;
 struct feedback;
@@ -37,8 +38,9 @@ struct motor {
 	struct motor_config *config;       /**< @brief 配置 */
 	struct motor_param_ext *param_ext; /**< @brief 扩展参数 */
 
-	struct calibration calib; /**< @brief 校准实例 */
-	struct foc foc;           /**< @brief FOC相关数据 */
+	struct calibration calib;         /**< @brief 校准实例 */
+	struct trajectory_plan traj_plan; /**< @brief 轨迹规划实例 */
+	struct foc foc;                   /**< @brief FOC相关数据 */
 };
 
 #endif

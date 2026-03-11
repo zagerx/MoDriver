@@ -165,117 +165,6 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle)
 }
 
 /* USER CODE BEGIN 1 */
-enum foc_data_index {
-	INDEX_ID_REF = 0,
-	INDEX_IQ_REF,
-	INDEX_VELOCITY_REG,
-
-	INDEX_POSITION_TAR,
-	INDEX_D_PI,
-	INDEX_Q_PI,
-	INDEX_VELOCITY_PI,
-	INDEX_VP_PI,
-};
-
-// 命令映射表结构
-typedef struct {
-	const char *cmd_name;
-	uint8_t min_params; // 最少需要的参数个数
-	enum foc_data_index data_index;
-} command_map_t;
-
-// 命令表定义
-static const command_map_t cmd_map[] = {
-	{"D_PI", 2, INDEX_D_PI},
-	{"D_ref", 1, INDEX_ID_REF},
-
-	{"Velocity_PI", 2, INDEX_VELOCITY_PI},
-	{"Valocity_tar", 1, INDEX_VELOCITY_REG},
-	{"VP_PI", 6, INDEX_VP_PI},
-	{"POS_TAR", 1, INDEX_POSITION_TAR},
-};
-void process_data(uint8_t *data, uint16_t len)
-{
-
-	if (data[0] == 0 || len == 0 || len > 255) {
-		return;
-	}
-
-	char buf[256];
-	uint16_t copy_len = (len < sizeof(buf) - 1) ? len : sizeof(buf) - 1;
-	memcpy(buf, (char *)data, copy_len);
-	buf[copy_len] = '\0';
-
-	// 找冒号
-	char *colon_pos = strchr(buf, ':');
-	if (!colon_pos) {
-		return;
-	}
-
-	*colon_pos = '\0';
-	char *cmd = buf;
-	char *params_str = colon_pos + 1;
-
-	// ========== 高效参数解析 ==========
-	float params[10];
-	uint8_t param_count = 0;
-	char *ptr = params_str;
-
-	while (*ptr != '\0' && param_count < 10) {
-		// 跳过空格
-		while (*ptr == ' ') {
-			ptr++;
-		}
-		if (*ptr == '\0') {
-			break;
-		}
-
-		// 解析浮点数
-		char *end;
-		params[param_count] = strtof(ptr, &end);
-
-		if (end == ptr) {
-			// 转换失败，跳过这个字段
-			while (*end != ',' && *end != '\0') {
-				end++;
-			}
-		} else {
-			param_count++;
-		}
-
-		// 移动到下一个参数
-		ptr = end;
-		if (*ptr == ',') {
-			ptr++;
-		} else {
-			break;
-		}
-	}
-
-	if (param_count == 0) {
-		return;
-	}
-
-	for (size_t i = 0; i < sizeof(cmd_map) / sizeof(cmd_map[0]); i++) {
-		if (strcmp(cmd, cmd_map[i].cmd_name) == 0) {
-			if (param_count >= cmd_map[i].min_params) {
-				float input[10];
-				uint8_t copy_count = (param_count < 10) ? param_count : 10;
-
-				for (int j = 0; j < copy_count; j++) {
-					input[j] = params[j];
-				}
-
-				if (cmd_map[i].data_index == INDEX_VELOCITY_PI) {
-				} else if (cmd_map[i].data_index == INDEX_VP_PI) {
-				} else if (cmd_map[i].data_index == INDEX_POSITION_TAR) {
-				} else if (cmd_map[i].data_index == INDEX_VELOCITY_REG) {
-				}
-			}
-			return;
-		}
-	}
-}
 void USER_UART_IRQHandler(UART_HandleTypeDef *huart)
 {
 	if (USART1 == huart->Instance) {
@@ -284,8 +173,7 @@ void USER_UART_IRQHandler(UART_HandleTypeDef *huart)
 			HAL_UART_DMAStop(huart);
 			volatile unsigned short data_length =
 				sizeof(sg_uartreceive_buff) - __HAL_DMA_GET_COUNTER(huart->hdmarx);
-			process_data(sg_uartreceive_buff, data_length);
-			memset(sg_uartreceive_buff, 0, 125);
+			// memset(sg_uartreceive_buff, 0, 125);
 			HAL_UART_Receive_DMA(huart, (uint8_t *)sg_uartreceive_buff,
 					     sizeof(sg_uartreceive_buff));
 		}

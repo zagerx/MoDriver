@@ -13,9 +13,6 @@
 #undef NULL
 #define NULL (0)
 
-/** @brief 控制周期 100us (10kHz) */
-// #define CONTROL_PERIOD_DT 0.0001f
-
 /**
  * @brief 绑定硬件接口
  * @param[in] motor 电机实例
@@ -52,6 +49,7 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
 	}
 	feedback_bind_encoder_param(motor->feedback, param_ext->feedback_param);
 	currsmp_bind_param(motor->currsmp, param_ext->currsmp_param);
+	trajectory_planner_bind_param(&motor->traj_plan, param_ext->traj_param);
 }
 
 /**

@@ -50,12 +50,17 @@ struct currsmp_param {
 	float gain_i_bus; /**< @brief 母线电流增益 */
 	float gain_v_bus; /**< @brief 母线电压增益 */
 };
+typedef struct trajectory_param {
+	float acc_max; // 最大加速度
+	float vmax;    // 最大速度
+} trajectory_param_t;
 /**
  * @brief 电机扩展参数结构体
  */
 struct motor_param_ext {
 	struct feedback_param *feedback_param; /**< @brief 反馈参数指针 */
 	struct currsmp_param *currsmp_param;   /**< @brief 电流采样参数指针 */
+	struct trajectory_param *traj_param;   /**< @brief 轨迹规划参数指针 */
 	uint16_t crc_16;                       /**< @brief 参数完整性校验 */
 };
 
