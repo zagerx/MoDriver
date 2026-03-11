@@ -8,11 +8,11 @@ struct foc {
 /**
  * @brief 绑定FOC数据源
  * @param[in] foc FOC实例
- * @param[in] fb_out 反馈输出数据
+ * @param[in] feeback 反馈输出数据
  * @param[in] currsmp_out 电流采样输出数据
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback_output *fb_out, struct currsmp_output *currsmp_out);
+void foc_bind(struct foc *foc, struct feedback_output *feeback, struct currsmp_output *currsmp_out);
 /**
  * @brief 开环强制对齐（固定角度）
  * @param[in] motor 电机实例

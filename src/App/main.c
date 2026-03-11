@@ -42,11 +42,29 @@ static struct trajectory_param m1_traj_param = {
 	.vmax = 5.0f,     // 最大速度 5 m/s
 };
 static struct motor_param_ext m1_param_ext = {
-	.feedback_param = &m1_feedback_param,
-	.currsmp_param = &m1_currsmp_param,
-	.traj_param = &m1_traj_param,
+	.feedback_param = {0},
+	.currsmp_param =
+		{
+			.gain_phase = 0.006011f,  // 电流采样增益（A/LSB）
+			.gain_i_bus = 0.01f,      // 母线电流采样增益（A/LSB）
+			.gain_v_bus = 0.0112793f, // 母线电压采样增益（V/LSB） 130V(130+10)
+		},
+	.traj_param =
+		{
+			.acc_max = 10.0f, // 最大加速度 10 m/s^2
+			.vmax = 5.0f,     // 最大速度 5 m/s},
+		},
+	.foc_param =
+		{
+			.d_axis = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f},
+			.q_axis = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f},
+			.vel = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f},
+			.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f},
+			.target_pos = 0.0f,
+			.target_vel = 0.0f,
+			.target_torque = 0.0f,
+		},
 };
-
 int main(void)
 {
 	/* 初始化硬件层（时钟、GPIO、外设等） */

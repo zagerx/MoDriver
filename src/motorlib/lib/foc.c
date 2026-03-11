@@ -13,14 +13,14 @@
 /**
  * @brief 绑定FOC数据源
  * @param[in] foc FOC实例
- * @param[in] fb_out 反馈输出数据
+ * @param[in] feeback 反馈输出数据
  * @param[in] currsmp_out 电流采样输出数据
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback_output *fb_out, struct currsmp_output *currsmp_out)
+void foc_bind(struct foc *foc, struct feedback_output *feeback, struct currsmp_output *currsmp_out)
 {
 	if (foc) {
-		foc_data_bind(&foc->data, fb_out, currsmp_out);
+		foc_data_bind(&foc->data, feeback, currsmp_out);
 	}
 }
 /**
@@ -40,7 +40,7 @@ void foc_update_idiq(struct foc *foc)
 	float i_a = meas->currsmp->i_a;
 	float i_b = meas->currsmp->i_b;
 
-	float eangle = meas->fb_out->eangle_rad;
+	float eangle = meas->feeback->eangle_rad;
 
 	arm_clarke_f32(i_a, i_b, &meas->i_alpha, &meas->i_beta);
 

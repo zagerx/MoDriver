@@ -54,14 +54,32 @@ typedef struct trajectory_param {
 	float acc_max; // 最大加速度
 	float vmax;    // 最大速度
 } trajectory_param_t;
+
+struct foc_pid_param {
+	float kp; /**< @brief 比例增益 */
+	float ki; /**< @brief 积分增益 */
+	float kd; /**< @brief 微分增益 */
+};
+
+struct foc_param {
+	struct foc_pid_param d_axis; /**< @brief d轴电流环PID参数 */
+	struct foc_pid_param q_axis; /**< @brief q轴电流环PID参数 */
+	struct foc_pid_param vel;    /**< @brief 速度环PID参数 */
+	struct foc_pid_param pos;    /**< @brief 位置环PID参数 */
+	float target_pos;            /**< @brief 目标位置 位置模式的输入 */
+	float target_vel;            /**< @brief 目标速度 速度模式的输入*/
+	float target_torque;         /**< @brief 目标转矩 力矩模式的输入*/
+};
+
 /**
  * @brief 电机扩展参数结构体
  */
 struct motor_param_ext {
-	struct feedback_param *feedback_param; /**< @brief 反馈参数指针 */
-	struct currsmp_param *currsmp_param;   /**< @brief 电流采样参数指针 */
-	struct trajectory_param *traj_param;   /**< @brief 轨迹规划参数指针 */
-	uint16_t crc_16;                       /**< @brief 参数完整性校验 */
+	struct feedback_param feedback_param; /**< @brief 反馈参数指针 */
+	struct currsmp_param currsmp_param;   /**< @brief 电流采样参数指针 */
+	struct trajectory_param traj_param;   /**< @brief 轨迹规划参数指针 */
+	struct foc_param foc_param;           /**< @brief FOC参数 */
+	uint16_t crc_16;                      /**< @brief 参数完整性校验 */
 };
 
 #endif /* MOTOR_DRIVER_H */

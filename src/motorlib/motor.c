@@ -44,12 +44,12 @@ void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
  */
 void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext)
 {
-	if (!motor || !param_ext || !param_ext->feedback_param) {
+	if (!motor || !param_ext) {
 		return;
 	}
-	feedback_bind_encoder_param(motor->feedback, param_ext->feedback_param);
-	currsmp_bind_param(motor->currsmp, param_ext->currsmp_param);
-	trajectory_planner_bind_param(&motor->traj_plan, param_ext->traj_param);
+	feedback_bind_encoder_param(motor->feedback, &param_ext->feedback_param);
+	currsmp_bind_param(motor->currsmp, &param_ext->currsmp_param);
+	trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param);
 }
 
 /**
