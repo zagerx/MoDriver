@@ -115,10 +115,10 @@ void process_data(uint8_t *data, uint16_t len)
 					m1_param_ext.foc_param.target_pos = input[0];
 				} else if (cmd_map[i].data_index == INDEX_VP_PI) {
 
-					m1_param_ext.foc_param.d_axis.kp = input[0];
-					m1_param_ext.foc_param.d_axis.ki = input[1];
-					m1_param_ext.foc_param.q_axis.kp = input[2];
-					m1_param_ext.foc_param.q_axis.ki = input[3];
+					// m1_param_ext.foc_param.d_axis.kp = input[0];
+					// m1_param_ext.foc_param.d_axis.ki = input[1];
+					// m1_param_ext.foc_param.q_axis.kp = input[2];
+					// m1_param_ext.foc_param.q_axis.ki = input[3];
 					m1_param_ext.foc_param.vel.kp = input[4];
 					m1_param_ext.foc_param.vel.ki = input[5];
 					m1_param_ext.foc_param.pos.kp = input[6];

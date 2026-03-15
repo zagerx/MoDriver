@@ -72,7 +72,7 @@ void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eang
 	float duty[3];
 	float vbus = motor->currsmp->output.v_bus;
 	svpwm_limit_voltage(vbus, &d_axis_voltage, &uq);
-	svpwm_normalize(eangle, vbus, d_axis_voltage, 0.0f, &ualpha, &ubeta); // 归一化到线性调制区
+	svpwm_normalize(eangle, vbus, d_axis_voltage, uq, &ualpha, &ubeta); // 归一化到线性调制区
 	// 直接输出d轴电压，q轴为0，保持固定角度eangle
 	svpwm_calc_duty(ualpha, ubeta, duty);
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
@@ -160,9 +160,11 @@ void currment_debug(struct motor *motor, float tar)
 
 	ud = foc_currentloop_pid_run(&foc_data->ctrl.d_axis, tar, meas->i_d, CONTROL_PERIOD_DT);
 	uq = 0.0f;
-	svpwm_limit_voltage(vbus, &ud, &uq);
-	foc_currentpid_saturation(&foc_data->ctrl.d_axis, ud, ud);
-	svpwm_normalize(eangle, vbus, ud, uq, &ualpha, &ubeta);
+	float ud_limit = ud;
+	float uq_limit = uq;
+	svpwm_limit_voltage(vbus, &ud_limit, &uq_limit);
+	foc_currentpid_saturation(&foc_data->ctrl.d_axis, ud_limit, ud);
+	svpwm_normalize(eangle, vbus, ud_limit, uq, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }

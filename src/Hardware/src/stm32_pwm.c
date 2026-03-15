@@ -25,5 +25,5 @@ void tim1_pwm_set_duty(float duty_a, float duty_b, float duty_c)
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, (uint32_t)(duty_a * M_TIM_ARR));
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (uint32_t)(duty_b * M_TIM_ARR));
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, (uint32_t)(duty_c * M_TIM_ARR));
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, M_TIM_ARR / 2 - 300);
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 30);
 }

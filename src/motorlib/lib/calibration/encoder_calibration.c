@@ -153,12 +153,13 @@ bool encoder_calib_run(struct motor *motor)
 		/* 更新反馈参数 */
 		_feedback_update_param_pole_pairs(feedback, (float)pole_pairs);
 		_feedback_update_param_direction(feedback, (float)direction);
+		enc->align_tick_cnt = 0;
 		enc->state = ENC_CALIB_OFFSET_ALIGN;
 		break;
 
 	case ENC_CALIB_OFFSET_ALIGN:
 		/* 第二次对齐：对齐到-90度，此时的编码器值即为偏置 */
-		open_loop_force_align(motor, ALIGN_VOLTAGE, -M_PI / 2.0f);
+		open_loop_force_align(motor, ALIGN_VOLTAGE, 0.0f);
 		enc->align_tick_cnt++;
 
 		if ((enc->align_tick_cnt * CONTROL_PERIOD_DT * 1000) >= ALIGN_TIMEOUT) {

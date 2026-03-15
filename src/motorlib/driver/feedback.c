@@ -3,7 +3,7 @@
 #include <math.h>
 
 /** @brief 低通滤波系数（0~1，越大响应越快） */
-#define VELOCITY_LPF_ALPHA 0.8f
+#define VELOCITY_LPF_ALPHA 0.08f
 
 /**
  * @brief 角度归一化到 [0, 2PI]
@@ -97,7 +97,8 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
  * @details 检测越过CPR边界的溢出并计算累积机械角度
  * @note 使用原始值计算差分，偏移量在角度计算时处理，避免负数存入uint16_t
  */
-static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t raw, int32_t adjusted_raw)
+static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t raw,
+					     int32_t adjusted_raw)
 {
 	struct feedback_param *param = feedback->param;
 	struct feedback_data *data = &feedback->data;
@@ -117,14 +118,15 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t
 
 	/* 更新累积计数 */
 	data->total_counts += delta;
-	
+
 	/* 计算累积机械角度（考虑编码器零位偏移） */
 	data->accumulated_mangle_rad =
-		(two_pi / (float)cpr) * (float)(data->total_counts - (int32_t)param->encoder_offset) * param->direction;
+		(two_pi / (float)cpr) *
+		(float)(data->total_counts - (int32_t)param->encoder_offset) * param->direction;
 
 	/* 保存原始值供下次使用（避免负数存入uint16_t导致的抖动问题） */
 	data->prev_raw = raw;
-	
+
 	(void)adjusted_raw; /* 显式标记未使用，避免编译器警告 */
 }
 
