@@ -19,12 +19,13 @@
  * @param[in] currsmp_out 电流采样输出数据
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback_output *feeback, struct currsmp_output *currsmp_out,
+void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp_output *currsmp_out,
 	      struct foc_pid_param *d_axis_pid_param, struct foc_pid_param *q_axis_pid_param,
 	      struct foc_pid_param *vel_pid_param, struct foc_pid_param *pos_pid_param)
 {
+	foc->feedback = feeback;
 	if (foc) {
-		foc_data_bind(&foc->data, feeback, currsmp_out, d_axis_pid_param, q_axis_pid_param,
+		foc_data_bind(&foc->data, currsmp_out, d_axis_pid_param, q_axis_pid_param,
 			      vel_pid_param, pos_pid_param);
 	}
 }
@@ -45,7 +46,7 @@ void foc_update_idiq(struct foc *foc)
 	float i_a = meas->currsmp->i_a;
 	float i_b = meas->currsmp->i_b;
 
-	float eangle = meas->feeback->eangle_rad;
+	float eangle = feedback_get_velocity(foc->feedback);
 
 	arm_clarke_f32(i_a, i_b, &meas->i_alpha, &meas->i_beta);
 

@@ -5,7 +5,7 @@
 #include "statemachine.h"
 
 /** @brief 电机1反馈实例 */
-static struct feedback m1_feedback;
+// static struct feedback m1_feedback;
 
 /** @brief 电机1逆变器实例 */
 // static struct inverter m1_inverter;
@@ -23,7 +23,7 @@ static struct statemachine m1_sm;
 
 /** @brief 电机1实例 */
 static struct motor motor1 = {
-	.feedback = &m1_feedback,
+	.feedback = &feedback_1,
 	.inverter = &inverter_1,
 	.currsmp = &m1_currsmp,
 	.sm = &m1_sm,

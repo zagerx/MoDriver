@@ -121,6 +121,7 @@ void motor_runing_state(struct statemachine *sm)
 	};
 	struct motor *motor = (struct motor *)(sm->data);
 	struct inverter *inverter = motor->inverter;
+	struct foc *foc = &motor->foc;
 	struct foc_data *foc_data = &motor->foc.data;
 	struct foc_measurement *meas = &foc_data->meas;
 	struct foc_control *ctrl = &foc_data->ctrl;
@@ -152,8 +153,9 @@ void motor_runing_state(struct statemachine *sm)
 			sm->count = 0;
 			float target = motor->param_ext->foc_param.target_pos;
 
-			foc_data->ref.i_q = foc_pid_run(
-				vel_pid, target, meas->feeback->velocity_rad_s, SPEED_PERIOD_DT);
+			foc_data->ref.i_q =
+				foc_pid_run(vel_pid, target, feedback_get_velocity(foc->feedback),
+					    SPEED_PERIOD_DT);
 			// foc_data->ref.i_d = 0.0f;
 			foc_data->ref.i_d = 0.0f;
 			// foc_data->ref.i_q = target;

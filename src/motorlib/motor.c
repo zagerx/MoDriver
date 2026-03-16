@@ -100,7 +100,7 @@ void motor_init(struct motor *motor)
 	struct currsmp *currsmp = motor->currsmp;
 	struct foc *foc = &motor->foc;
 
-	foc_bind(foc, &fb->output, &currsmp->output, &motor->param_ext->foc_param.d_axis,
+	foc_bind(foc, fb, &currsmp->output, &motor->param_ext->foc_param.d_axis,
 		 &motor->param_ext->foc_param.q_axis, &motor->param_ext->foc_param.vel,
 		 &motor->param_ext->foc_param.pos);
 }

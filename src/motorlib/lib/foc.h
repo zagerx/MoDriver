@@ -1,8 +1,10 @@
 #ifndef FOC_H
 #define FOC_H
 #include "foc_data.h"
+#include "feedback.h"
 struct motor;
 struct foc {
+	struct feedback *feedback;
 	struct foc_data data; /**< @brief FOC数据指针 */
 };
 /**
@@ -12,7 +14,7 @@ struct foc {
  * @param[in] currsmp_out 电流采样输出数据
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback_output *feeback, struct currsmp_output *currsmp_out,
+void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp_output *currsmp_out,
 	      struct foc_pid_param *d_axis_pid_param, struct foc_pid_param *q_axis_pid_param,
 	      struct foc_pid_param *vel_pid_param, struct foc_pid_param *pos_pid_param);
 /**
