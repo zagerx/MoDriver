@@ -2,9 +2,10 @@
 #include "_motorlib_internal.h"
 #include "feedback.h"
 #include "inverter.h"
-#include "currsmp.h"
+// #include "currsmp.h"
 #include "foc.h"
-#include "svpwm.h"
+// #include "svpwm.h"
+#include "open_loop.h"
 #include <math.h>
 #include "motorlib_control_param.h"
 #ifndef M_PI

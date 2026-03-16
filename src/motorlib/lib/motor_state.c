@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include "motorlib_control_param.h"
 #include "svpwm.h"
+#include "open_loop.h"
+#include "currsmp.h"
 void motor_openloop_encoder_state(struct statemachine *sm);
 
 /**
@@ -122,9 +124,9 @@ void motor_runing_state(struct statemachine *sm)
 	struct motor *motor = (struct motor *)(sm->data);
 	struct inverter *inverter = motor->inverter;
 	struct foc *foc = &motor->foc;
-	struct foc_data *foc_data = &motor->foc.data;
-	struct foc_measurement *meas = &foc_data->meas;
-	struct foc_control *ctrl = &foc_data->ctrl;
+	// struct foc_data *foc_data = &motor->foc.data;
+	struct foc_measurement *meas = &foc->meas;
+	struct foc_control *ctrl = &foc->ctrl;
 	struct foc_pid *d_axis_pid = &ctrl->d_axis;
 	struct foc_pid *q_axis_pid = &ctrl->q_axis;
 	struct foc_pid *vel_pid = &ctrl->velocity;
@@ -154,22 +156,22 @@ void motor_runing_state(struct statemachine *sm)
 			sm->count = 0;
 			float target = motor->param_ext->foc_param.target_pos;
 
-			foc_data->ref.i_q =
+			foc->ref.i_q =
 				foc_pid_run(vel_pid, target, feedback_get_velocity(foc->feedback),
 					    SPEED_PERIOD_DT);
 			// foc_data->ref.i_d = 0.0f;
-			foc_data->ref.i_d = 0.0f;
+			foc->ref.i_d = 0.0f;
 			// foc_data->ref.i_q = target;
 		}
-		ud = foc_currentloop_pid_run(&foc_data->ctrl.d_axis, foc_data->ref.i_d, meas->i_d,
+		ud = foc_currentloop_pid_run(&foc->ctrl.d_axis, foc->ref.i_d, meas->i_d,
 					     CONTROL_PERIOD_DT);
-		uq = foc_currentloop_pid_run(&foc_data->ctrl.q_axis, foc_data->ref.i_q, meas->i_q,
+		uq = foc_currentloop_pid_run(&foc->ctrl.q_axis, foc->ref.i_q, meas->i_q,
 					     CONTROL_PERIOD_DT);
 		float ud_limit = ud;
 		float uq_limit = uq;
 		svpwm_limit_voltage(vbus, &ud_limit, &uq_limit);
-		foc_currentpid_saturation(&foc_data->ctrl.d_axis, ud_limit, ud);
-		foc_currentpid_saturation(&foc_data->ctrl.q_axis, uq_limit, uq);
+		foc_currentpid_saturation(&foc->ctrl.d_axis, ud_limit, ud);
+		foc_currentpid_saturation(&foc->ctrl.q_axis, uq_limit, uq);
 		svpwm_normalize(eangle, vbus, ud_limit, uq_limit, &ualpha, &ubeta);
 		svpwm_calc_duty(ualpha, ubeta, duty);
 		inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);

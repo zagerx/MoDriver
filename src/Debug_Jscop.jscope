@@ -10,6 +10,9 @@
             <Scope>
                 <Options TimeResolutionUs="1000000" />
             </Scope>
+            <Trigger>
+                <Options Level="0" Symbol="target_pos" On="0" Auto="0" Rise="0" Fall="0" />
+            </Trigger>
         </Configuration>
         <Windows>
             <Graph Show="1" />
@@ -17,25 +20,19 @@
         </Windows>
         <SelectedSymbols>
             <Symbol>
-                <Options Name="kp" Address="0x20000094" Type="float" TypeID="1" Size="4" GraphColorRed="0" GraphColorGreen="0" GraphColorBlue="255" YMinSampled="1.79769e+308" YMaxSampled="-1.79769e+308" YAvgSampled="0" Offset="0" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="1" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/App/main.c" DrawStyle="0" NameWithParents=".m1_param_ext.foc_param.d_axis.kp" />
+                <Options Name="target_pos" Address="0x200000D4" Type="float" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="255" GraphColorBlue="0" YMinSampled="0" YMaxSampled="0" YAvgSampled="0" Offset="4" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="50" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/App/main.c" DrawStyle="0" NameWithParents=".m1_param_ext.foc_param.target_pos" />
             </Symbol>
             <Symbol>
-                <Options Name="ki" Address="0x20000098" Type="float" TypeID="1" Size="4" GraphColorRed="0" GraphColorGreen="255" GraphColorBlue="0" YMinSampled="1.79769e+308" YMaxSampled="-1.79769e+308" YAvgSampled="0" Offset="0" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="1" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/App/main.c" DrawStyle="0" NameWithParents=".m1_param_ext.foc_param.d_axis.ki" />
+                <Options Name="i_d" Address="0x200001CC" Type="float" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="0" GraphColorBlue="255" YMinSampled="0" YMaxSampled="0" YAvgSampled="0" Offset="8" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="5" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/motorlib/motor_config.c" DrawStyle="0" NameWithParents=".motor1.foc.data.meas.i_d" />
             </Symbol>
             <Symbol>
-                <Options Name="target_pos" Address="0x200000D4" Type="float" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="255" GraphColorBlue="0" YMinSampled="1.79769e+308" YMaxSampled="-1.79769e+308" YAvgSampled="0" Offset="0" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="1" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/App/main.c" DrawStyle="0" NameWithParents=".m1_param_ext.foc_param.target_pos" />
+                <Options Name="i_q" Address="0x200001D0" Type="float" TypeID="1" Size="4" GraphColorRed="0" GraphColorGreen="255" GraphColorBlue="127" YMinSampled="0" YMaxSampled="0" YAvgSampled="0" Offset="12" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="5" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/motorlib/motor_config.c" DrawStyle="0" NameWithParents=".motor1.foc.data.meas.i_q" />
             </Symbol>
             <Symbol>
-                <Options Name="velocity_rad_s" Address="0x20000768" Type="float" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="0" GraphColorBlue="0" YMinSampled="1.79769e+308" YMaxSampled="-1.79769e+308" YAvgSampled="0" Offset="0" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="1" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/motorlib/motor_config.c" DrawStyle="0" NameWithParents=".m1_feedback.output.velocity_rad_s" />
+                <Options Name="i_q" Address="0x200001D8" Type="float" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="0" GraphColorBlue="0" YMinSampled="0" YMaxSampled="0" YAvgSampled="0" Offset="16" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="5" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/motorlib/motor_config.c" DrawStyle="0" NameWithParents=".motor1.foc.data.ref.i_q" />
             </Symbol>
             <Symbol>
-                <Options Name="i_d" Address="0x200001CC" Type="float" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="0" GraphColorBlue="255" YMinSampled="1.79769e+308" YMaxSampled="-1.79769e+308" YAvgSampled="0" Offset="0" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="1" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/motorlib/motor_config.c" DrawStyle="0" NameWithParents=".motor1.foc.data.meas.i_d" />
-            </Symbol>
-            <Symbol>
-                <Options Name="i_q" Address="0x200001D0" Type="float" TypeID="1" Size="4" GraphColorRed="0" GraphColorGreen="255" GraphColorBlue="127" YMinSampled="1.79769e+308" YMaxSampled="-1.79769e+308" YAvgSampled="0" Offset="0" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="1" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/motorlib/motor_config.c" DrawStyle="0" NameWithParents=".motor1.foc.data.meas.i_q" />
-            </Symbol>
-            <Symbol>
-                <Options Name="i_q" Address="0x200001D8" Type="float" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="0" GraphColorBlue="0" YMinSampled="1.79769e+308" YMaxSampled="-1.79769e+308" YAvgSampled="0" Offset="0" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="1" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/motorlib/motor_config.c" DrawStyle="0" NameWithParents=".motor1.foc.data.ref.i_q" />
+                <Options Name="velocity_rad_s" Address="0x20000794" Type="float" TypeID="1" Size="4" GraphColorRed="255" GraphColorGreen="85" GraphColorBlue="0" YMinSampled="0" YMaxSampled="0" YAvgSampled="0" Offset="20" ShowInGraph="1" YOffset="0" IsAutoConfig="0" YResolution="50" MaxValue="-2147483648" File="/home/zhangge/worknote/EmbeddedCode/MoDriverProject/src/motorlib/driver/feedback.c" DrawStyle="0" NameWithParents=".feedback_1.output.velocity_rad_s" />
             </Symbol>
         </SelectedSymbols>
     </Project>
