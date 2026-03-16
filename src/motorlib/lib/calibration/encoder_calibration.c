@@ -158,11 +158,11 @@ bool encoder_calib_run(struct motor *motor)
 		break;
 
 	case ENC_CALIB_OFFSET_ALIGN:
-		/* 第二次对齐：对齐到-90度，此时的编码器值即为偏置 */
+		/* 第二次对齐：对齐到0度，此时的编码器值即为偏置 */
 		open_loop_force_align(motor, ALIGN_VOLTAGE, 0.0f);
 		enc->align_tick_cnt++;
 
-		if ((enc->align_tick_cnt * CONTROL_PERIOD_DT * 1000) >= ALIGN_TIMEOUT) {
+		if (enc->align_tick_cnt >= ALIGN_TIMEOUT_TICKS) {
 			/* 对齐完成，读取编码器值作为偏置 */
 			uint16_t offset = feedback_get_raw(feedback);
 			_feedback_update_param_encoder_offset(feedback, offset);
