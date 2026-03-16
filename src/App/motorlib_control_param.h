@@ -1,6 +1,10 @@
 #ifndef MOTORLIB_CONTROL_PARAM_H
 #define MOTORLIB_CONTROL_PARAM_H
 
+#ifndef MOTOR_COUNT
+#define MOTOR_COUNT (1u)
+#endif
+
 /*硬件相关*/
 #define PHASE_CURRENT_GAIN   30.0f      /* 相电流增益 */
 #define BUS_CURRENT_GAIN     0.01f      /* 母线电流增益 */
@@ -27,7 +31,8 @@
 #define ALIGN_TIMEOUT_TICKS                                                                        \
 	((uint32_t)(ALIGN_TIMEOUT / (CONTROL_PERIOD_DT * 1000.0f))) /* 2000ms / 0.05ms = 40000 */
 #define ROTATE_TIMEOUT_TICKS                                                                       \
-	((uint32_t)(ROTATE_TIMEOUT / (CONTROL_PERIOD_DT * 1000.0f))) /* 5000ms / 0.05ms = 100000 */
+	((uint32_t)(ROTATE_TIMEOUT / (CONTROL_PERIOD_DT * 1000.0f))) /* 5000ms / 0.05ms = 100000   \
+								      */
 
 #define CURRMENT_LOOP_KP    (0.1f)   /* 电流环P增益 */
 #define CURRMENT_LOOP_KI    (800.0f) /* 电流环I增益 */

@@ -2,21 +2,11 @@
 #define INVERTER_H
 
 #include <stdint.h>
-#include "motor_driver.h"
 
-/**
- * @brief 逆变器控制结构体
- */
-struct inverter {
-	const struct inverter_ops *ops; /**< @brief 逆变器操作接口 */
-};
+struct inverter;
+struct inverter_ops;
+extern struct inverter inverter_1;
 
-/**
- * @brief 绑定逆变器操作接口
- * @param[in] inverter 逆变器实例
- * @param[in] ops 逆变器操作接口
- * @return 无
- */
 /**
  * @brief 绑定逆变器操作接口
  * @param[in] inverter 逆变器实例
