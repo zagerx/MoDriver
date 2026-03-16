@@ -43,9 +43,11 @@ void foc_update_idiq(struct foc *foc)
 	}
 	struct foc_data *data = &foc->data;
 	struct foc_measurement *meas = &data->meas;
-
-	float i_a = meas->currsmp->i_a;
-	float i_b = meas->currsmp->i_b;
+	struct currsmp_output out;
+	currsmp_get_output(foc->currsmp, &out);
+	// float vbus = out.v_bus;
+	float i_a = out.i_a;
+	float i_b = out.i_b;
 
 	float eangle = feedback_get_velocity(foc->feedback);
 
@@ -143,9 +145,12 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage)
 	float ualpha, ubeta;
 	float duty[3];
 
-	struct foc_data *foc_data = &motor->foc.data;
-	struct foc_measurement *meas = &foc_data->meas;
-	float vbus = meas->currsmp->v_bus;
+	// struct foc_data *foc_data = &motor->foc.data;
+	// struct foc_measurement *meas = &foc_data->meas;
+	// float vbus = meas->currsmp->v_bus;
+	struct currsmp_output out;
+	currsmp_get_output(motor->currsmp, &out);
+	float vbus = out.v_bus;
 	svpwm_limit_voltage(vbus, &ud, &q_axis_voltage);
 	svpwm_normalize(eangle, vbus, ud, q_axis_voltage, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
@@ -163,9 +168,10 @@ void currment_debug(struct motor *motor, float tar)
 	float duty[3];
 
 	struct foc_data *foc_data = &motor->foc.data;
+	struct currsmp_output out;
+	currsmp_get_output(motor->currsmp, &out);
+	float vbus = out.v_bus;
 	struct foc_measurement *meas = &foc_data->meas;
-	float vbus = meas->currsmp->v_bus;
-
 	ud = foc_currentloop_pid_run(&foc_data->ctrl.d_axis, tar, meas->i_d, CONTROL_PERIOD_DT);
 	uq = 0.0f;
 	float ud_limit = ud;

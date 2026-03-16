@@ -6,7 +6,7 @@
 #include "foc_pid.h"
 #include "motor_driver.h"
 struct foc_measurement {
-	struct currsmp_output *currsmp; /**< @brief 电流采样输出数据 */
+	// struct currsmp_output *currsmp; /**< @brief 电流采样输出数据 */
 	// struct feedback_output *feeback; /**< @brief 反馈输出数据 */
 	float i_alpha; /**< @brief α轴电流 */
 	float i_beta;  /**< @brief β轴电流 */

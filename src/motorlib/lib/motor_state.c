@@ -132,8 +132,9 @@ void motor_runing_state(struct statemachine *sm)
 	float ud, uq; // d轴电压为0，保持固定角度
 	float ualpha, ubeta;
 	float duty[3];
-	float vbus = meas->currsmp->v_bus;
-
+	struct currsmp_output out;
+	currsmp_get_output(foc->currsmp, &out);
+	float vbus = out.v_bus;
 	float eangle = feedback_get_elec_angle(feedback);
 
 	switch (sm->phase) {
