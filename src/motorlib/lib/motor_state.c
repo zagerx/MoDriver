@@ -188,7 +188,7 @@ void motor_openloop_encoder_state(struct statemachine *sm)
 	struct inverter *inverter = motor->inverter;
 	static float target;
 	// struct feedback *feedback = motor->feedback;
-	static uint32_t debug_cnt = 0;
+	// static uint32_t debug_cnt = 0;
 
 	switch (sm->phase) {
 	case ENTER:

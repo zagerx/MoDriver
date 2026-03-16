@@ -19,14 +19,15 @@
  * @param[in] currsmp_out 电流采样输出数据
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp_output *currsmp_out,
+void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp *currsmp,
 	      struct foc_pid_param *d_axis_pid_param, struct foc_pid_param *q_axis_pid_param,
 	      struct foc_pid_param *vel_pid_param, struct foc_pid_param *pos_pid_param)
 {
 	foc->feedback = feeback;
+	foc->currsmp = currsmp;
 	if (foc) {
-		foc_data_bind(&foc->data, currsmp_out, d_axis_pid_param, q_axis_pid_param,
-			      vel_pid_param, pos_pid_param);
+		foc_data_bind(&foc->data, d_axis_pid_param, q_axis_pid_param, vel_pid_param,
+			      pos_pid_param);
 	}
 }
 /**
@@ -71,7 +72,10 @@ void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eang
 	float uq = 0.0f; // q轴电压为0，保持固定角度
 	float ualpha, ubeta;
 	float duty[3];
-	float vbus = motor->currsmp->output.v_bus;
+	struct currsmp_output out;
+	currsmp_get_output(motor->currsmp, &out);
+	float vbus; // = motor->currsmp->output.v_bus;
+	vbus = out.v_bus;
 	svpwm_limit_voltage(vbus, &d_axis_voltage, &uq);
 	svpwm_normalize(eangle, vbus, d_axis_voltage, uq, &ualpha, &ubeta); // 归一化到线性调制区
 	// 直接输出d轴电压，q轴为0，保持固定角度eangle
@@ -98,7 +102,10 @@ void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, f
 	float uq = 0.0f;                     // q轴电压为0，保持固定角度
 	float ualpha, ubeta;
 	float duty[3];
-	float vbus = motor->currsmp->output.v_bus;
+	// float vbus = motor->currsmp->output.v_bus;
+	struct currsmp_output out;
+	currsmp_get_output(motor->currsmp, &out);
+	float vbus = out.v_bus;
 	svpwm_limit_voltage(vbus, &d_axis_voltage, &uq);
 	svpwm_normalize(foc_data->self_eangle, vbus, d_axis_voltage, 0.0f, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);

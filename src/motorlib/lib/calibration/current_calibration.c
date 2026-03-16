@@ -74,7 +74,7 @@ void current_calib_apply(struct motor *motor)
 	struct currsmp *currsmp;
 	uint16_t offsets[3];
 
-	if (!motor || !motor->currsmp || !motor->currsmp->param) {
+	if (!motor || !motor->currsmp || !motor->currsmp) {
 		return;
 	}
 

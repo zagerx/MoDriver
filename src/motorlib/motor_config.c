@@ -11,7 +11,7 @@
 // static struct inverter m1_inverter;
 
 /** @brief 电机1电流采样实例 */
-static struct currsmp m1_currsmp;
+// static struct currsmp m1_currsmp;
 // /** @brief 电机1配置 */
 // static struct motor_config m1_config;
 
@@ -25,7 +25,7 @@ static struct statemachine m1_sm;
 static struct motor motor1 = {
 	.feedback = &feedback_1,
 	.inverter = &inverter_1,
-	.currsmp = &m1_currsmp,
+	.currsmp = &currsmp_1,
 	.sm = &m1_sm,
 	// .config = &m1_config,
 	// .data = &m1_data,
