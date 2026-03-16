@@ -23,12 +23,12 @@ void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp *currsmp
 	      struct foc_pid_param *d_axis_pid_param, struct foc_pid_param *q_axis_pid_param,
 	      struct foc_pid_param *vel_pid_param, struct foc_pid_param *pos_pid_param)
 {
+	if (!foc) {
+		return;
+	}
 	foc->feedback = feeback;
 	foc->currsmp = currsmp;
-	if (foc) {
-		foc_data_bind(&foc->data, d_axis_pid_param, q_axis_pid_param, vel_pid_param,
-			      pos_pid_param);
-	}
+	foc_data_bind(&foc->data, d_axis_pid_param, q_axis_pid_param, vel_pid_param, pos_pid_param);
 }
 /**
  * @brief 更新id/iq电流
@@ -38,7 +38,7 @@ void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp *currsmp
  */
 void foc_update_idiq(struct foc *foc)
 {
-	if (!foc) {
+	if (!foc || !foc->currsmp || !foc->feedback) {
 		return;
 	}
 	struct foc_data *data = &foc->data;
@@ -49,7 +49,7 @@ void foc_update_idiq(struct foc *foc)
 	float i_a = out.i_a;
 	float i_b = out.i_b;
 
-	float eangle = feedback_get_velocity(foc->feedback);
+	float eangle = feedback_get_elec_angle(foc->feedback);
 
 	arm_clarke_f32(i_a, i_b, &meas->i_alpha, &meas->i_beta);
 

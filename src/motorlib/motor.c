@@ -73,12 +73,16 @@ static int16_t motor_param_check(struct motor *motor)
 		return -1; /* 电机实例为空 */
 	}
 	struct motor_param_ext *param_ext = motor->param_ext;
+	if (!param_ext) {
+		return -2; /* 扩展参数为空 */
+	}
 	/* CRC 校验伪代码 */
 	// uint16_t calc_crc = crc16_calculate((uint8_t *)param_ext, sizeof(*param_ext));
 	// if (calc_crc != param_ext->crc_16) {
 	//     return -20; /* CRC 校验失败 */
 	// }
 	(void)param_ext->crc_16;
+	/* 暂时保留默认返回-1，确保进入校准状态 */
 	return -1;
 }
 
@@ -90,16 +94,26 @@ static int16_t motor_param_check(struct motor *motor)
  */
 void motor_init(struct motor *motor)
 {
+	if (!motor) {
+		return;
+	}
 	struct statemachine *sm = motor->sm;
+	struct feedback *fb = motor->feedback;
+	struct currsmp *currsmp = motor->currsmp;
+	if (!sm || !fb || !currsmp) {
+		/* 关键指针为空，无法初始化 */
+		return;
+	}
 	if (motor_param_check(motor)) {
 		statemachine_init(sm, motor, motor_carib_state, NULL, 0);
 	} else {
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
 	}
-	struct feedback *fb = motor->feedback;
-	struct currsmp *currsmp = motor->currsmp;
 	struct foc *foc = &motor->foc;
-
+	if (!motor->param_ext) {
+		/* 参数未绑定 */
+		return;
+	}
 	foc_bind(foc, fb, currsmp, &motor->param_ext->foc_param.d_axis,
 		 &motor->param_ext->foc_param.q_axis, &motor->param_ext->foc_param.vel,
 		 &motor->param_ext->foc_param.pos);
