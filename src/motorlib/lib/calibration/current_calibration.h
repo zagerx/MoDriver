@@ -1,3 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
+/**
+ * @file current_calibration.h
+ * @brief 电流校准模块头文件
+ */
+
 #ifndef CURRENT_CALIBRATION_H
 #define CURRENT_CALIBRATION_H
 
@@ -6,20 +13,20 @@
 
 struct motor;
 
-/* 电流校准对象（数据结构） */
+/** 电流校准对象（数据结构） */
 struct current_calib {
-	uint32_t sample_cnt;     /* 采样计数 */
-	uint32_t sum_a;          /* a轴累加和 */
-	uint32_t sum_b;          /* b轴累加和 */
-	uint32_t sum_c;          /* c轴累加和 */
-	uint16_t target_samples; /* 目标采样数 */
+	uint32_t sample_cnt;     /**< 采样计数 */
+	uint32_t sum_a;          /**< a轴累加和 */
+	uint32_t sum_b;          /**< b轴累加和 */
+	uint32_t sum_c;          /**< c轴累加和 */
+	uint16_t target_samples; /**< 目标采样数 */
 };
 
-/* 电流校准阶段 */
+/** 电流校准阶段 */
 enum current_calib_state {
-	CURRENT_STATE_IDLE = 0,
-	CURRENT_STATE_SAMPLING,
-	CURRENT_STATE_FINISH
+	CURRENT_STATE_IDLE = 0,  /**< 空闲状态 */
+	CURRENT_STATE_SAMPLING,  /**< 采样中 */
+	CURRENT_STATE_FINISH     /**< 校准完成 */
 };
 
 /**

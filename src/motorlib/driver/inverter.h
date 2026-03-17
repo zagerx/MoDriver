@@ -1,11 +1,16 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #ifndef INVERTER_H
 #define INVERTER_H
 
 #include <stdint.h>
 
-struct inverter;
-struct inverter_ops;
-extern struct inverter inverter_1;
+/**
+ * @brief 逆变器控制结构体
+ */
+struct inverter {
+	const struct inverter_ops *ops; /**< @brief 逆变器操作接口 */
+};
 
 /**
  * @brief 绑定逆变器操作接口
@@ -14,18 +19,21 @@ extern struct inverter inverter_1;
  * @return 无
  */
 void inverter_bind_inverter(struct inverter *inverter, const struct inverter_ops *ops);
+
 /**
  * @brief 使能逆变器
  * @param[in] inverter 逆变器实例
  * @return 无
  */
 void inverter_enable(struct inverter *inverter);
+
 /**
  * @brief 禁用逆变器
  * @param[in] inverter 逆变器实例
  * @return 无
  */
 void inverter_disable(struct inverter *inverter);
+
 /**
  * @brief 设置三相电压
  * @param[in] inverter 逆变器实例
@@ -35,4 +43,5 @@ void inverter_disable(struct inverter *inverter);
  * @return 无
  */
 void inverter_set_voltage(struct inverter *inverter, float u, float v, float w);
+
 #endif /* INVERTER_H */

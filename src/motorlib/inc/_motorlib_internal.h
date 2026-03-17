@@ -1,15 +1,18 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #ifndef _MOTOR_INTERNAL_H
 #define _MOTOR_INTERNAL_H
 
 #include "motor_driver.h"
-#include "motor_error.h"
 #include "foc.h"
 #include "calibration.h"
 #include "trajectory_plan.h"
+
 struct statemachine;
 struct inverter;
 struct feedback;
 struct currsmp;
+
 /**
  * @brief 电机数据结构体
  */
@@ -41,4 +44,4 @@ struct motor {
 	struct foc foc;                    /**< @brief FOC相关数据 */
 };
 
-#endif
+#endif /* _MOTOR_INTERNAL_H */

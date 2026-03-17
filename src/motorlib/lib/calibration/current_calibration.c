@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #include "current_calibration.h"
 #include "_motorlib_internal.h"
 #include "calibration.h"
@@ -8,9 +10,12 @@
 
 /**
  * @brief 初始化电流校准
- * @param[in] motor 电机实例
+ *
+ * @param[in] motor   电机实例
  * @param[in] samples 目标采样数（0表示使用默认值）
+ *
  * @return 无
+ *
  * @details 禁用逆变器，清零累加器，准备电流采样
  */
 void current_calib_init(struct motor *motor, uint16_t samples)
@@ -38,8 +43,12 @@ void current_calib_init(struct motor *motor, uint16_t samples)
 
 /**
  * @brief 执行一次电流采样
+ *
  * @param[in] motor 电机实例
- * @return true 校准完成，false 需要继续采样
+ *
+ * @return true  校准完成
+ * @return false 需要继续采样
+ *
  * @note 应在高频任务中周期性调用
  */
 bool current_calib_run(struct motor *motor)
@@ -54,6 +63,7 @@ bool current_calib_run(struct motor *motor)
 	curr = &motor->calib.current;
 
 	currsmp_get_raw(motor->currsmp, &input);
+
 	curr->sum_a += input.i_a_raw;
 	curr->sum_b += input.i_b_raw;
 	curr->sum_c += input.i_c_raw;
@@ -64,8 +74,11 @@ bool current_calib_run(struct motor *motor)
 
 /**
  * @brief 应用电流校准结果
+ *
  * @param[in] motor 电机实例
+ *
  * @return 无
+ *
  * @details 计算平均ADC值并设置为电流采样偏移量
  */
 void current_calib_apply(struct motor *motor)

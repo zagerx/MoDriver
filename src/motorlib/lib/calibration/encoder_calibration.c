@@ -1,13 +1,14 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #include "encoder_calibration.h"
 #include "_motorlib_internal.h"
 #include "feedback.h"
 #include "inverter.h"
-// #include "currsmp.h"
 #include "foc.h"
-// #include "svpwm.h"
 #include "open_loop.h"
 #include <math.h>
 #include "motorlib_control_param.h"
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif
@@ -16,7 +17,13 @@
 #define M_TWOPI (2.0f * M_PI)
 #endif
 
-/* 解卷绕辅助函数 - 处理编码器溢出 */
+/**
+ * @brief 解卷绕辅助函数 - 处理编码器溢出
+ * @param[in] current 当前编码器值
+ * @param[in,out] prev 上一次的编码器值指针
+ * @return 解卷绕后的差值
+ * @details 处理编码器溢出情况，计算当前值与上一次值的差值
+ */
 static inline int32_t unwrap_delta(uint16_t current, uint16_t *prev)
 {
 	int32_t diff = (int32_t)current - (int32_t)(*prev);
@@ -77,6 +84,7 @@ bool encoder_calib_run(struct motor *motor)
 	int pole_pairs;
 	int direction;
 	float sum_eangle;
+
 	if (!motor || !motor->feedback || !motor->inverter || !motor->currsmp) {
 		return true;
 	}
@@ -91,6 +99,7 @@ bool encoder_calib_run(struct motor *motor)
 		if (enc->align_tick_cnt == 0) {
 			inverter_enable(inverter);
 		}
+
 		open_loop_force_align(motor, ALIGN_VOLTAGE, 0.0f);
 		enc->align_tick_cnt++;
 

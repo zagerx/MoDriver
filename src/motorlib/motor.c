@@ -1,4 +1,14 @@
 /* SPDX-License-Identifier: GPL-2.0 */
+/**
+ * @file motor.c
+ * @brief 电机控制模块主文件
+ * @author zager
+ * @date 2026-03-18
+ * @version v0.0.9
+ *
+ * 本文件实现电机控制的核心功能，包括硬件绑定、参数绑定、初始化和高频控制任务。
+ * 模块采用状态机设计，支持校准、空闲、运行等多种工作状态。
+ */
 
 #include "motor.h"
 #include "_motorlib_internal.h"
@@ -6,19 +16,22 @@
 #include "feedback.h"
 #include "currsmp.h"
 #include "statemachine.h"
-#include <stdint.h>
 #include "motor_state.h"
 #include "foc.h"
 #include "motorlib_control_param.h"
+
+#include <stdint.h>
+
 #undef NULL
 #define NULL (0)
 
 /**
  * @brief 绑定硬件接口
- * @param[in] motor 电机实例
- * @param[in] hw 硬件接口集合
+ * @param[in] motor 电机实例指针
+ * @param[in] hw 硬件接口集合指针
  * @return 无
- * @details 将编码器和逆变器操作接口绑定到电机实例
+ * @details 将编码器操作接口和逆变器操作接口绑定到电机实例。
+ *          必须在初始化前调用此函数。
  */
 void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
 {
@@ -37,25 +50,27 @@ void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
 
 /**
  * @brief 绑定扩展参数
- * @param[in] motor 电机实例
- * @param[in] param_ext 扩展参数
+ * @param[in] motor 电机实例指针
+ * @param[in] param_ext 扩展参数指针
  * @return 无
- * @details 绑定反馈参数到电机实例
+ * @details 绑定反馈参数、电流采样参数和FOC参数到电机实例。
+ *          必须在初始化前调用此函数。
  */
 void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext)
 {
 	if (!motor || !param_ext) {
 		return;
 	}
+
 	motor->param_ext = param_ext;
 	feedback_bind_encoder_param(motor->feedback, &param_ext->feedback_param);
 	currsmp_bind_param(motor->currsmp, &param_ext->currsmp_param);
-	// trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param);
+	/* trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param); */
 }
 
 /**
  * @brief 检查电机参数合法性
- * @param[in] motor 电机实例
+ * @param[in] motor 电机实例指针
  * @return int16_t 错误码
  * @retval 0 参数合法
  * @retval -1 电机实例为空
@@ -66,65 +81,77 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
  * @retval -12 极对数无效
  * @retval -13 方向无效
  * @retval -14 编码器分辨率无效
+ * @note 当前版本总是返回-1，强制进入校准状态
  */
 static int16_t motor_param_check(struct motor *motor)
 {
 	if (!motor) {
 		return -1; /* 电机实例为空 */
 	}
+
 	struct motor_param_ext *param_ext = motor->param_ext;
 	if (!param_ext) {
 		return -2; /* 扩展参数为空 */
 	}
+
 	/* CRC 校验伪代码 */
-	// uint16_t calc_crc = crc16_calculate((uint8_t *)param_ext, sizeof(*param_ext));
-	// if (calc_crc != param_ext->crc_16) {
-	//     return -20; /* CRC 校验失败 */
-	// }
+	/* uint16_t calc_crc = crc16_calculate((uint8_t *)param_ext, sizeof(*param_ext)); */
+	/* if (calc_crc != param_ext->crc_16) { */
+	/*     return -20; */
+	/* } */
 	(void)param_ext->crc_16;
+
 	/* 暂时保留默认返回-1，确保进入校准状态 */
 	return -1;
 }
 
 /**
  * @brief 初始化电机
- * @param[in] motor 电机实例
+ * @param[in] motor 电机实例指针
  * @return 无
- * @details 检查参数并初始化状态机，根据检查结果进入相应初始状态
+ * @details 检查参数合法性并初始化状态机。
+ *          如果参数检查失败，进入校准状态；否则进入空闲状态。
+ *          同时绑定FOC控制器参数。
  */
 void motor_init(struct motor *motor)
 {
 	if (!motor) {
 		return;
 	}
+
 	struct statemachine *sm = motor->sm;
 	struct feedback *fb = motor->feedback;
 	struct currsmp *currsmp = motor->currsmp;
+
 	if (!sm || !fb || !currsmp) {
 		/* 关键指针为空，无法初始化 */
 		return;
 	}
+
 	if (motor_param_check(motor)) {
 		statemachine_init(sm, motor, motor_carib_state, NULL, 0);
 	} else {
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
 	}
+
 	struct foc *foc = &motor->foc;
 	if (!motor->param_ext) {
 		/* 参数未绑定 */
 		return;
 	}
-	foc_bind(foc, fb, currsmp, &motor->param_ext->foc_param.d_axis,
-		 &motor->param_ext->foc_param.q_axis, &motor->param_ext->foc_param.vel,
-		 &motor->param_ext->foc_param.pos);
+
+	foc_bind(foc, fb, currsmp, &motor->param_ext->foc_param);
 }
 
 /**
  * @brief 高频控制任务
- * @param[in] motor 电机实例
+ * @param[in] motor 电机实例指针
+ * @param[in] adc_raw ADC原始数据数组指针
  * @return 无
  * @note 应在定时器中断中周期性调用（默认10kHz）
- * @details 执行反馈更新和状态机调度
+ * @details 执行电流采样原始数据更新、反馈原始数据更新和状态机调度。
+ *          在非校准状态下，执行完整的反馈更新和FOC电流计算。
+ *          在校准状态下，仅更新母线相关数据。
  */
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 {
@@ -138,6 +165,7 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 
 	currsmp_update_raw(currsmp, adc_raw);
 	feedback_update_raw(feedback);
+
 	/* 仅在非校准状态下执行完整的反馈更新和状态机调度，校准状态下可能需要特殊处理 */
 	if (sm->current_state != motor_carib_state) {
 		currsmp_update(currsmp);
@@ -146,5 +174,6 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 	} else {
 		currsmp_update_bus(currsmp);
 	}
+
 	sm_dispatch(sm);
 }

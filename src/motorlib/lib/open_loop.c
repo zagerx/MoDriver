@@ -1,9 +1,13 @@
+// SPDX-License-Identifier: GPL-2.0
+
 #include "open_loop.h"
 #include "_motorlib_internal.h"
 #include "svpwm.h"
 #include "inverter.h"
 #include "currsmp.h"
 #include "feedback.h"
+#include "motorlib_control_param.h"
+
 /**
  * @brief 开环强制对齐（固定角度）
  * @param[in] motor 电机实例
@@ -17,17 +21,22 @@ void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eang
 	if (!motor) {
 		return;
 	}
-	float uq = 0.0f; // q轴电压为0，保持固定角度
+
+	float uq = 0.0f;
 	float ualpha, ubeta;
 	float duty[3];
 	struct currsmp_output out;
+
 	currsmp_get_output(motor->currsmp, &out);
-	float vbus; // = motor->currsmp->output.v_bus;
+
+	float vbus;
 	vbus = out.v_bus;
+
 	svpwm_limit_voltage(vbus, &d_axis_voltage, &uq);
-	svpwm_normalize(eangle, vbus, d_axis_voltage, uq, &ualpha, &ubeta); // 归一化到线性调制区
+	svpwm_normalize(eangle, vbus, d_axis_voltage, uq, &ualpha, &ubeta);
 	// 直接输出d轴电压，q轴为0，保持固定角度eangle
 	svpwm_calc_duty(ualpha, ubeta, duty);
+
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }
 
@@ -45,17 +54,23 @@ void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, f
 	if (!motor) {
 		return;
 	}
+
 	struct foc *foc = &motor->foc;
 	foc->self_eangle += omega * dt; // 电角度增量 = 角速度 * 时间
-	float uq = 0.0f;                // q轴电压为0，保持固定角度
+
+	float uq = 0.0f;
 	float ualpha, ubeta;
 	float duty[3];
 	struct currsmp_output out;
+
 	currsmp_get_output(motor->currsmp, &out);
+
 	float vbus = out.v_bus;
+
 	svpwm_limit_voltage(vbus, &d_axis_voltage, &uq);
 	svpwm_normalize(foc->self_eangle, vbus, d_axis_voltage, 0.0f, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
+
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }
 
@@ -69,6 +84,7 @@ float open_loop_get_force_angle(struct motor *motor)
 	if (!motor) {
 		return 0.0f;
 	}
+
 	return motor->foc.self_eangle;
 }
 
@@ -84,43 +100,62 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage)
 	if (!motor) {
 		return;
 	}
+
 	struct feedback *feedback = motor->feedback;
 	float eangle = feedback_get_elec_angle(feedback);
-	float ud = 0.0f; // d轴电压为0，保持固定角度
+	float ud = 0.0f;
 	float ualpha, ubeta;
 	float duty[3];
 
 	struct currsmp_output out;
 	currsmp_get_output(motor->currsmp, &out);
+
 	float vbus = out.v_bus;
+
 	svpwm_limit_voltage(vbus, &ud, &q_axis_voltage);
 	svpwm_normalize(eangle, vbus, ud, q_axis_voltage, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
+
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }
+
+/**
+ * @brief 电流调试模式
+ * @param[in] motor 电机实例
+ * @param[in] tar 目标电流值
+ * @return 无
+ * @details 使用FOC电流环PID控制，输出d轴电压
+ */
 void currment_debug(struct motor *motor, float tar)
 {
 	if (!motor) {
 		return;
 	}
+
 	struct feedback *feedback = motor->feedback;
 	float eangle = feedback_get_elec_angle(feedback);
-	float ud, uq; // d轴电压为0，保持固定角度
+	float ud, uq;
 	float ualpha, ubeta;
 	float duty[3];
 
 	struct foc *foc = &motor->foc;
 	struct currsmp_output out;
 	currsmp_get_output(motor->currsmp, &out);
+
 	float vbus = out.v_bus;
 	struct foc_measurement *meas = &foc->meas;
+
 	ud = foc_currentloop_pid_run(&foc->ctrl.d_axis, tar, meas->i_d, CONTROL_PERIOD_DT);
 	uq = 0.0f;
+
 	float ud_limit = ud;
 	float uq_limit = uq;
+
 	svpwm_limit_voltage(vbus, &ud_limit, &uq_limit);
 	foc_currentpid_saturation(&foc->ctrl.d_axis, ud_limit, ud);
+
 	svpwm_normalize(eangle, vbus, ud_limit, uq, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
+
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }

@@ -113,6 +113,7 @@ void process_data(uint8_t *data, uint16_t len)
 
 				if (cmd_map[i].data_index == INDEX_TAR) {
 					m1_param_ext.foc_param.target_pos = input[0];
+					m1_param_ext.foc_param.target_vel = input[0];
 				} else if (cmd_map[i].data_index == INDEX_VP_PI) {
 
 					// m1_param_ext.foc_param.d_axis.kp = input[0];

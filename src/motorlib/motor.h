@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
+
 #ifndef MOTOR_H
 #define MOTOR_H
 
@@ -39,6 +40,7 @@ void motor_init(struct motor *motor);
 /**
  * @brief 高频控制任务
  * @param[in] motor 电机实例
+ * @param[in] adc_raw ADC原始数据数组
  * @return 无
  * @note 应在定时器中断中周期性调用（默认10kHz），执行反馈更新和状态机调度
  */

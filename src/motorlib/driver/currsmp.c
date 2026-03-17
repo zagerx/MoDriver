@@ -1,18 +1,6 @@
-#include "currsmp.h"
-#include "motorlib_control_param.h"
+/* SPDX-License-Identifier: GPL-2.0 */
 
-struct currsmp_data {
-	float test; /**< @brief 测试数据 */
-};
-/**
- * @brief 电流采样数据结构体
- */
-struct currsmp {
-	struct currsmp_input input;   /**< @brief 电流采样原始数据 */
-	struct currsmp_output output; /**< @brief 电流采样数据 */
-	struct currsmp_param *param;  /**< @brief 电流采样参数 */
-	struct currsmp_data data;     /**< @brief 电流采样内部数据 */
-};
+#include "currsmp.h"
 
 /**
  * @brief 绑定电流采样参数
@@ -27,17 +15,6 @@ void currsmp_bind_param(struct currsmp *currsmp, struct currsmp_param *param)
 	}
 }
 
-#if !defined(MOTOR_COUNT) || (MOTOR_COUNT == 0)
-#error "MOTOR_COUNT not defined or invalid"
-#elif MOTOR_COUNT == 1
-struct currsmp currsmp_1;
-#elif MOTOR_COUNT == 2
-struct currsmp currsmp_1;
-struct currsmp currsmp_2;
-#else
-#error "MOTOR_COUNT must be 1 or 2"
-#endif
-
 /**
  * @brief 初始化电流采样实例
  * @param[in] currsmp 电流采样实例
@@ -49,6 +26,7 @@ void currsmp_init(struct currsmp *currsmp)
 	if (!currsmp || !currsmp->param) {
 		return;
 	}
+
 	currsmp->input.i_a_raw = 0;
 	currsmp->input.i_b_raw = 0;
 	currsmp->input.i_c_raw = 0;
@@ -61,6 +39,7 @@ void currsmp_init(struct currsmp *currsmp)
 	currsmp->output.i_bus = 0.0f;
 	currsmp->output.v_bus = 0.0f;
 }
+
 /**
  * @brief 更新电流采样原始数据
  * @param[in] currsmp 电流采样实例
@@ -73,12 +52,14 @@ void currsmp_update_raw(struct currsmp *currsmp, uint16_t *adc_raw)
 	if (!currsmp) {
 		return;
 	}
+
 	currsmp->input.i_a_raw = adc_raw[0];
 	currsmp->input.i_b_raw = adc_raw[1];
 	currsmp->input.i_c_raw = adc_raw[2];
 	currsmp->input.i_bus_raw = adc_raw[3];
 	currsmp->input.v_bus_raw = adc_raw[4];
 }
+
 /**
  * @brief 更新电流采样计算值（转换为物理量）
  * @param[in] currsmp 电流采样实例
@@ -90,6 +71,7 @@ void currsmp_update(struct currsmp *currsmp)
 	if (!currsmp) {
 		return;
 	}
+
 	/* 转换为物理量 */
 	currsmp->output.i_a = (currsmp->input.i_a_raw - currsmp->param->a_chn_offset) *
 			      currsmp->param->gain_phase;
@@ -100,6 +82,7 @@ void currsmp_update(struct currsmp *currsmp)
 	currsmp->output.i_bus = (currsmp->input.i_bus_raw) * currsmp->param->gain_i_bus;
 	currsmp->output.v_bus = (currsmp->input.v_bus_raw) * currsmp->param->gain_v_bus;
 }
+
 /**
  * @brief 仅更新母线电压和电流
  * @param[in] currsmp 电流采样实例
@@ -111,6 +94,7 @@ void currsmp_update_bus(struct currsmp *currsmp)
 	if (!currsmp) {
 		return;
 	}
+
 	currsmp->output.v_bus = (currsmp->input.v_bus_raw) * currsmp->param->gain_v_bus;
 	currsmp->output.i_bus = (currsmp->input.i_bus_raw) * currsmp->param->gain_i_bus;
 }
@@ -126,6 +110,7 @@ void currsmp_get_output(struct currsmp *currsmp, struct currsmp_output *output)
 	if (!currsmp || !output) {
 		return;
 	}
+
 	*output = currsmp->output;
 }
 
@@ -140,6 +125,7 @@ void currsmp_get_raw(struct currsmp *currsmp, struct currsmp_input *input)
 	if (!currsmp || !input) {
 		return;
 	}
+
 	*input = currsmp->input;
 }
 
@@ -155,6 +141,7 @@ void currsmp_update_offset(struct currsmp *currsmp, uint16_t *adc_raw)
 	if (!currsmp || !currsmp->param) {
 		return;
 	}
+
 	currsmp->param->a_chn_offset = adc_raw[0];
 	currsmp->param->b_chn_offset = adc_raw[1];
 	currsmp->param->c_chn_offset = adc_raw[2];
@@ -171,6 +158,7 @@ void currsmp_update_phase_gain(struct currsmp *currsmp, float gain_phase)
 	if (!currsmp || !currsmp->param) {
 		return;
 	}
+
 	currsmp->param->gain_phase = gain_phase;
 }
 
@@ -185,6 +173,7 @@ void currsmp_update_i_bus_gain(struct currsmp *currsmp, float gain_i_bus)
 	if (!currsmp || !currsmp->param) {
 		return;
 	}
+
 	currsmp->param->gain_i_bus = gain_i_bus;
 }
 
@@ -199,5 +188,6 @@ void currsmp_update_v_bus_gain(struct currsmp *currsmp, float gain_v_bus)
 	if (!currsmp || !currsmp->param) {
 		return;
 	}
+
 	currsmp->param->gain_v_bus = gain_v_bus;
 }

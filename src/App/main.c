@@ -26,9 +26,9 @@ struct motor_param_ext m1_param_ext = {
 	.feedback_param = {0},
 	.currsmp_param =
 		{
-			.gain_phase = 0.006011f,  // 电流采样增益（A/LSB）
-			.gain_i_bus = 0.01f,      // 母线电流采样增益（A/LSB）
-			.gain_v_bus = 0.0112793f, // 母线电压采样增益（V/LSB） 130V(130+10)
+			.gain_phase = PHASE_CURRENT_GAIN, // 电流采样增益（A/LSB）
+			.gain_i_bus = BUS_CURRENT_GAIN,   // 母线电流采样增益（A/LSB）
+			.gain_v_bus = BUS_VOLTAGE_GAIN,   // 母线电压采样增益（V/LSB） 130V(130+10)
 		},
 	.traj_param =
 		{

@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #ifndef ENCODER_CALIBRATION_H
 #define ENCODER_CALIBRATION_H
 
@@ -6,24 +8,28 @@
 
 struct motor;
 
-/* 编码器校准对象 - 仅运行时数据 */
+/**
+ * @brief 编码器校准对象 - 仅运行时数据
+ */
 struct encoder_calib {
-	uint32_t tick_cnt;       /* 滴答计数（10kHz时基） */
-	uint8_t state;           /* 子状态机 */
-	uint16_t raw_prev;       /* 上次编码器原始值（解卷绕用） */
-	int32_t raw_delta_acc;   /* 编码器累计变化量（解卷绕后） */
-	uint32_t align_tick_cnt; /* 对齐当前计数 */
+	uint32_t tick_cnt;       /**< 滴答计数 */
+	uint8_t state;           /**< 子状态机 */
+	uint16_t raw_prev;       /**< 上次编码器原始值（解卷绕用） */
+	int32_t raw_delta_acc;   /**< 编码器累计变化量（解卷绕后） */
+	uint32_t align_tick_cnt; /**< 对齐当前计数 */
 };
 
-/* 编码器校准阶段 */
+/**
+ * @brief 编码器校准阶段
+ */
 enum encoder_calib_state {
-	ENC_CALIB_IDLE = 0,
-	ENC_CALIB_ALIGN,        /* 对齐到0度 */
-	ENC_CALIB_ROTATE,       /* 开环旋转 */
-	ENC_CALIB_CALC,         /* 计算极对数和方向 */
-	ENC_CALIB_OFFSET_ALIGN, /* 对齐到-90度取偏置 */
-	ENC_CALIB_DONE,
-	ENC_CALIB_ERROR
+	ENC_CALIB_IDLE = 0,     /**< 空闲状态 */
+	ENC_CALIB_ALIGN,        /**< 对齐到0度 */
+	ENC_CALIB_ROTATE,       /**< 开环旋转 */
+	ENC_CALIB_CALC,         /**< 计算极对数和方向 */
+	ENC_CALIB_OFFSET_ALIGN, /**< 对齐到0度取偏置 */
+	ENC_CALIB_DONE,         /**< 校准完成 */
+	ENC_CALIB_ERROR         /**< 校准错误 */
 };
 
 /**
@@ -38,7 +44,7 @@ void encoder_calib_init(struct motor *motor);
  * @brief 执行一次编码器校准步进
  * @param[in] motor 电机实例
  * @return true 校准完成，false 需要继续执行
- * @note 应在10kHz高频任务中周期性调用
+ * @note 应在高频任务中周期性调用
  */
 bool encoder_calib_run(struct motor *motor);
 
@@ -50,4 +56,4 @@ bool encoder_calib_run(struct motor *motor);
  */
 void encoder_calib_apply(struct motor *motor);
 
-#endif
+#endif /* ENCODER_CALIBRATION_H */

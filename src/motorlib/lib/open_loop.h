@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #ifndef OPEN_LOOP_H
 #define OPEN_LOOP_H
 
@@ -11,6 +13,7 @@ struct motor;
  * @return 无
  */
 void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eangle);
+
 /**
  * @brief 开环强制拖动（角速度控制）
  * @param[in] motor 电机实例
@@ -20,12 +23,14 @@ void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eang
  * @return 无
  */
 void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, float omega);
+
 /**
  * @brief 获取开环强制角度
  * @param[in] motor 电机实例
  * @return 当前电角度
  */
 float open_loop_get_force_angle(struct motor *motor);
+
 /**
  * @brief 开环编码器模式（使用编码器反馈）
  * @param[in] motor 电机实例
@@ -33,10 +38,13 @@ float open_loop_get_force_angle(struct motor *motor);
  * @return 无
  */
 void open_loop_encoder(struct motor *motor, float q_axis_voltage);
+
 /**
  * @brief 更新id/iq电流
- * @param[in] foc FOC实例
+ * @param[in] motor 电机实例
+ * @param[in] tar 目标值
  * @return 无
  */
 void currment_debug(struct motor *motor, float tar);
+
 #endif

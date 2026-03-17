@@ -1,65 +1,17 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #include <stdint.h>
 #include <math.h>
 
 #include "feedback.h"
-#include "motorlib_control_param.h"
-
-/** @brief 反馈状态枚举 */
-enum feedback_state {
-	FEEDBACK_STATE_OK = 0,             /**< @brief 正常状态 */
-	FEEDBACK_STATE_NOT_CALIBRATED = 1, /**< @brief 未校准状态 */
-};
-
-/**
- * @brief 反馈原始数据与中间计算数据结构体
- */
-struct feedback_data {
-	volatile uint16_t raw;                 /**< @brief 原始编码器读数 */
-	volatile uint16_t prev_raw;            /**< @brief 上一次原始读数（用于差分） */
-	volatile int32_t total_counts;         /**< @brief 累积计数（考虑溢出） */
-	volatile float accumulated_mangle_rad; /**< @brief 累积机械角度 rad */
-	volatile float prev_mangle_rad;        /**< @brief 上一次机械角度（用于速度差分） */
-	volatile float mech_omega_rad_s;       /**< @brief 机械角速度 rad/s */
-};
-
-/**
- * @brief 反馈输出数据结构体
- */
-struct feedback_output {
-	float eangle_rad;     /**< @brief 电角度 rad */
-	float velocity_rad_s; /**< @brief 机械角速度 rad/s */
-	float odometer;       /**< @brief 里程（累积线位移）m */
-};
-
-/**
- * @brief 编码器反馈结构体
- */
-struct feedback {
-	const struct encoder_ops *ops; /**< @brief 编码器操作接口 */
-	struct feedback_param *param;  /**< @brief 反馈参数指针 */
-	struct feedback_output output; /**< @brief 输出数据 */
-	struct feedback_data data;     /**< @brief 原始数据与中间计算数据 */
-	enum feedback_state state;     /**< @brief 当前状态 */
-};
-
-#if !defined(MOTOR_COUNT) || (MOTOR_COUNT == 0)
-#error "MOTOR_COUNT not defined or invalid"
-#elif MOTOR_COUNT == 1
-struct feedback feedback_1;
-#elif MOTOR_COUNT == 2
-struct feedback feedback_1;
-struct feedback feedback_2;
-#else
-#error "MOTOR_COUNT must be 1 or 2"
-#endif
 
 /** @brief 低通滤波系数（0~1，越大响应越快） */
 #define VELOCITY_LPF_ALPHA 0.08f
 
 /**
  * @brief 角度归一化到 [0, 2PI]
- * @param[in] angle 输入角度 rad
- * @return float 归一化后的角度 rad
+ * @param[in] angle 输入角度，单位：rad
+ * @return float 归一化后的角度，单位：rad
  * @note 将任意角度映射到 [0, 2π] 范围内
  */
 static float normalize_angle(float angle)
@@ -171,9 +123,9 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t
 	data->total_counts += delta;
 
 	/* 计算累积机械角度（考虑编码器零位偏移） */
-	data->accumulated_mangle_rad =
-		(two_pi / (float)cpr) *
-		(float)(data->total_counts - (int32_t)param->encoder_offset) * param->direction;
+	data->accumulated_mangle_rad = (two_pi / (float)cpr) *
+				       (float)(data->total_counts - (int32_t)param->encoder_offset) *
+				       param->direction;
 
 	/* 保存原始值供下次使用（避免负数存入uint16_t导致的抖动问题） */
 	data->prev_raw = raw;
@@ -184,8 +136,8 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t
 /**
  * @brief 计算电角度（机械角度 * 极对数，归一化到 [0, 2π]）
  * @param[in] feedback 反馈实例
- * @param[in] mangle 机械角度 rad
- * @return float 电角度 rad
+ * @param[in] mangle 机械角度，单位：rad
+ * @return float 电角度，单位：rad
  */
 static float feedback_calc_elec_angle(struct feedback *feedback, float mangle)
 {
@@ -196,9 +148,9 @@ static float feedback_calc_elec_angle(struct feedback *feedback, float mangle)
 /**
  * @brief 差分法计算机械角速度，带低通滤波
  * @param[in] feedback 反馈实例
- * @param[in] dt 采样周期 s
- * @param[in] cur_mangle 当前机械角度 rad
- * @return float 机械角速度 rad/s
+ * @param[in] dt 采样周期，单位：s
+ * @param[in] cur_mangle 当前机械角度，单位：rad
+ * @return float 机械角速度，单位：rad/s
  * @note 使用差分法计算速度，并应用一阶低通滤波
  */
 static float feedback_calc_velocity(struct feedback *feedback, float dt, float cur_mangle)
@@ -229,17 +181,25 @@ static float feedback_calc_velocity(struct feedback *feedback, float dt, float c
 
 	return data->mech_omega_rad_s;
 }
+
+/**
+ * @brief 更新反馈原始数据
+ * @param[in] feedback 反馈实例
+ * @return 无
+ */
 void feedback_update_raw(struct feedback *feedback)
 {
 	if (!feedback || feedback->state != FEEDBACK_STATE_OK) {
 		return;
 	}
+
 	feedback->data.raw = feedback_get_raw(feedback);
 }
+
 /**
  * @brief 更新反馈数据（编码器读取 + 角度/速度/电角度计算）
  * @param[in] feedback 反馈实例
- * @param[in] dt 采样周期 s
+ * @param[in] dt 采样周期，单位：s
  * @return 无
  * @details 执行编码器读取、零位偏移校正、累积角度计算、电角度计算、速度计算和里程更新
  */
@@ -270,131 +230,4 @@ void feedback_update(struct feedback *feedback, float dt)
 
 	/* 6. 更新里程（可选） */
 	feedback->output.odometer = cur_mangle * param->wheel_radius / param->gear_ratio;
-}
-
-/**
- * @brief 获取编码器原始值
- * @param[in] fb 反馈实例
- * @return uint16_t 原始编码器读数
- */
-uint16_t feedback_get_raw(struct feedback *fb)
-{
-	return fb->ops ? fb->ops->read() : 0;
-}
-
-/**
- * @brief 获取电角度
- * @param[in] fb 反馈实例
- * @return float 电角度 rad
- */
-float feedback_get_elec_angle(struct feedback *fb)
-{
-	return fb->output.eangle_rad;
-}
-
-/**
- * @brief 获取机械角速度
- * @param[in] fb 反馈实例
- * @return float 机械角速度 rad/s
- */
-float feedback_get_velocity(struct feedback *fb)
-{
-	return fb->output.velocity_rad_s;
-}
-
-/**
- * @brief 获取线速度
- * @param[in] fb 反馈实例
- * @return float 线速度 m/s
- */
-float feedback_get_line_velocity(struct feedback *fb)
-{
-	return fb->output.velocity_rad_s * fb->param->wheel_radius / fb->param->gear_ratio;
-}
-
-/* 以下函数为内部参数更新函数，以 _ 开头 */
-
-/**
- * @brief 更新轮子半径参数
- * @param[in] feedback 反馈实例
- * @param[in] wheel_radius 轮子半径 m
- * @return 无
- */
-void _feedback_update_param_wheel_radius(struct feedback *feedback, float wheel_radius)
-{
-	if (!feedback) {
-		return;
-	}
-	feedback->param->wheel_radius = wheel_radius;
-}
-
-/**
- * @brief 更新减速比参数
- * @param[in] feedback 反馈实例
- * @param[in] gear_ratio 减速比
- * @return 无
- */
-void _feedback_update_param_gear_ratio(struct feedback *feedback, float gear_ratio)
-{
-	if (!feedback) {
-		return;
-	}
-	feedback->param->gear_ratio = gear_ratio;
-}
-
-/**
- * @brief 更新极对数参数
- * @param[in] feedback 反馈实例
- * @param[in] pole_pairs 极对数
- * @return 无
- */
-void _feedback_update_param_pole_pairs(struct feedback *feedback, float pole_pairs)
-{
-	if (!feedback) {
-		return;
-	}
-	feedback->param->pole_pairs = pole_pairs;
-}
-
-/**
- * @brief 更新旋转方向参数
- * @param[in] feedback 反馈实例
- * @param[in] direction 旋转方向（1 或 -1）
- * @return 无
- */
-void _feedback_update_param_direction(struct feedback *feedback, float direction)
-{
-	if (!feedback) {
-		return;
-	}
-	feedback->param->direction = direction;
-}
-
-/**
- * @brief 更新编码器分辨率参数
- * @param[in] feedback 反馈实例
- * @param[in] encoder_resolution 编码器分辨率
- * @return 无
- */
-void _feedback_update_param_encoder_resolution(struct feedback *feedback,
-					       uint16_t encoder_resolution)
-{
-	if (!feedback) {
-		return;
-	}
-	feedback->param->encoder_resolution = encoder_resolution;
-}
-
-/**
- * @brief 更新编码器零位偏移参数
- * @param[in] feedback 反馈实例
- * @param[in] encoder_offset 编码器零位偏移
- * @return 无
- */
-void _feedback_update_param_encoder_offset(struct feedback *feedback, uint16_t encoder_offset)
-{
-	if (!feedback) {
-		return;
-	}
-	feedback->param->encoder_offset = encoder_offset;
 }

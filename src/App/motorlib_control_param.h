@@ -6,9 +6,16 @@
 #endif
 
 /*硬件相关*/
-#define PHASE_CURRENT_GAIN   30.0f      /* 相电流增益 */
-#define BUS_CURRENT_GAIN     0.01f      /* 母线电流增益 */
-#define BUS_VOLTAGE_GAIN     0.0112793f /* 母线电压增益 */
+#define ISENSE_AMP_GAIN      (4.7f)    /* 电流采样运放增益 [V/V] */
+#define ADC_VREF             (3.3f)    /* ADC参考电压 [V] */
+#define ADC_RESOLUTION       (4096.0f) /* ADC分辨率 (12位) */
+#define SHUNT_RESISTANCE_OHM (0.025f)  /* 采样电阻 [Ω] */
+#define PHASE_CURRENT_GAIN   (ADC_VREF / (ADC_RESOLUTION * SHUNT_RESISTANCE_OHM * ISENSE_AMP_GAIN))
+
+#define BUS_R1               (130000.0f)
+#define BUS_R2               (10000.0f)
+#define BUS_VOLTAGE_GAIN     ((ADC_VREF * (BUS_R1 + BUS_R2)) / (ADC_RESOLUTION * BUS_R2))
+#define BUS_CURRENT_GAIN     0.00f      /* 母线电流增益 */
 #define ENCODER_RESOLUTION   16384      /* 编码器分辨率 */
 #define ENCODER_RESOLUTION_F (16384.0f) /* 编码器分辨率 */
 
@@ -22,7 +29,7 @@
 
 #define MIN_MECH_ROUNDS 0.02f
 #define MIN_ELEC_ROUNDS 0.20f
-#define ALIGN_VOLTAGE   0.15f
+#define ALIGN_VOLTAGE   0.55f
 #define ROTATE_VOLTAGE  (ALIGN_VOLTAGE)
 #define ALIGN_TIMEOUT   2000 /* 对齐阶段超时时间 ms */
 #define ROTATE_TIMEOUT  5000 /* 旋转阶段超时时间 ms */
@@ -40,5 +47,5 @@
 
 #define SPEED_LOOP_KP    (0.05f)
 #define SPEED_LOOP_KI    (6.0f)
-#define SPEED_LOOP_LIMIT (13.0f)
+#define SPEED_LOOP_LIMIT (7.0f)
 #endif /* MOTORLIB_CONTROL_PARAM_H */

@@ -1,8 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #include "calibration.h"
 #include "current_calibration.h"
 #include "encoder_calibration.h"
 #include "_motorlib_internal.h"
-#include "inverter.h"
 #include <stdint.h>
 
 /**
@@ -25,17 +26,21 @@ void calibration_init(struct motor *motor)
 	calib->enc_phase = ENCODER_PHASE_INIT;
 }
 
-/* 电流校准阶段处理 */
 /**
-0:校准成功
--1:校准失败
-1:校准进行中
-*/
+ * @brief 电流校准阶段处理
+ * @param[in] motor 电机实例
+ * @return 校准状态
+ * @retval 0 校准成功
+ * @retval -1 校准失败
+ * @retval 1 校准进行中
+ */
 static int16_t current_phase_handle(struct motor *motor)
 {
 	struct calibration *calib = &motor->calib;
 	int16_t ret;
+
 	ret = 1;
+
 	switch (calib->curr_state) {
 	case CURRENT_STATE_IDLE:
 		current_calib_init(motor, 0);
@@ -53,6 +58,7 @@ static int16_t current_phase_handle(struct motor *motor)
 	case CURRENT_STATE_FINISH:
 		ret = 0;
 		break;
+
 	default:
 		ret = -1;
 		break;
@@ -61,13 +67,22 @@ static int16_t current_phase_handle(struct motor *motor)
 	return ret;
 }
 
-/* 编码器校准阶段处理 */
+/**
+ * @brief 编码器校准阶段处理
+ * @param[in] motor 电机实例
+ * @return 校准状态
+ * @retval 0 校准成功
+ * @retval -1 校准失败
+ * @retval 1 校准进行中
+ */
 static int16_t encoder_phase_handle(struct motor *motor)
 {
 	struct calibration *calib = &motor->calib;
 	bool done;
 	int16_t ret;
+
 	ret = 1;
+
 	switch (calib->enc_phase) {
 	case ENCODER_PHASE_INIT:
 		encoder_calib_init(motor);
@@ -86,6 +101,7 @@ static int16_t encoder_phase_handle(struct motor *motor)
 	case ENCODER_PHASE_FINISH:
 		ret = 0;
 		break;
+
 	default:
 		ret = -1;
 		break;

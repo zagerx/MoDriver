@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+
 #include "trajectory_plan.h"
 #include <math.h>
 #include <string.h>
@@ -13,19 +15,37 @@ static traj_plan_status_t traj_plan(traj_plan_data_t *d, float target_pos, float
 static void traj_plan_init(traj_plan_data_t *d, float start_pos, float start_v, float acc_max,
 			   float exec_cycle);
 static traj_plan_status_t traj_plan_three_segment(const traj_plan_input_t *in,
-						  traj_plan_output_t *out, float target_pos,
-						  float target_vel);
+					  traj_plan_output_t *out, float target_pos,
+					  float target_vel);
 static traj_plan_status_t traj_plan_deceleration_only(const traj_plan_input_t *in,
-						      traj_plan_output_t *out, float brake_acc);
+					      traj_plan_output_t *out, float brake_acc);
+
+/**
+ * @brief 绑定轨迹规划器参数
+ *
+ * @param trajectory 轨迹规划器实例指针
+ * @param param      轨迹参数指针
+ *
+ * @return 无
+ */
 void trajectory_planner_bind_param(struct trajectory_plan *trajectory, trajectory_param_t *param)
 {
 	if (trajectory) {
 		trajectory->param = param;
 	}
 }
-/* =========================================================
- * Planner 初始化
- * ========================================================= */
+
+/**
+ * @brief 初始化轨迹规划器
+ *
+ * @param trajectory 轨迹规划器实例指针
+ * @param start_pos  起始位置
+ * @param start_vel  起始速度
+ * @param start_acc  起始加速度
+ * @param exec_cycle 执行周期
+ *
+ * @return 0 表示成功
+ */
 int trajectory_planner_init(struct trajectory_plan *trajectory, float start_pos, float start_vel,
 			    float start_acc, float exec_cycle)
 {
@@ -42,13 +62,19 @@ int trajectory_planner_init(struct trajectory_plan *trajectory, float start_pos,
 	return 0;
 }
 
-/* =========================================================
- * Planner 执行（周期调用）
- * 边界条件：
- * - END状态：自动转换为IDLE
- * - RUNNING/STOPPING状态：执行轨迹段
- * - IDLE状态：无操作
- * ========================================================= */
+/**
+ * @brief 轨迹规划器执行（周期调用）
+ *
+ * @param trajectory 轨迹规划器实例指针
+ * @param dt         时间步长
+ *
+ * @return 无
+ *
+ * @note 边界条件：
+ *       - END状态：自动转换为IDLE
+ *       - RUNNING/STOPPING状态：执行轨迹段
+ *       - IDLE状态：无操作
+ */
 void trajectory_planner_action(struct trajectory_plan *trajectory, float dt)
 {
 	traj_exec_data_t *exec = &((trajectory_data_t *)&trajectory->data)->exec_data;
@@ -76,14 +102,20 @@ void trajectory_planner_action(struct trajectory_plan *trajectory, float dt)
 
 	/* IDLE状态：无操作，等待新目标 */
 }
-/* =========================================================
- * 紧急停止函数
- * 边界条件：
- * - 任何非END/IDLE状态都可进入STOPPING
- * - 立即强制设置STOPPING状态
- * - 必须保证加载有效轨迹（规划失败时使用零轨迹）
- * - STOPPING状态重复调用：重新规划（更安全）
- * ========================================================= */
+
+/**
+ * @brief 紧急停止函数
+ *
+ * @param trajectory 轨迹规划器实例指针
+ *
+ * @return 无
+ *
+ * @note 边界条件：
+ *       - 任何非END/IDLE状态都可进入STOPPING
+ *       - 立即强制设置STOPPING状态
+ *       - 必须保证加载有效轨迹（规划失败时使用零轨迹）
+ *       - STOPPING状态重复调用：重新规划（更安全）
+ */
 void trajectory_planner_stop(struct trajectory_plan *trajectory)
 {
 	trajectory_data_t *d = &trajectory->data;
@@ -129,12 +161,20 @@ void trajectory_planner_stop(struct trajectory_plan *trajectory)
 	plan->emergency_stop_seg.a = 0.0f;
 	traj_exec_load(exec, &plan->emergency_stop_seg, 1);
 }
-/* =========================================================
- * 纯减速轨迹规划（紧急停止专用）
- * 从当前速度使用紧急减速度减速到0
- * ========================================================= */
+
+/**
+ * @brief 纯减速轨迹规划（紧急停止专用）
+ *
+ * @param in         规划输入参数
+ * @param out        规划输出结果
+ * @param brake_acc  紧急刹停加速度
+ *
+ * @return 规划状态
+ *
+ * @note 从当前速度使用紧急减速度减速到0
+ */
 static traj_plan_status_t traj_plan_deceleration_only(const traj_plan_input_t *in,
-						      traj_plan_output_t *out, float brake_acc)
+					      traj_plan_output_t *out, float brake_acc)
 {
 	out->seg_cnt = 0;
 
@@ -161,13 +201,21 @@ static traj_plan_status_t traj_plan_deceleration_only(const traj_plan_input_t *i
 
 	return TRAJ_PLAN_OK;
 }
-/* =========================================================
- * 更新目标位置（在线 replanning）
- * 边界条件：
- * - STOPPING状态：拒绝更新（返回BUSY）
- * - IDLE/RUNNING/END状态：允许更新
- * - 加载成功后强制设为RUNNING
- * ========================================================= */
+
+/**
+ * @brief 更新目标位置（在线 replanning）
+ *
+ * @param trajectory      轨迹规划器实例指针
+ * @param new_target_pos  新的目标位置
+ * @param new_vel         新的目标速度
+ *
+ * @return 规划状态
+ *
+ * @note 边界条件：
+ *       - STOPPING状态：拒绝更新（返回BUSY）
+ *       - IDLE/RUNNING/END状态：允许更新
+ *       - 加载成功后强制设为RUNNING
+ */
 traj_plan_status_t trajectory_planner_update_target(struct trajectory_plan *trajectory,
 						    float new_target_pos, float new_vel)
 {
@@ -217,9 +265,16 @@ traj_plan_status_t trajectory_planner_update_target(struct trajectory_plan *traj
 
 	return TRAJ_PLAN_OK;
 }
-/* =========================================================
- * 核心规划入口
- * ========================================================= */
+
+/**
+ * @brief 核心规划入口
+ *
+ * @param d            规划数据
+ * @param target_pos   目标位置
+ * @param target_vel   目标速度
+ *
+ * @return 规划状态
+ */
 static traj_plan_status_t traj_plan(traj_plan_data_t *d, float target_pos, float target_vel)
 {
 	traj_plan_input_t *in = &d->plan_in;
@@ -239,19 +294,28 @@ static traj_plan_status_t traj_plan(traj_plan_data_t *d, float target_pos, float
 	return traj_plan_three_segment(in, out, target_pos, target_vel);
 }
 
-/* =========================================================
- * 三段式（梯形）速度规划 - 完善版
- * 根据运动方向智能选择加速度：
- * - 正常加减速使用 acc
- * - 方向相反的刹停使用 brake_acc
- * 修复：同向距离不足时，减速后自动反向修正至目标点
- * ========================================================= */
+/**
+ * @brief 三段式（梯形）速度规划
+ *
+ * @param in           规划输入参数
+ * @param out          规划输出结果
+ * @param target_pos   目标位置
+ * @param target_vel   目标速度
+ *
+ * @return 规划状态
+ *
+ * @note 根据运动方向智能选择加速度：
+ *       - 正常加减速使用 acc
+ *       - 方向相反的刹停使用 brake_acc
+ *       同向距离不足时，减速后自动反向修正至目标点
+ */
 #define TRAJ_POS_EPSILON  1e-4f
 #define TRAJ_VEL_EPSILON  1e-6f
 #define TRAJ_TIME_EPSILON 1e-7f
+
 static traj_plan_status_t traj_plan_three_segment(const traj_plan_input_t *in,
-						  traj_plan_output_t *out, float target_pos,
-						  float target_vel)
+					  traj_plan_output_t *out, float target_pos,
+					  float target_vel)
 {
 	out->seg_cnt = 0;
 
@@ -316,6 +380,7 @@ static traj_plan_status_t traj_plan_three_segment(const traj_plan_input_t *in,
 				float t_acc = v_peak / acc;
 				out->segs[out->seg_cnt++] =
 					(traj_seg_t){.t = t_acc, .a = move_dir * acc};
+
 				/* 减速段 */
 				float t_dec = v_peak / acc;
 				out->segs[out->seg_cnt++] =
@@ -391,6 +456,18 @@ static traj_plan_status_t traj_plan_three_segment(const traj_plan_input_t *in,
 
 	return TRAJ_PLAN_OK;
 }
+
+/**
+ * @brief 初始化规划数据
+ *
+ * @param d            规划数据结构指针
+ * @param start_pos    起始位置
+ * @param start_v      起始速度
+ * @param acc_max      最大加速度
+ * @param exec_cycle   执行周期
+ *
+ * @return 无
+ */
 static void traj_plan_init(traj_plan_data_t *d, float start_pos, float start_v, float acc_max,
 			   float exec_cycle)
 {
@@ -408,6 +485,16 @@ static void traj_plan_init(traj_plan_data_t *d, float start_pos, float start_v, 
 	d->emergency_stop_seg.a = 0.0f;
 }
 
+/**
+ * @brief 初始化执行数据
+ *
+ * @param d            执行数据结构指针
+ * @param start_pos    起始位置
+ * @param start_vel    起始速度
+ * @param start_acc    起始加速度
+ *
+ * @return 无
+ */
 static void traj_exec_init(traj_exec_data_t *d, float start_pos, float start_vel, float start_acc)
 {
 	memset(d, 0, sizeof(*d));
@@ -417,13 +504,19 @@ static void traj_exec_init(traj_exec_data_t *d, float start_pos, float start_vel
 	d->state = TRAJ_EXEC_IDLE;
 }
 
-/* =========================================================
- * 轨迹加载函数
- * 边界条件：
- * - 不修改执行器状态！
- * - 仅校验参数有效性
- * - 返回0成功，-1失败
- * ========================================================= */
+/**
+ * @brief 轨迹加载函数
+ *
+ * @param d            执行数据结构指针
+ * @param segs         轨迹段数组
+ * @param seg_cnt      轨迹段数量
+ *
+ * @return 0 表示成功，-1 表示失败
+ *
+ * @note 边界条件：
+ *       - 不修改执行器状态！
+ *       - 仅校验参数有效性
+ */
 static int traj_exec_load(traj_exec_data_t *d, const traj_seg_t *segs, int seg_cnt)
 {
 	/* 参数校验 */
@@ -447,14 +540,20 @@ static int traj_exec_load(traj_exec_data_t *d, const traj_seg_t *segs, int seg_c
 	return 0;
 }
 
-/* =========================================================
- * 轨迹执行步进函数
- * 边界条件：
- * - 纯执行，不做任何状态判断！
- * - 仅从段中加载数据执行运动学
- * - 段指针无效时强制结束（硬件保护）
- * - 执行完毕自动设置END状态
- * ========================================================= */
+/**
+ * @brief 轨迹执行步进函数
+ *
+ * @param d            执行数据结构指针
+ * @param dt           时间步长
+ *
+ * @return 无
+ *
+ * @note 边界条件：
+ *       - 纯执行，不做任何状态判断！
+ *       - 仅从段中加载数据执行运动学
+ *       - 段指针无效时强制结束（硬件保护）
+ *       - 执行完毕自动设置END状态
+ */
 static void traj_exec_step(traj_exec_data_t *d, float dt)
 {
 	float remain = dt;
@@ -503,24 +602,52 @@ static void traj_exec_step(traj_exec_data_t *d, float dt)
 	}
 }
 
+/**
+ * @brief 获取当前位置
+ *
+ * @param trajectory   轨迹规划器实例指针
+ *
+ * @return 当前位置
+ */
 float trajectory_planner_get_pos(const struct trajectory_plan *trajectory)
 {
 	const trajectory_data_t *data = &trajectory->data;
 	return data->exec_data.pos;
 }
 
+/**
+ * @brief 获取当前速度
+ *
+ * @param trajectory   轨迹规划器实例指针
+ *
+ * @return 当前速度
+ */
 float trajectory_planner_get_vel(const struct trajectory_plan *trajectory)
 {
 	const trajectory_data_t *data = &trajectory->data;
 	return data->exec_data.vel;
 }
 
+/**
+ * @brief 获取当前加速度
+ *
+ * @param trajectory   轨迹规划器实例指针
+ *
+ * @return 当前加速度
+ */
 float trajectory_planner_get_acc(const struct trajectory_plan *trajectory)
 {
 	const trajectory_data_t *data = &trajectory->data;
 	return data->exec_data.acc;
 }
 
+/**
+ * @brief 读取规划目标位置
+ *
+ * @param trajectory   轨迹规划器实例指针
+ *
+ * @return 规划目标位置
+ */
 float trajectory_planner_read_plantarget(const struct trajectory_plan *trajectory)
 {
 	const trajectory_data_t *data = &trajectory->data;

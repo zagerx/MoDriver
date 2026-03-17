@@ -1,14 +1,15 @@
+// SPDX-License-Identifier: GPL-2.0
+
 #include "_motorlib_internal.h"
 #include "arm_math_types.h"
 #include "foc.h"
 
 #include "foc_pid.h"
-#include "inverter.h"
 #include "feedback.h"
 #include "currsmp.h"
-#include "svpwm.h"
 #include "arm_math.h"
 #include "motor_driver.h"
+
 #undef RAD_TO_DEG
 #define RAD_TO_DEG (180.0f / M_PI)
 
@@ -17,22 +18,25 @@
  * @param[in] foc FOC实例
  * @param[in] feeback 反馈输出数据
  * @param[in] currsmp_out 电流采样输出数据
+ * @param[in] foc_param FOC参数
  * @return 无
  */
 void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp *currsmp,
-	      struct foc_pid_param *d_axis_pid_param, struct foc_pid_param *q_axis_pid_param,
-	      struct foc_pid_param *vel_pid_param, struct foc_pid_param *pos_pid_param)
+	      struct foc_param *foc_param)
 {
 	if (!foc) {
 		return;
 	}
-	foc->feedback = feeback;
-	foc->currsmp = currsmp;
-	foc->ctrl.d_axis.params = d_axis_pid_param;
-	foc->ctrl.q_axis.params = q_axis_pid_param;
-	foc->ctrl.velocity.params = vel_pid_param;
-	foc->ctrl.position.params = pos_pid_param;
+
+	foc->meas.cs_out = &currsmp->output;
+	foc->meas.fd_out = &feeback->output;
+	foc->ctrl.d_axis.params = &foc_param->d_axis;
+	foc->ctrl.q_axis.params = &foc_param->q_axis;
+	foc->ctrl.velocity.params = &foc_param->vel;
+	foc->ctrl.position.params = &foc_param->pos;
+	foc->parm = foc_param;
 }
+
 /**
  * @brief 更新id/iq电流
  * @param[in] foc FOC实例
@@ -41,17 +45,20 @@ void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp *currsmp
  */
 void foc_update_idiq(struct foc *foc)
 {
-	if (!foc || !foc->currsmp || !foc->feedback) {
+	if (!foc) {
 		return;
 	}
+
 	struct foc_measurement *meas = &foc->meas;
-	struct currsmp_output out;
-	currsmp_get_output(foc->currsmp, &out);
-	float i_a = out.i_a;
-	float i_b = out.i_b;
+	// struct currsmp_output out;
 
-	float eangle = feedback_get_elec_angle(foc->feedback);
+	// currsmp_get_output(foc->currsmp, &out);
 
+	float i_a = meas->cs_out->i_a;
+	float i_b = meas->cs_out->i_b;
+
+	// float eangle = feedback_get_elec_angle(foc->feedback);
+	float eangle = meas->fd_out->eangle_rad;
 	arm_clarke_f32(i_a, i_b, &meas->i_alpha, &meas->i_beta);
 
 	float sin_val, cos_val;
