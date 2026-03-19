@@ -2,3 +2,4 @@
 src/build/
 src/.cache/
 src/.vscode/
+src/CanOpenSTM32

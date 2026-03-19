@@ -1,4 +1,5 @@
 #include "motor.h"
+#include "tim.h"
 #include "usart.h"
 #include <string.h>
 #include <stdlib.h>
@@ -128,5 +129,13 @@ void process_data(uint8_t *data, uint16_t len)
 			}
 			return;
 		}
+	}
+}
+extern void canopen_app_interrupt(void);
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if (htim == &htim6) {
+		canopen_app_interrupt();
 	}
 }

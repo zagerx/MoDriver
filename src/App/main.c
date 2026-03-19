@@ -55,10 +55,16 @@ struct motor_param_ext m1_param_ext = {
 			.target_torque = 0.0f,
 		},
 };
+
+extern int canopen_app_init(void);
+extern void canopen_app_process(void);
+
 int main(void)
 {
 	/* 初始化硬件层（时钟、GPIO、外设等） */
 	hardware_init();
+
+	canopen_app_init();
 
 	/* 绑定电机硬件接口 */
 	motor_bind_hardware(motor_1, &m1_hw_ops);
@@ -78,6 +84,7 @@ int main(void)
 	while (1) {
 		// motor_highfreq_task(motor_1);
 		HAL_Delay(1);
+		canopen_app_process();
 		/* TODO: 添加低速任务 */
 	}
 }
