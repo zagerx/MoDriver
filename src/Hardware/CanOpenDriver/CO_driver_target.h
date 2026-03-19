@@ -30,23 +30,10 @@
  * It is included from CO_driver.h, which contains documentation
  * for common definitions below. */
 
-#include "stm32g4xx_hal.h"
+/* 注意：不再包含 stm32g4xx_hal.h，保持跨平台兼容性 */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-// Determining the CANOpen Driver
-
-#if defined(FDCAN) || defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-#define CO_STM32_FDCAN_Driver 1
-#elif defined(CAN) || defined(CAN1) || defined(CAN2) || defined(CAN3)
-#define CO_STM32_CAN_Driver 1
-#else
-#error This STM32 Do not support CAN or FDCAN
-#endif
-
-#undef CO_CONFIG_STORAGE_ENABLE // We don't need Storage option, implement based on your use case
-				// and remove this line from here
 
 #ifdef CO_DRIVER_CUSTOM
 #include "CO_driver_custom.h"
@@ -120,10 +107,10 @@ typedef struct {
 	volatile uint16_t CANtxCount;
 	uint32_t errOld;
 
-	/* STM32 specific features */
-	uint32_t primask_send; /* Primask register for interrupts for send operation */
-	uint32_t primask_emcy; /* Primask register for interrupts for emergency operation */
-	uint32_t primask_od;   /* Primask register for interrupts for send operation */
+	/* Platform specific lock storage - using uintptr_t for portability */
+	uintptr_t lock_send;
+	uintptr_t lock_emcy;
+	uintptr_t lock_od;
 
 } CO_CANmodule_t;
 
@@ -137,33 +124,27 @@ typedef struct {
 	void *addrNV;
 } CO_storage_entry_t;
 
+/*============================================================================
+ * Critical section protection - Platform abstraction
+ * 
+ * These functions are implemented in the platform-specific .c file
+ *===========================================================================*/
+
 /* (un)lock critical section in CO_CANsend() */
-// Why disabling the whole Interrupt
-#define CO_LOCK_CAN_SEND(CAN_MODULE)                                                               \
-	do {                                                                                       \
-		(CAN_MODULE)->primask_send = __get_PRIMASK();                                      \
-		__disable_irq();                                                                   \
-	} while (0)
-#define CO_UNLOCK_CAN_SEND(CAN_MODULE) __set_PRIMASK((CAN_MODULE)->primask_send)
+void CO_LOCK_CAN_SEND(CO_CANmodule_t *CAN_MODULE);
+void CO_UNLOCK_CAN_SEND(CO_CANmodule_t *CAN_MODULE);
 
 /* (un)lock critical section in CO_errorReport() or CO_errorReset() */
-#define CO_LOCK_EMCY(CAN_MODULE)                                                                   \
-	do {                                                                                       \
-		(CAN_MODULE)->primask_emcy = __get_PRIMASK();                                      \
-		__disable_irq();                                                                   \
-	} while (0)
-#define CO_UNLOCK_EMCY(CAN_MODULE) __set_PRIMASK((CAN_MODULE)->primask_emcy)
+void CO_LOCK_EMCY(CO_CANmodule_t *CAN_MODULE);
+void CO_UNLOCK_EMCY(CO_CANmodule_t *CAN_MODULE);
 
 /* (un)lock critical section when accessing Object Dictionary */
-#define CO_LOCK_OD(CAN_MODULE)                                                                     \
-	do {                                                                                       \
-		(CAN_MODULE)->primask_od = __get_PRIMASK();                                        \
-		__disable_irq();                                                                   \
-	} while (0)
-#define CO_UNLOCK_OD(CAN_MODULE) __set_PRIMASK((CAN_MODULE)->primask_od)
+void CO_LOCK_OD(CO_CANmodule_t *CAN_MODULE);
+void CO_UNLOCK_OD(CO_CANmodule_t *CAN_MODULE);
 
 /* Synchronization between CAN receive and message processing threads. */
-#define CO_MemoryBarrier()
+void CO_MemoryBarrier(void);
+
 #define CO_FLAG_READ(rxNew) ((rxNew) != NULL)
 #define CO_FLAG_SET(rxNew)                                                                         \
 	do {                                                                                       \

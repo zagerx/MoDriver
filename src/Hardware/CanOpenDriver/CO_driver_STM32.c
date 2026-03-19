@@ -29,7 +29,9 @@
  * Implementation Author:               Tilen Majerle <tilen@majerle.eu>
  */
 #include "301/CO_driver.h"
-// #include "CO_app_STM32.h"
+
+/* 包含 STM32 特定头文件 - 仅在 .c 文件中 */
+#include "stm32g4xx_hal.h"
 
 /* Local CAN module object */
 static CO_CANmodule_t *CANModule_local = NULL; /* Local instance of global CAN module */
@@ -526,4 +528,46 @@ void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t Bu
 		}
 		CO_UNLOCK_CAN_SEND(CANModule_local);
 	}
+}
+
+/*============================================================================
+ * Critical section protection implementation for STM32
+ *===========================================================================*/
+
+void CO_LOCK_CAN_SEND(CO_CANmodule_t *CAN_MODULE)
+{
+	CAN_MODULE->lock_send = (uintptr_t)__get_PRIMASK();
+	__disable_irq();
+}
+
+void CO_UNLOCK_CAN_SEND(CO_CANmodule_t *CAN_MODULE)
+{
+	__set_PRIMASK((uint32_t)CAN_MODULE->lock_send);
+}
+
+void CO_LOCK_EMCY(CO_CANmodule_t *CAN_MODULE)
+{
+	CAN_MODULE->lock_emcy = (uintptr_t)__get_PRIMASK();
+	__disable_irq();
+}
+
+void CO_UNLOCK_EMCY(CO_CANmodule_t *CAN_MODULE)
+{
+	__set_PRIMASK((uint32_t)CAN_MODULE->lock_emcy);
+}
+
+void CO_LOCK_OD(CO_CANmodule_t *CAN_MODULE)
+{
+	CAN_MODULE->lock_od = (uintptr_t)__get_PRIMASK();
+	__disable_irq();
+}
+
+void CO_UNLOCK_OD(CO_CANmodule_t *CAN_MODULE)
+{
+	__set_PRIMASK((uint32_t)CAN_MODULE->lock_od);
+}
+
+void CO_MemoryBarrier(void)
+{
+	__sync_synchronize();
 }

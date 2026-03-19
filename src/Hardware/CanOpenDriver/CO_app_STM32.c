@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "CO_storageBlank.h"
+// #include "CO_storageBlank.h"  // Storage 功能暂时禁用
 #include "OD.h"
 #include "tim.h"
 
@@ -63,16 +63,17 @@ int canopen_app_init(void)
 
 	// Keep a copy global reference of canOpenSTM32 Object
 
-#if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
-	static CO_storage_t storage;
-	static CO_storage_entry_t storageEntries[] = {{.addr = &OD_PERSIST_COMM,
-						       .len = sizeof(OD_PERSIST_COMM),
-						       .subIndexOD = 2,
-						       .attr = CO_storage_cmd | CO_storage_restore,
-						       .addrNV = NULL}};
-	uint8_t storageEntriesCount = sizeof(storageEntries) / sizeof(storageEntries[0]);
-	uint32_t storageInitError = 0;
-#endif
+// Storage 功能暂时禁用
+// #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+// 	static CO_storage_t storage;
+// 	static CO_storage_entry_t storageEntries[] = {{.addr = &OD_PERSIST_COMM,
+// 						       .len = sizeof(OD_PERSIST_COMM),
+// 						       .subIndexOD = 2,
+// 						       .attr = CO_storage_cmd | CO_storage_restore,
+// 						       .addrNV = NULL}};
+// 	uint8_t storageEntriesCount = sizeof(storageEntries) / sizeof(storageEntries[0]);
+// 	uint32_t storageInitError = 0;
+// #endif
 
 	/* Allocate memory */
 	CO_config_t *config_ptr = NULL;
@@ -94,16 +95,16 @@ int canopen_app_init(void)
 
 	// canopenNodeSTM32->canOpenStack = CO;
 
-#if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
-	err = CO_storageBlank_init(&storage, CO->CANmodule, OD_ENTRY_H1010_storeParameters,
-				   OD_ENTRY_H1011_restoreDefaultParameters, storageEntries,
-				   storageEntriesCount, &storageInitError);
-
-	if (err != CO_ERROR_NO && err != CO_ERROR_DATA_CORRUPT) {
-		log_printf("Error: Storage %d\n", storageInitError);
-		return 2;
-	}
-#endif
+// Storage 功能暂时禁用
+// #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+// 	err = CO_storageBlank_init(&storage, CO->CANmodule, OD_ENTRY_H1010_storeParameters,
+// 				   OD_ENTRY_H1011_restoreDefaultParameters, storageEntries,
+// 				   storageEntriesCount, &storageInitError);
+// 
+// 	if (err != CO_ERROR_NO && err != CO_ERROR_DATA_CORRUPT) {
+// 		return 2;
+// 	}
+// #endif
 
 	canopen_app_resetCommunication();
 	return 0;
@@ -174,12 +175,14 @@ int canopen_app_resetCommunication(void)
 	/* Configure CANopen callbacks, etc */
 	if (!CO->nodeIdUnconfigured) {
 
-#if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
-		if (storageInitError != 0) {
-			CO_errorReport(CO->em, CO_EM_NON_VOLATILE_MEMORY, CO_EMC_HARDWARE,
-				       storageInitError);
-		}
-#endif
+// Storage 功能暂时禁用
+// #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+// 		uint32_t storageInitError = 0;
+// 		if (storageInitError != 0) {
+// 			CO_errorReport(CO->em, CO_EM_NON_VOLATILE_MEMORY, CO_EMC_HARDWARE,
+// 				       storageInitError);
+// 		}
+// #endif
 	} else {
 	}
 

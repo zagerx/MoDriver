@@ -21,7 +21,7 @@ target_include_directories(canopennode
 
 target_link_libraries(canopennode
     PRIVATE
-        stm32cubemx
+        # stm32cubemx
 )
 target_compile_definitions(canopennode PRIVATE
     CO_CONFIG_LEDS=0
