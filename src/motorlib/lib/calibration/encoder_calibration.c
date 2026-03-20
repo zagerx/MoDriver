@@ -18,14 +18,14 @@
 #endif
 
 /* 编码器校准配置参数 */
-#define ENC_CALIB_SCAN_DISTANCE     (16.0f * M_PI)  /* 扫描电角度距离，默认16π (8圈电角度) */
-#define ENC_CALIB_SCAN_OMEGA        (8.0f * M_PI)   /* 扫描电角速度，默认8π rad/s (4圈/秒) */
-#define ENC_CALIB_ALIGN_TIME        1.0f            /* 对齐保持时间，秒 */
-#define ENC_CALIB_DIRECTION_THRESHOLD 8             /* 方向检测最小编码器变化计数 */
-#define ENC_CALIB_CPR_TOLERANCE     0.02f           /* CPR校验容差，2% */
+#define ENC_CALIB_SCAN_DISTANCE       (14.0f * M_PI) /* 扫描电角度距离，默认16π (8圈电角度) */
+#define ENC_CALIB_SCAN_OMEGA          (2.0f * M_PI)  /* 扫描电角速度，默认8π rad/s (4圈/秒) */
+#define ENC_CALIB_ALIGN_TIME          1.0f           /* 对齐保持时间，秒 */
+#define ENC_CALIB_DIRECTION_THRESHOLD 8              /* 方向检测最小编码器变化计数 */
+#define ENC_CALIB_CPR_TOLERANCE       0.02f          /* CPR校验容差，2% */
 
 /* 预计算的tick阈值 */
-#define ENC_CALIB_ALIGN_TICKS       ((uint32_t)(ENC_CALIB_ALIGN_TIME / CONTROL_PERIOD_DT))
+#define ENC_CALIB_ALIGN_TICKS ((uint32_t)(ENC_CALIB_ALIGN_TIME / CONTROL_PERIOD_DT))
 
 /**
  * @brief 解卷绕辅助函数 - 处理编码器溢出
@@ -165,7 +165,7 @@ bool encoder_calib_run(struct motor *motor)
 		/* 检查编码器响应和方向 */
 		{
 			int32_t enc_delta = enc->raw_delta_acc;
-			
+			float detected_direction;
 			/* 检查是否有足够响应 */
 			if (abs(enc_delta) < ENC_CALIB_DIRECTION_THRESHOLD) {
 				enc->state = ENC_CALIB_ERROR_NO_RESPONSE;
@@ -175,9 +175,9 @@ bool encoder_calib_run(struct motor *motor)
 
 			/* 判断方向 */
 			if (enc_delta > 0) {
-				enc->detected_direction = 1;
+				detected_direction = 1;
 			} else {
-				enc->detected_direction = -1;
+				detected_direction = -1;
 			}
 
 			/* 计算极对数 */
@@ -188,14 +188,14 @@ bool encoder_calib_run(struct motor *motor)
 			if (pole_pairs < 1) {
 				pole_pairs = 1;
 			}
-			enc->detected_pole_pairs = pole_pairs;
 
 			/* CPR校验：检查实际编码器变化与期望是否匹配 */
-			float expected_enc_delta = (ENC_CALIB_SCAN_DISTANCE / M_TWOPI) * 
-			                          (ENCODER_RESOLUTION_F / (float)pole_pairs);
+			float expected_enc_delta = (ENC_CALIB_SCAN_DISTANCE / M_TWOPI) *
+						   (ENCODER_RESOLUTION_F / (float)pole_pairs);
 			float actual_enc_delta = fabsf((float)enc_delta);
-			float cpr_error = fabsf(actual_enc_delta - expected_enc_delta) / expected_enc_delta;
-			
+			float cpr_error =
+				fabsf(actual_enc_delta - expected_enc_delta) / expected_enc_delta;
+
 			if (cpr_error > ENC_CALIB_CPR_TOLERANCE) {
 				/* CPR不匹配，可能是极对数错误或编码器问题 */
 				enc->state = ENC_CALIB_ERROR_CPR_MISMATCH;
@@ -205,7 +205,7 @@ bool encoder_calib_run(struct motor *motor)
 
 			/* 更新反馈参数 */
 			_feedback_update_param_pole_pairs(feedback, (float)pole_pairs);
-			_feedback_update_param_direction(feedback, (float)enc->detected_direction);
+			_feedback_update_param_direction(feedback, (float)detected_direction);
 
 			/* 准备反向扫描 */
 			enc->tick_cnt = 0;
@@ -215,7 +215,8 @@ bool encoder_calib_run(struct motor *motor)
 
 	case ENC_CALIB_SCAN_BACKWARD:
 		/* 反向扫描：以相同速度反向旋转回起点 */
-		open_loop_force_drag(motor, CONTROL_PERIOD_DT, ALIGN_VOLTAGE, -ENC_CALIB_SCAN_OMEGA);
+		open_loop_force_drag(motor, CONTROL_PERIOD_DT, ALIGN_VOLTAGE,
+				     -ENC_CALIB_SCAN_OMEGA);
 
 		/* 读取编码器并累加 */
 		current_raw = feedback_get_raw(feedback);
@@ -240,11 +241,12 @@ bool encoder_calib_run(struct motor *motor)
 
 			/* 整数部分：平均值 */
 			offset_int = (int32_t)(enc->encvaluesum / (int64_t)enc->num_steps);
-			
+
 			/* 小数部分：余数平均 + 0.5f 中心对齐 */
-			residual = enc->encvaluesum - ((int64_t)offset_int * (int64_t)enc->num_steps);
+			residual =
+				enc->encvaluesum - ((int64_t)offset_int * (int64_t)enc->num_steps);
 			offset_frac = (float)residual / (float)enc->num_steps + 0.5f;
-			
+
 			/* 限制小数部分在合理范围 */
 			if (offset_frac >= 1.0f) {
 				offset_frac -= 1.0f;
@@ -262,35 +264,13 @@ bool encoder_calib_run(struct motor *motor)
 				offset_int -= ENCODER_RESOLUTION;
 			}
 
-			/* 保存结果 */
-			enc->calculated_offset = (uint16_t)offset_int;
-			enc->calculated_offset_frac = offset_frac;
-			
 			/* 更新反馈参数 */
-			_feedback_update_param_encoder_offset(feedback, enc->calculated_offset);
-			_feedback_update_param_encoder_offset_frac(feedback, enc->calculated_offset_frac);
+			_feedback_update_param_encoder_offset(feedback, (uint16_t)offset_int,
+							      offset_frac);
 			_feedback_update_param_encoder_resolution(feedback, ENCODER_RESOLUTION);
 
 			enc->align_tick_cnt = 0;
-			enc->state = ENC_CALIB_FINAL_ALIGN;
-		}
-		break;
-
-	case ENC_CALIB_FINAL_ALIGN:
-		/* 最终对齐：对齐到0度电角度验证 */
-		{
-			/* 计算目标编码器值（0电角度对应的编码器值） */
-			float eangle_0_offset = -enc->calculated_offset_frac * 
-			                       (M_TWOPI / (feedback->param->pole_pairs * ENCODER_RESOLUTION_F));
-			
-			open_loop_force_align(motor, ALIGN_VOLTAGE, eangle_0_offset);
-			enc->align_tick_cnt++;
-
-			if (enc->align_tick_cnt >= ENC_CALIB_ALIGN_TICKS / 2) {
-				enc->state = ENC_CALIB_DONE;
-				inverter_disable(inverter);
-				return true;
-			}
+			enc->state = ENC_CALIB_DONE;
 		}
 		break;
 
@@ -306,34 +286,6 @@ bool encoder_calib_run(struct motor *motor)
 	}
 
 	return false;
-}
-
-/**
- * @brief 获取编码器校准结果
- * @param[in] motor 电机实例
- * @param[out] result 校准结果结构体
- * @return true 成功，false 校准未完成或失败
- */
-bool encoder_calib_get_result(struct motor *motor, struct encoder_calib_result *result)
-{
-	struct encoder_calib *enc;
-
-	if (!motor || !result) {
-		return false;
-	}
-
-	enc = &motor->calib.encoder;
-
-	if (enc->state != ENC_CALIB_DONE) {
-		return false;
-	}
-
-	result->pole_pairs = enc->detected_pole_pairs;
-	result->direction = enc->detected_direction;
-	result->offset = enc->calculated_offset;
-	result->offset_frac = enc->calculated_offset_frac;
-
-	return true;
 }
 
 /**

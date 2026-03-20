@@ -11,34 +11,33 @@ struct motor;
 /**
  * @brief 编码器校准结果结构体
  */
-struct encoder_calib_result {
-	int pole_pairs;        /**< 检测到的极对数 */
-	int direction;         /**< 检测到的方向（1或-1） */
-	uint16_t offset;       /**< 编码器零位偏移（整数部分） */
-	float offset_frac;     /**< 编码器零位偏移（小数部分，0~1） */
-};
+// struct encoder_calib_result {
+// 	int pole_pairs;    /**< 检测到的极对数 */
+// 	int direction;     /**< 检测到的方向（1或-1） */
+// 	uint16_t offset;   /**< 编码器零位偏移（整数部分） */
+// 	float offset_frac; /**< 编码器零位偏移（小数部分，0~1） */
+// };
 
 /**
  * @brief 编码器校准对象 - 运行时数据
  */
 struct encoder_calib {
-	uint32_t tick_cnt;           /**< 滴答计数 */
-	uint8_t state;               /**< 子状态机状态 */
-	uint16_t raw_prev;           /**< 上次编码器原始值（解卷绕用） */
-	int32_t raw_delta_acc;       /**< 编码器累计变化量（解卷绕后） */
-	uint32_t align_tick_cnt;     /**< 对齐阶段计数 */
-	
-	/* ODrive风格校准数据 */
-	int32_t init_enc_val;        /**< 初始编码器值 */
-	int64_t encvaluesum;         /**< 编码器值累加和（用于平均） */
-	uint32_t num_steps;          /**< 采样步数 */
-	float calib_start_eangle;    /**< 校准起始电角度 */
-	
-	/* 检测结果 */
-	int detected_pole_pairs;     /**< 检测到的极对数 */
-	int detected_direction;      /**< 检测到的方向 */
-	uint16_t calculated_offset;  /**< 计算得到的零位偏移 */
-	float calculated_offset_frac; /**< 计算得到的零位小数偏移 */
+	uint32_t tick_cnt;       /**< 滴答计数 */
+	uint8_t state;           /**< 子状态机状态 */
+	uint16_t raw_prev;       /**< 上次编码器原始值（解卷绕用） */
+	int32_t raw_delta_acc;   /**< 编码器累计变化量（解卷绕后） */
+	uint32_t align_tick_cnt; /**< 对齐阶段计数 */
+
+	int32_t init_enc_val;     /**< 初始编码器值 */
+	int64_t encvaluesum;      /**< 编码器值累加和（用于平均） */
+	uint32_t num_steps;       /**< 采样步数 */
+	float calib_start_eangle; /**< 校准起始电角度 */
+
+	// /* 检测结果 */
+	// int detected_pole_pairs;      /**< 检测到的极对数 */
+	// int detected_direction;       /**< 检测到的方向 */
+	// uint16_t calculated_offset;   /**< 计算得到的零位偏移 */
+	// float calculated_offset_frac; /**< 计算得到的零位小数偏移 */
 };
 
 /**
@@ -51,7 +50,6 @@ enum encoder_calib_state {
 	ENC_CALIB_CHECK_RESPONSE,    /**< 检查响应和方向 */
 	ENC_CALIB_SCAN_BACKWARD,     /**< 反向扫描 */
 	ENC_CALIB_CALC_OFFSET,       /**< 计算零点偏移 */
-	ENC_CALIB_FINAL_ALIGN,       /**< 最终对齐验证 */
 	ENC_CALIB_DONE,              /**< 校准完成 */
 	ENC_CALIB_ERROR_NO_RESPONSE, /**< 错误：编码器无响应 */
 	ENC_CALIB_ERROR_CPR_MISMATCH /**< 错误：CPR不匹配 */
@@ -73,14 +71,6 @@ void encoder_calib_init(struct motor *motor);
  * @details 基于ODrive的校准思想，使用双向扫描和往返平均计算偏移
  */
 bool encoder_calib_run(struct motor *motor);
-
-/**
- * @brief 获取编码器校准结果
- * @param[in] motor 电机实例
- * @param[out] result 校准结果结构体
- * @return true 成功，false 校准未完成或失败
- */
-bool encoder_calib_get_result(struct motor *motor, struct encoder_calib_result *result);
 
 /**
  * @brief 应用编码器校准结果

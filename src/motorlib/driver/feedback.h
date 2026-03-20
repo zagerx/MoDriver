@@ -223,28 +223,14 @@ static inline void _feedback_update_param_encoder_resolution(struct feedback *fe
  * @return 无
  */
 static inline void _feedback_update_param_encoder_offset(struct feedback *feedback,
-							 uint16_t encoder_offset)
+							 uint16_t encoder_offset,
+							 float encoder_offset_frac)
 {
 	if (!feedback) {
 		return;
 	}
 
 	feedback->param->encoder_offset = encoder_offset;
-}
-
-/**
- * @brief 更新编码器零位小数偏移参数
- * @param[in] feedback 反馈实例
- * @param[in] encoder_offset_frac 编码器零位小数偏移（0~1）
- * @return 无
- */
-static inline void _feedback_update_param_encoder_offset_frac(struct feedback *feedback,
-							      float encoder_offset_frac)
-{
-	if (!feedback) {
-		return;
-	}
-
 	feedback->param->encoder_offset_frac = encoder_offset_frac;
 }
 

@@ -123,9 +123,9 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t
 	data->total_counts += delta;
 
 	/* 计算累积机械角度（考虑编码器零位偏移） */
-	data->accumulated_mangle_rad = (two_pi / (float)cpr) *
-				       (float)(data->total_counts - (int32_t)param->encoder_offset) *
-				       param->direction;
+	data->accumulated_mangle_rad =
+		(two_pi / (float)cpr) *
+		(float)(data->total_counts - (int32_t)param->encoder_offset) * param->direction;
 
 	/* 保存原始值供下次使用（避免负数存入uint16_t导致的抖动问题） */
 	data->prev_raw = raw;
@@ -229,13 +229,13 @@ void feedback_update(struct feedback *feedback, float dt)
 	/* 5. 差分法计算机械角速度 */
 	feedback->output.velocity_rad_s = feedback_calc_velocity(feedback, dt, cur_mangle);
 
-	/* 6. 应用小数偏移到电角度输出，提高换相精度
-	 * ODrive风格：小数偏移用于子计数精度的相位对齐 */
+	/* 6. 应用小数偏移到电角度输出	小数偏移用于子计数精度的相位对齐 */
 	if (param->encoder_offset_frac != 0.0f) {
 		/* 将小数偏移转换为电角度弧度 */
-		float frac_eangle_offset = param->encoder_offset_frac * M_TWOPI / 
-		                           (float)param->encoder_resolution * param->pole_pairs;
-		feedback->output.eangle_rad = normalize_angle(feedback->output.eangle_rad - frac_eangle_offset);
+		float frac_eangle_offset = param->encoder_offset_frac * M_TWOPI /
+					   (float)param->encoder_resolution * param->pole_pairs;
+		feedback->output.eangle_rad =
+			normalize_angle(feedback->output.eangle_rad - frac_eangle_offset);
 	}
 
 	/* 7. 更新里程（可选） */
