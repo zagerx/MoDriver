@@ -41,7 +41,8 @@ struct feedback_param {
 	float pole_pairs;            /**< @brief 极对数 */
 	float direction;             /**< @brief 旋转方向，1或-1 */
 	uint16_t encoder_resolution; /**< @brief 编码器分辨率（CPR） */
-	uint16_t encoder_offset;     /**< @brief 编码器零位偏移 */
+	uint16_t encoder_offset;     /**< @brief 编码器零位偏移（整数部分） */
+	float encoder_offset_frac;   /**< @brief 编码器零位小数偏移（0~1），用于精确对齐电角度 */
 };
 
 /**

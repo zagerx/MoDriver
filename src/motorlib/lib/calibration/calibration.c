@@ -78,10 +78,12 @@ static int16_t current_phase_handle(struct motor *motor)
 static int16_t encoder_phase_handle(struct motor *motor)
 {
 	struct calibration *calib = &motor->calib;
+	struct encoder_calib *enc;
 	bool done;
 	int16_t ret;
 
 	ret = 1;
+	enc = &motor->calib.encoder;
 
 	switch (calib->enc_phase) {
 	case ENCODER_PHASE_INIT:
@@ -92,10 +94,15 @@ static int16_t encoder_phase_handle(struct motor *motor)
 	case ENCODER_PHASE_RUNNING:
 		done = encoder_calib_run(motor);
 		if (done) {
-			encoder_calib_apply(motor);
-			calib->enc_phase = ENCODER_PHASE_FINISH;
+			/* 检查是否出错 */
+			if (enc->state == ENC_CALIB_ERROR_NO_RESPONSE ||
+			    enc->state == ENC_CALIB_ERROR_CPR_MISMATCH) {
+				ret = -1; /* 错误 */
+			} else {
+				encoder_calib_apply(motor);
+				calib->enc_phase = ENCODER_PHASE_FINISH;
+			}
 		}
-		ret = 1;
 		break;
 
 	case ENCODER_PHASE_FINISH:
@@ -133,15 +140,25 @@ enum calibration_status calibration_task(struct motor *motor)
 		break;
 
 	case CALIBRATION_STATUS_CURRENT:
-		if (!current_phase_handle(motor)) {
-			calib->status = CALIBRATION_STATUS_ENCODER;
+		{
+			int16_t curr_ret = current_phase_handle(motor);
+			if (curr_ret == 0) {
+				calib->status = CALIBRATION_STATUS_ENCODER;
+			} else if (curr_ret < 0) {
+				calib->status = CALIBRATION_STATUS_FAILED;
+			}
 		}
 		break;
 
 	case CALIBRATION_STATUS_ENCODER:
 		/* 执行编码器校准 */
-		if (!encoder_phase_handle(motor)) {
-			calib->status = CALIBRATION_STATUS_SUCCESS;
+		{
+			int16_t enc_ret = encoder_phase_handle(motor);
+			if (enc_ret == 0) {
+				calib->status = CALIBRATION_STATUS_SUCCESS;
+			} else if (enc_ret < 0) {
+				calib->status = CALIBRATION_STATUS_FAILED;
+			}
 		}
 		break;
 

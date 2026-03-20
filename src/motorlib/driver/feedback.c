@@ -142,7 +142,8 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t
 static float feedback_calc_elec_angle(struct feedback *feedback, float mangle)
 {
 	struct feedback_param *param = feedback->param;
-	return normalize_angle(mangle * param->pole_pairs);
+	float eangle = mangle * param->pole_pairs;
+	return normalize_angle(eangle);
 }
 
 /**
@@ -228,6 +229,15 @@ void feedback_update(struct feedback *feedback, float dt)
 	/* 5. 差分法计算机械角速度 */
 	feedback->output.velocity_rad_s = feedback_calc_velocity(feedback, dt, cur_mangle);
 
-	/* 6. 更新里程（可选） */
+	/* 6. 应用小数偏移到电角度输出，提高换相精度
+	 * ODrive风格：小数偏移用于子计数精度的相位对齐 */
+	if (param->encoder_offset_frac != 0.0f) {
+		/* 将小数偏移转换为电角度弧度 */
+		float frac_eangle_offset = param->encoder_offset_frac * M_TWOPI / 
+		                           (float)param->encoder_resolution * param->pole_pairs;
+		feedback->output.eangle_rad = normalize_angle(feedback->output.eangle_rad - frac_eangle_offset);
+	}
+
+	/* 7. 更新里程（可选） */
 	feedback->output.odometer = cur_mangle * param->wheel_radius / param->gear_ratio;
 }
