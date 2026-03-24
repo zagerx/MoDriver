@@ -1,0 +1,244 @@
+/*
+ * CANopen 应用层实现 - STM32 平台
+ *
+ * @file        CO_app_STM32.c
+ * @brief       CANopen 应用层封装，实现 ops 风格接口
+ */
+
+#include "CO_app_STM32.h"
+#include "OD.h"
+#include "fdcan.h"
+#include "tim.h"
+#include <string.h>
+
+/*============================================================================
+ * 默认配置参数
+ *===========================================================================*/
+
+#define DEFAULT_FIRST_HB_TIME        500
+#define DEFAULT_SDO_SRV_TIMEOUT_TIME 1000
+#define DEFAULT_SDO_CLI_TIMEOUT_TIME 500
+#define DEFAULT_SDO_CLI_BLOCK        false
+
+/* NMT 控制字 */
+#define NMT_CONTROL                                                                                \
+	(CO_NMT_STARTUP_TO_OPERATIONAL | CO_NMT_ERR_ON_ERR_REG | CO_ERR_REG_GENERIC_ERR |          \
+	 CO_ERR_REG_COMMUNICATION)
+
+/*============================================================================
+ * 内部函数声明
+ *===========================================================================*/
+
+static int canopen_app_resetCommunication(canopen_app_t *app);
+
+/*============================================================================
+ * API 实现
+ *===========================================================================*/
+
+/**
+ * @brief 初始化 CANopen 应用
+ */
+int canopen_app_init(canopen_app_t *app, uint8_t node_id)
+{
+	/* 参数检查 */
+	if (app == NULL || node_id < 1 || node_id > 127) {
+		return -1;
+	}
+
+	/* 清零结构体 */
+	memset(app, 0, sizeof(canopen_app_t));
+
+	/* 填充配置 */
+	app->node_id = node_id;
+	app->heartbeat_ms = DEFAULT_FIRST_HB_TIME;
+
+	/* Allocate CANopen object */
+	CO_config_t *config_ptr = NULL;
+#ifdef CO_MULTIPLE_OD
+	static CO_config_t co_config = {0};
+	OD_INIT_CONFIG(co_config);
+	co_config.CNT_LEDS = 0;
+	co_config.CNT_LSS_SLV = 0;
+	config_ptr = &co_config;
+#endif
+
+	uint32_t heapMemoryUsed;
+	app->co = CO_new(config_ptr, &heapMemoryUsed);
+	if (app->co == NULL) {
+		return -2;
+	}
+
+	/* 初始化通信 */
+	if (canopen_app_resetCommunication(app) != 0) {
+		CO_delete(app->co);
+		app->co = NULL;
+		return -3;
+	}
+
+	app->initialized = true;
+
+	return 0;
+}
+
+/**
+ * @brief 反初始化 CANopen 应用
+ * @note 不停止定时器，定时器由应用层统一管理
+ */
+void canopen_app_deinit(canopen_app_t *app)
+{
+	if (app == NULL || !app->initialized) {
+		return;
+	}
+
+	/* 进入配置模式 */
+	CO_CANsetConfigurationMode(NULL);
+
+	if (app->co) {
+		CO_CANmodule_disable(app->co->CANmodule);
+		CO_delete(app->co);
+		app->co = NULL;
+	}
+
+	app->initialized = false;
+}
+
+/**
+ * @brief 主循环处理函数
+ */
+void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
+{
+	if (app == NULL || !app->initialized || app->co == NULL) {
+		return;
+	}
+
+	if (dt_ms > 0) {
+		/* 转换为微秒 */
+		uint32_t timeDifference_us = dt_ms * 1000;
+
+		/* 处理 CANopen */
+		CO_NMT_reset_cmd_t reset_status =
+			CO_process(app->co, false, timeDifference_us, NULL);
+
+		/* 处理复位命令 */
+		switch (reset_status) {
+		case CO_RESET_COMM:
+			/* 通信复位 - 不停止定时器，定时器持续运行 */
+			CO_CANsetConfigurationMode(NULL);
+			CO_delete(app->co);
+			app->co = NULL;
+			app->initialized = false;
+
+			/* 重新初始化 */
+			if (canopen_app_init(app, app->node_id) != 0) {
+				/* 重新初始化失败，标记错误 */
+			}
+			break;
+
+		case CO_RESET_APP:
+			/* 应用复位 - 系统重启 */
+			HAL_NVIC_SystemReset();
+			break;
+
+		case CO_RESET_NOT:
+		default:
+			/* 正常状态，NMT 状态变化由应用层通过 canopen_app_get_nmt_state() 查询 */
+			break;
+		}
+	}
+}
+
+/**
+ * @brief 中断处理函数
+ */
+void canopen_app_interrupt(canopen_app_t *app, uint32_t dt_us)
+{
+	if (app == NULL || !app->initialized || app->co == NULL) {
+		return;
+	}
+
+	/* 检查状态 */
+	if (app->co->nodeIdUnconfigured || !app->co->CANmodule->CANnormal) {
+		return;
+	}
+
+	CO_LOCK_OD(app->co->CANmodule);
+
+	bool_t syncWas = false;
+	uint32_t timeDifference_us = dt_us;
+
+#if (CO_CONFIG_SYNC) & CO_CONFIG_SYNC_ENABLE
+	syncWas = CO_process_SYNC(app->co, timeDifference_us, NULL);
+#endif
+
+#if (CO_CONFIG_PDO) & CO_CONFIG_RPDO_ENABLE
+	CO_process_RPDO(app->co, syncWas, timeDifference_us, NULL);
+#endif
+
+#if (CO_CONFIG_PDO) & CO_CONFIG_TPDO_ENABLE
+	CO_process_TPDO(app->co, syncWas, timeDifference_us, NULL);
+#endif
+
+	CO_UNLOCK_OD(app->co->CANmodule);
+}
+
+/*============================================================================
+ * 内部函数实现
+ *===========================================================================*/
+
+/**
+ * @brief 复位通信（内部函数）
+ */
+static int canopen_app_resetCommunication(canopen_app_t *app)
+{
+	CO_ReturnError_t err;
+	uint32_t errInfo = 0;
+
+	/* 停止 CAN */
+	if (app->co->CANmodule) {
+		app->co->CANmodule->CANnormal = false;
+	}
+
+	/* 进入配置模式 */
+	CO_CANsetConfigurationMode(NULL);
+
+	if (app->co->CANmodule) {
+		CO_CANmodule_disable(app->co->CANmodule);
+	}
+
+	/* 初始化 CAN 硬件 */
+	err = CO_CANinit(app->co, NULL, 0);
+	if (err != CO_ERROR_NO) {
+		app->last_err = err;
+		return -1;
+	}
+
+	/* 初始化 CANopen */
+	err = CO_CANopenInit(app->co, NULL,                  /* alternate NMT */
+			     NULL,                           /* alternate em */
+			     OD,                             /* Object dictionary */
+			     NULL,                           /* OD_statusBits */
+			     NMT_CONTROL, app->heartbeat_ms, /* firstHBTime_ms */
+			     DEFAULT_SDO_SRV_TIMEOUT_TIME,   /* SDOserverTimeoutTime_ms */
+			     DEFAULT_SDO_CLI_TIMEOUT_TIME,   /* SDOclientTimeoutTime_ms */
+			     DEFAULT_SDO_CLI_BLOCK,          /* SDOclientBlockTransfer */
+			     app->node_id, &errInfo);
+
+	if (err != CO_ERROR_NO && err != CO_ERROR_NODE_ID_UNCONFIGURED_LSS) {
+		app->last_err = err;
+		return -2;
+	}
+
+	/* 初始化 PDO */
+	err = CO_CANopenInitPDO(app->co, app->co->em, OD, app->node_id, &errInfo);
+	if (err != CO_ERROR_NO && err != CO_ERROR_NODE_ID_UNCONFIGURED_LSS) {
+		app->last_err = err;
+		return -3;
+	}
+
+	/* 注意：定时器由应用层启动，这里不控制定时器 */
+
+	/* 启动 CAN */
+	CO_CANsetNormalMode(app->co->CANmodule);
+
+	return 0;
+}

@@ -131,11 +131,22 @@ void process_data(uint8_t *data, uint16_t len)
 		}
 	}
 }
-extern void canopen_app_interrupt(void);
+
+/*============================================================================
+ * CANopen 定时中断处理
+ *===========================================================================*/
+
+#include "CO_app_STM32.h"
+
+/* 外部声明 main.c 中定义的 CANopen 应用实例 */
+extern canopen_app_t canopen_app;
+
+/* 定时器中断周期（微秒）- 与 TIM6 配置对应 */
+#define CANOPEN_TIM_PERIOD_US 1000  /* 1ms = 1000us */
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim == &htim6) {
-		canopen_app_interrupt();
+		canopen_app_interrupt(&canopen_app, CANOPEN_TIM_PERIOD_US);
 	}
 }

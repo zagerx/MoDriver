@@ -1,3 +1,7 @@
+/*
+ * MoDrive 主程序 - CANopen CiA 402 伺服驱动
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -6,7 +10,12 @@
 #include "motor_driver.h"
 #include "stm32g4xx_hal.h"
 #include "motorlib_control_param.h"
-/* 电机1硬件接口定义 */
+#include "CO_app_STM32.h"
+
+/*============================================================================
+ * 电机 1 硬件接口配置
+ *===========================================================================*/
+
 static const struct encoder_ops m1_encoder_ops = {
 	.read = encoder_getraw,
 };
@@ -24,70 +33,97 @@ static const struct motor_hw_ops m1_hw_ops = {
 
 struct motor_param_ext m1_param_ext = {
 	.feedback_param = {0},
-	.currsmp_param =
-		{
-			.gain_phase = PHASE_CURRENT_GAIN, // 电流采样增益（A/LSB）
-			.gain_i_bus = BUS_CURRENT_GAIN,   // 母线电流采样增益（A/LSB）
-			.gain_v_bus = BUS_VOLTAGE_GAIN,   // 母线电压采样增益（V/LSB） 130V(130+10)
-		},
-	.traj_param =
-		{
-			.acc_max = 10.0f, // 最大加速度 10 m/s^2
-			.vmax = 5.0f,     // 最大速度 5 m/s},
-		},
-	.foc_param =
-		{
-			.d_axis = {.kp = CURRMENT_LOOP_KP,
-				   .ki = CURRMENT_LOOP_KI,
-				   .kd = 0.0f,
-				   .limit = CURRMENT_LOOP_LIMIT},
-			.q_axis = {.kp = CURRMENT_LOOP_KP,
-				   .ki = CURRMENT_LOOP_KI,
-				   .kd = 0.0f,
-				   .limit = CURRMENT_LOOP_LIMIT},
-			.vel = {.kp = SPEED_LOOP_KP,
-				.ki = SPEED_LOOP_KI,
-				.kd = 0.0f,
-				.limit = SPEED_LOOP_LIMIT},
-			.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = 100.0f},
-			.target_pos = 0.0f,
-			.target_vel = 0.0f,
-			.target_torque = 0.0f,
-		},
+	.currsmp_param = {
+		.gain_phase = PHASE_CURRENT_GAIN, /* 电流采样增益（A/LSB） */
+		.gain_i_bus = BUS_CURRENT_GAIN,   /* 母线电流采样增益（A/LSB） */
+		.gain_v_bus = BUS_VOLTAGE_GAIN,   /* 母线电压采样增益（V/LSB） */
+	},
+	.traj_param = {
+		.acc_max = 10.0f, /* 最大加速度 10 m/s^2 */
+		.vmax = 5.0f,     /* 最大速度 5 m/s */
+	},
+	.foc_param = {
+		.d_axis = {.kp = CURRMENT_LOOP_KP,
+			   .ki = CURRMENT_LOOP_KI,
+			   .kd = 0.0f,
+			   .limit = CURRMENT_LOOP_LIMIT},
+		.q_axis = {.kp = CURRMENT_LOOP_KP,
+			   .ki = CURRMENT_LOOP_KI,
+			   .kd = 0.0f,
+			   .limit = CURRMENT_LOOP_LIMIT},
+		.vel = {.kp = SPEED_LOOP_KP,
+			.ki = SPEED_LOOP_KI,
+			.kd = 0.0f,
+			.limit = SPEED_LOOP_LIMIT},
+		.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = 100.0f},
+		.target_pos = 0.0f,
+		.target_vel = 0.0f,
+		.target_torque = 0.0f,
+	},
 };
 
-extern int canopen_app_init(void);
-extern void canopen_app_process(void);
+/*============================================================================
+ * CANopen 应用实例
+ *===========================================================================*/
+
+/* 注意：定义为非 static 以便 it.c 访问 */
+canopen_app_t canopen_app;
+
+/*============================================================================
+ * 主函数
+ *===========================================================================*/
 
 int main(void)
 {
 	/* 初始化硬件层（时钟、GPIO、外设等） */
 	hardware_init();
 
-	canopen_app_init();
+	/* 启动 1ms 定时器中断（一旦开启，永不关闭） */
+	HAL_TIM_Base_Start_IT(&htim6);
 
-	/* 绑定电机硬件接口 */
+	/* 初始化 CANopen 应用（节点 ID = 21） */
+	if (canopen_app_init(&canopen_app, 21) != 0) {
+		/* 初始化失败处理 */
+		while (1) {
+			HAL_Delay(100);
+		}
+	}
+
+	/* 关联电机硬件接口 */
 	motor_bind_hardware(motor_1, &m1_hw_ops);
 
-	/*从外部flash读取参数*/
-	// flash_read(&m1_param_ext, sizeof(m1_param_ext));//TODO: 实现flash读写接口并使用
+	/* 从外部 flash 读取参数（TODO: 实现 flash 读写） */
+	/* flash_read(&m1_param_ext, sizeof(m1_param_ext)); */
 
 	/* 绑定电机参数 */
 	motor_bind_param_ext(motor_1, &m1_param_ext);
 
+	/* 初始化电机 */
 	motor_init(motor_1);
 
-	/*开启中断*/
+	/* 开启中断 */
 	adc_start();
 	tim1_set_adc();
+
 	/* 主循环 */
+	uint32_t last_tick = HAL_GetTick();
 	while (1) {
-		// motor_highfreq_task(motor_1);
 		HAL_Delay(1);
-		canopen_app_process();
-		/* TODO: 添加低速任务 */
+		uint32_t current_tick = HAL_GetTick();
+		uint32_t dt_ms = current_tick - last_tick;
+		last_tick = current_tick;
+		canopen_app_process(&canopen_app, dt_ms);
 	}
 }
+
+/*============================================================================
+ * 中断回调函数
+ *===========================================================================*/
+
+/**
+ * @brief ADC 注入组转换完成回调
+ * @note 20kHz 高频控制任务
+ */
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
 	volatile uint16_t raw_uvw[5];
@@ -100,3 +136,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 		motor_highfreq_task(motor_1, (uint16_t *)raw_uvw);
 	}
 }
+
+/* 注意：HAL_TIM_PeriodElapsedCallback 定义在 it.c 中，
+ * 在那里调用 canopen_app_interrupt(&canopen_app);
+ */

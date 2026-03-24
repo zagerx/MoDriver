@@ -32,6 +32,8 @@
 
 /* 包含 STM32 特定头文件 - 仅在 .c 文件中 */
 #include "stm32g4xx_hal.h"
+#include "fdcan.h"  /* 访问 hfdcan2 */
+#include "tim.h"    /* 访问 htim6 */
 
 /* Local CAN module object */
 static CO_CANmodule_t *CANModule_local = NULL; /* Local instance of global CAN module */
@@ -44,19 +46,16 @@ static CO_CANmodule_t *CANModule_local = NULL; /* Local instance of global CAN m
 void CO_CANsetConfigurationMode(void *CANptr)
 {
 	/* Put CAN module in configuration mode */
-	if (CANptr != NULL) {
-		HAL_FDCAN_Stop((FDCAN_HandleTypeDef *)CANptr);
-	}
+	(void)CANptr;  /* 不使用参数，直接使用 hfdcan2 */
+	HAL_FDCAN_Stop(&hfdcan2);
 }
 
 /******************************************************************************/
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule)
 {
 	/* Put CAN module in normal mode */
-	if (CANmodule->CANptr != NULL) {
-		if (HAL_FDCAN_Start(((FDCAN_HandleTypeDef *)CANmodule->CANptr)) == HAL_OK) {
-			CANmodule->CANnormal = true;
-		}
+	if (HAL_FDCAN_Start(&hfdcan2) == HAL_OK) {
+		CANmodule->CANnormal = true;
 	}
 }
 
@@ -65,14 +64,12 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 				   uint16_t rxSize, CO_CANtx_t txArray[], uint16_t txSize,
 				   uint16_t CANbitRate)
 {
+	(void)CANptr;  /* 不使用参数，直接使用 hfdcan2 */
 
 	/* verify arguments */
 	if (CANmodule == NULL || rxArray == NULL || txArray == NULL) {
 		return CO_ERROR_ILLEGAL_ARGUMENT;
 	}
-
-	/* Hold CANModule variable */
-	CANmodule->CANptr = CANptr;
 
 	/* Keep a local copy of CANModule */
 	CANModule_local = CANmodule;
@@ -117,7 +114,7 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 	 * Reject non-matching extended ID messages
 	 */
 
-	if (HAL_FDCAN_ConfigGlobalFilter((FDCAN_HandleTypeDef *)CANptr, FDCAN_ACCEPT_IN_RX_FIFO0,
+	if (HAL_FDCAN_ConfigGlobalFilter(&hfdcan2, FDCAN_ACCEPT_IN_RX_FIFO0,
 					 FDCAN_REJECT, FDCAN_FILTER_REMOTE,
 					 FDCAN_FILTER_REMOTE) != HAL_OK) {
 		return CO_ERROR_ILLEGAL_ARGUMENT;
@@ -126,7 +123,7 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 	/* Enable notifications */
 	/* Activate the CAN notification interrupts */
 	if (HAL_FDCAN_ActivateNotification(
-		    (FDCAN_HandleTypeDef *)CANptr,
+		    &hfdcan2,
 		    0 | FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO1_NEW_MESSAGE |
 			    FDCAN_IT_TX_COMPLETE | FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_BUS_OFF |
 			    FDCAN_IT_ARB_PROTOCOL_ERROR | FDCAN_IT_DATA_PROTOCOL_ERROR |
@@ -140,9 +137,8 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 /******************************************************************************/
 void CO_CANmodule_disable(CO_CANmodule_t *CANmodule)
 {
-	if (CANmodule != NULL && CANmodule->CANptr != NULL) {
-		HAL_FDCAN_Stop(((FDCAN_HandleTypeDef *)CANmodule->CANptr));
-	}
+	(void)CANmodule;
+	HAL_FDCAN_Stop(&hfdcan2);
 }
 
 /******************************************************************************/
@@ -212,7 +208,7 @@ static uint8_t prv_send_can_message(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffe
 
 	/* Check if TX FIFO is ready to accept more messages */
 	static FDCAN_TxHeaderTypeDef tx_hdr;
-	if (HAL_FDCAN_GetTxFifoFreeLevel(((FDCAN_HandleTypeDef *)CANmodule->CANptr)) > 0) {
+	if (HAL_FDCAN_GetTxFifoFreeLevel(&hfdcan2) > 0) {
 		/*
 		 * RTR flag is part of identifier value
 		 * hence it needs to be properly decoded
@@ -260,7 +256,7 @@ static uint8_t prv_send_can_message(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffe
 		}
 
 		/* Now add message to FIFO. Should not fail */
-		success = HAL_FDCAN_AddMessageToTxFifoQ(((FDCAN_HandleTypeDef *)CANmodule->CANptr),
+		success = HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2,
 							&tx_hdr, buffer->data) == HAL_OK;
 	}
 
@@ -344,7 +340,7 @@ void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 	// CANOpen just care about Bus_off, Warning, Passive and Overflow
 	// I didn't find overflow error register in STM32, if you find it please let me know
 
-	err = ((FDCAN_HandleTypeDef *)((FDCAN_HandleTypeDef *)CANmodule->CANptr))->Instance->PSR &
+	err = hfdcan2.Instance->PSR &
 	      (FDCAN_PSR_BO | FDCAN_PSR_EW | FDCAN_PSR_EP);
 
 	if (CANmodule->errOld != err) {

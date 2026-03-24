@@ -55,7 +55,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user defined include paths
+    # CANopen 相关路径
+    ${CMAKE_SOURCE_DIR}/CANopenNode        # 使 App/OD.c 能找到 301/CO_ODinterface.h
+    ${CMAKE_SOURCE_DIR}/Hardware/CanOpenDriver  # CO_driver_target.h
 )
 
 # Add project symbols (macros)
@@ -86,10 +88,9 @@ add_subdirectory(CANopenNode)
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     App/main.c
     App/it.c
+    App/CO_app_STM32.c
+    App/OD.c
     Hardware/CanOpenDriver/CO_driver_STM32.c
-    Hardware/CanOpenDriver/CO_app_STM32.c
-    Hardware/CanOpenDriver/OD.c
-
 )
 
 # 工程依赖

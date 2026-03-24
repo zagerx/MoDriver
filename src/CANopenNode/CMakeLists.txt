@@ -16,7 +16,8 @@ add_library(canopennode STATIC
 target_include_directories(canopennode
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Hardware/CanOpenDriver/
+        ${CMAKE_CURRENT_SOURCE_DIR}/../App/                       # OD.h 位置（协议栈需要）
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Hardware/CanOpenDriver/    # CO_driver_target.h 接口
 )
 
 target_link_libraries(canopennode
