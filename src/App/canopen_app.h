@@ -1,7 +1,7 @@
 /*
  * CANopen 应用层接口 - STM32 平台
  *
- * @file        CO_app_STM32.h
+ * @file        canopen_app.h
  * @brief       CANopen 应用层封装，提供类似 motorlib 的 ops 风格接口
  */
 
@@ -28,14 +28,13 @@ typedef struct canopen_app canopen_app_t;
  * @note 包含配置、回调和内部状态
  */
 struct canopen_app {
-	/*----- 配置参数（初始化后只读） -----*/
-	uint8_t node_id;               /**< 节点 ID (1-127) */
-	uint16_t heartbeat_ms;         /**< 心跳周期 (ms) */
+	void (*sys_reset_ops)(void);
+	uint8_t node_id;       /**< 节点 ID (1-127) */
+	uint16_t heartbeat_ms; /**< 心跳周期 (ms) */
 
-	/*----- 内部状态（驱动层管理，应用层勿碰） -----*/
-	CO_t *co;                      /**< CANopen 协议栈实例 */
-	bool initialized;              /**< 初始化标志 */
-	CO_ReturnError_t last_err;     /**< 最后一次错误码 */
+	CO_t *co;                  /**< CANopen 协议栈实例 */
+	bool initialized;          /**< 初始化标志 */
+	CO_ReturnError_t last_err; /**< 最后一次错误码 */
 };
 
 /*============================================================================
@@ -125,8 +124,6 @@ static inline bool canopen_app_is_ready(const canopen_app_t *app)
 	return app ? app->initialized : false;
 }
 
-
-
 /**
  * @brief 获取 CANopen 协议栈实例
  * @param[in] app 应用实例
@@ -142,4 +139,4 @@ static inline CO_t *canopen_app_get_co_handle(const canopen_app_t *app)
 }
 #endif
 
-#endif /* CO_APP_STM32_H */
+#endif /*  */

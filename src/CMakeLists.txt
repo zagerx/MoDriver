@@ -88,7 +88,7 @@ add_subdirectory(CANopenNode)
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     App/main.c
     App/it.c
-    App/CO_app_STM32.c
+    App/canopen_app.c
     App/OD.c
     Hardware/CanOpenDriver/CO_driver_STM32.c
 )

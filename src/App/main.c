@@ -10,7 +10,7 @@
 #include "motor_driver.h"
 #include "stm32g4xx_hal.h"
 #include "motorlib_control_param.h"
-#include "CO_app_STM32.h"
+#include "canopen_app.h"
 
 /*============================================================================
  * 电机 1 硬件接口配置
@@ -33,33 +33,36 @@ static const struct motor_hw_ops m1_hw_ops = {
 
 struct motor_param_ext m1_param_ext = {
 	.feedback_param = {0},
-	.currsmp_param = {
-		.gain_phase = PHASE_CURRENT_GAIN, /* 电流采样增益（A/LSB） */
-		.gain_i_bus = BUS_CURRENT_GAIN,   /* 母线电流采样增益（A/LSB） */
-		.gain_v_bus = BUS_VOLTAGE_GAIN,   /* 母线电压采样增益（V/LSB） */
-	},
-	.traj_param = {
-		.acc_max = 10.0f, /* 最大加速度 10 m/s^2 */
-		.vmax = 5.0f,     /* 最大速度 5 m/s */
-	},
-	.foc_param = {
-		.d_axis = {.kp = CURRMENT_LOOP_KP,
-			   .ki = CURRMENT_LOOP_KI,
-			   .kd = 0.0f,
-			   .limit = CURRMENT_LOOP_LIMIT},
-		.q_axis = {.kp = CURRMENT_LOOP_KP,
-			   .ki = CURRMENT_LOOP_KI,
-			   .kd = 0.0f,
-			   .limit = CURRMENT_LOOP_LIMIT},
-		.vel = {.kp = SPEED_LOOP_KP,
-			.ki = SPEED_LOOP_KI,
-			.kd = 0.0f,
-			.limit = SPEED_LOOP_LIMIT},
-		.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = 100.0f},
-		.target_pos = 0.0f,
-		.target_vel = 0.0f,
-		.target_torque = 0.0f,
-	},
+	.currsmp_param =
+		{
+			.gain_phase = PHASE_CURRENT_GAIN, /* 电流采样增益（A/LSB） */
+			.gain_i_bus = BUS_CURRENT_GAIN,   /* 母线电流采样增益（A/LSB） */
+			.gain_v_bus = BUS_VOLTAGE_GAIN,   /* 母线电压采样增益（V/LSB） */
+		},
+	.traj_param =
+		{
+			.acc_max = 10.0f, /* 最大加速度 10 m/s^2 */
+			.vmax = 5.0f,     /* 最大速度 5 m/s */
+		},
+	.foc_param =
+		{
+			.d_axis = {.kp = CURRMENT_LOOP_KP,
+				   .ki = CURRMENT_LOOP_KI,
+				   .kd = 0.0f,
+				   .limit = CURRMENT_LOOP_LIMIT},
+			.q_axis = {.kp = CURRMENT_LOOP_KP,
+				   .ki = CURRMENT_LOOP_KI,
+				   .kd = 0.0f,
+				   .limit = CURRMENT_LOOP_LIMIT},
+			.vel = {.kp = SPEED_LOOP_KP,
+				.ki = SPEED_LOOP_KI,
+				.kd = 0.0f,
+				.limit = SPEED_LOOP_LIMIT},
+			.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = 100.0f},
+			.target_pos = 0.0f,
+			.target_vel = 0.0f,
+			.target_torque = 0.0f,
+		},
 };
 
 /*============================================================================
@@ -67,7 +70,9 @@ struct motor_param_ext m1_param_ext = {
  *===========================================================================*/
 
 /* 注意：定义为非 static 以便 it.c 访问 */
-canopen_app_t canopen_app;
+canopen_app_t canopen_app = {
+	.sys_reset_ops = HAL_NVIC_SystemReset,
+};
 
 /*============================================================================
  * 主函数

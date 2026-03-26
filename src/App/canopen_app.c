@@ -1,14 +1,12 @@
 /*
  * CANopen 应用层实现 - STM32 平台
  *
- * @file        CO_app_STM32.c
+ * @file        canopen_app.c
  * @brief       CANopen 应用层封装，实现 ops 风格接口
  */
 
-#include "CO_app_STM32.h"
+#include "canopen_app.h"
 #include "OD.h"
-#include "fdcan.h"
-#include "tim.h"
 #include <string.h>
 
 /*============================================================================
@@ -136,12 +134,12 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 
 		case CO_RESET_APP:
 			/* 应用复位 - 系统重启 */
-			HAL_NVIC_SystemReset();
+
+			app->sys_reset_ops();
 			break;
 
 		case CO_RESET_NOT:
 		default:
-			/* 正常状态，NMT 状态变化由应用层通过 canopen_app_get_nmt_state() 查询 */
 			break;
 		}
 	}
