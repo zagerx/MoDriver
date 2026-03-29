@@ -70,9 +70,9 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
         .eventTimer = 0x0000
     },
     .x1600_RPDOMappingParameter = {
-        .numberOfMappedApplicationObjectsInPDO = 0x02,
-        .applicationObject1 = 0x60400010,
-        .applicationObject2 = 0x60600008,
+        .numberOfMappedApplicationObjectsInPDO = 0x00,
+        .applicationObject1 = 0x00000000,
+        .applicationObject2 = 0x00000000,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
         .applicationObject5 = 0x00000000,
@@ -195,8 +195,6 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .COB_IDClientToServerRx = 0x00000600,
         .COB_IDServerToClientTx = 0x00000580
     },
-    .x6040_controlword = 0x0000,
-    .x6060_modesOfOperation = 0x00,
     .x606C_velocity = 0
 };
 
@@ -239,8 +237,6 @@ typedef struct {
     OD_obj_record_t o_1A01_TPDOMappingParameter[9];
     OD_obj_record_t o_1A02_TPDOMappingParameter[9];
     OD_obj_record_t o_1A03_TPDOMappingParameter[9];
-    OD_obj_var_t o_6040_controlword;
-    OD_obj_var_t o_6060_modesOfOperation;
     OD_obj_var_t o_606C_velocity;
 } ODObjs_t;
 
@@ -531,37 +527,37 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         {
             .dataOrig = &OD_PERSIST_COMM.x1600_RPDOMappingParameter.applicationObject3,
             .subIndex = 3,
-            .attribute = ODA_SDO_RW | ODA_RSRDO | ODA_MB,
+            .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_PERSIST_COMM.x1600_RPDOMappingParameter.applicationObject4,
             .subIndex = 4,
-            .attribute = ODA_SDO_RW | ODA_RSRDO | ODA_MB,
+            .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_PERSIST_COMM.x1600_RPDOMappingParameter.applicationObject5,
             .subIndex = 5,
-            .attribute = ODA_SDO_RW | ODA_RSRDO | ODA_MB,
+            .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_PERSIST_COMM.x1600_RPDOMappingParameter.applicationObject6,
             .subIndex = 6,
-            .attribute = ODA_SDO_RW | ODA_RSRDO | ODA_MB,
+            .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_PERSIST_COMM.x1600_RPDOMappingParameter.applicationObject7,
             .subIndex = 7,
-            .attribute = ODA_SDO_RW | ODA_RSRDO | ODA_MB,
+            .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_PERSIST_COMM.x1600_RPDOMappingParameter.applicationObject8,
             .subIndex = 8,
-            .attribute = ODA_SDO_RW | ODA_RSRDO | ODA_MB,
+            .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         }
     },
@@ -1067,16 +1063,6 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 4
         }
     },
-    .o_6040_controlword = {
-        .dataOrig = &OD_RAM.x6040_controlword,
-        .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
-        .dataLength = 2
-    },
-    .o_6060_modesOfOperation = {
-        .dataOrig = &OD_RAM.x6060_modesOfOperation,
-        .attribute = ODA_SDO_RW | ODA_TRPDO,
-        .dataLength = 1
-    },
     .o_606C_velocity = {
         .dataOrig = &OD_RAM.x606C_velocity,
         .attribute = ODA_SDO_RW | ODA_TPDO | ODA_MB,
@@ -1122,8 +1108,6 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1A01, 0x09, ODT_REC, &ODObjs.o_1A01_TPDOMappingParameter, NULL},
     {0x1A02, 0x09, ODT_REC, &ODObjs.o_1A02_TPDOMappingParameter, NULL},
     {0x1A03, 0x09, ODT_REC, &ODObjs.o_1A03_TPDOMappingParameter, NULL},
-    {0x6040, 0x01, ODT_VAR, &ODObjs.o_6040_controlword, NULL},
-    {0x6060, 0x01, ODT_VAR, &ODObjs.o_6060_modesOfOperation, NULL},
     {0x606C, 0x01, ODT_VAR, &ODObjs.o_606C_velocity, NULL},
     {0x0000, 0x00, 0, NULL, NULL}
 };

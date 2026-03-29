@@ -16,7 +16,7 @@
 
         Created:      2020/11/23 19:00:00
         Created By:   
-        Modified:     2026/3/26 16:58:24
+        Modified:     2026/3/24 16:42:30
         Modified By:  
 
     Device Info:
@@ -44,8 +44,8 @@
 #define OD_CNT_HB_PROD 1
 #define OD_CNT_SDO_SRV 1
 #define OD_CNT_SDO_CLI 1
-#define OD_CNT_RPDO 7
-#define OD_CNT_TPDO 5
+#define OD_CNT_RPDO 4
+#define OD_CNT_TPDO 4
 
 
 /*******************************************************************************
@@ -235,8 +235,6 @@ typedef struct {
         uint32_t COB_IDClientToServerRx;
         uint32_t COB_IDServerToClientTx;
     } x1200_SDOServerParameter;
-    uint16_t x6040_controlword;
-    uint8_t x6060_modesOfOperation;
     int32_t x606C_velocity;
 } OD_RAM_t;
 
@@ -292,9 +290,7 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01 &OD->list[30]
 #define OD_ENTRY_H1A02 &OD->list[31]
 #define OD_ENTRY_H1A03 &OD->list[32]
-#define OD_ENTRY_H6040 &OD->list[33]
-#define OD_ENTRY_H6060 &OD->list[34]
-#define OD_ENTRY_H606C &OD->list[35]
+#define OD_ENTRY_H606C &OD->list[33]
 
 
 /*******************************************************************************
@@ -333,9 +329,7 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[30]
 #define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[31]
 #define OD_ENTRY_H1A03_TPDOMappingParameter &OD->list[32]
-#define OD_ENTRY_H6040_controlword &OD->list[33]
-#define OD_ENTRY_H6060_modesOfOperation &OD->list[34]
-#define OD_ENTRY_H606C_velocity &OD->list[35]
+#define OD_ENTRY_H606C_velocity &OD->list[33]
 
 
 /*******************************************************************************
