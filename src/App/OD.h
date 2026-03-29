@@ -188,6 +188,7 @@ typedef struct {
     struct {
         uint8_t numberOfMappedApplicationObjectsInPDO;
         uint32_t applicationObject1;
+        uint32_t applicationObject2;
     } x1A00_TPDOMappingParameter;
     struct {
         uint8_t numberOfMappedApplicationObjectsInPDO;
@@ -235,7 +236,12 @@ typedef struct {
         uint32_t COB_IDClientToServerRx;
         uint32_t COB_IDServerToClientTx;
     } x1200_SDOServerParameter;
+    uint16_t x6040_controlword;
+    uint16_t x6041_statusword;
+    uint8_t x6060_modeworld;
+    uint8_t x6061_modeDisplay;
     int32_t x606C_velocity;
+    int32_t x60FF_targetVelocity;
 } OD_RAM_t;
 
 #ifndef OD_ATTR_PERSIST_COMM
@@ -290,7 +296,12 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01 &OD->list[30]
 #define OD_ENTRY_H1A02 &OD->list[31]
 #define OD_ENTRY_H1A03 &OD->list[32]
-#define OD_ENTRY_H606C &OD->list[33]
+#define OD_ENTRY_H6040 &OD->list[33]
+#define OD_ENTRY_H6041 &OD->list[34]
+#define OD_ENTRY_H6060 &OD->list[35]
+#define OD_ENTRY_H6061 &OD->list[36]
+#define OD_ENTRY_H606C &OD->list[37]
+#define OD_ENTRY_H60FF &OD->list[38]
 
 
 /*******************************************************************************
@@ -329,7 +340,12 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[30]
 #define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[31]
 #define OD_ENTRY_H1A03_TPDOMappingParameter &OD->list[32]
-#define OD_ENTRY_H606C_velocity &OD->list[33]
+#define OD_ENTRY_H6040_controlword &OD->list[33]
+#define OD_ENTRY_H6041_statusword &OD->list[34]
+#define OD_ENTRY_H6060_modeworld &OD->list[35]
+#define OD_ENTRY_H6061_modeDisplay &OD->list[36]
+#define OD_ENTRY_H606C_velocity &OD->list[37]
+#define OD_ENTRY_H60FF_targetVelocity &OD->list[38]
 
 
 /*******************************************************************************
