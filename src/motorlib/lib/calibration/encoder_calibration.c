@@ -9,6 +9,9 @@
 #include <math.h>
 #include "motorlib_control_param.h"
 
+#undef ABS
+#define ABS(x) ((x) < 0 ? -(x) : (x))
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif
@@ -167,7 +170,7 @@ bool encoder_calib_run(struct motor *motor)
 			int32_t enc_delta = enc->raw_delta_acc;
 			float detected_direction;
 			/* 检查是否有足够响应 */
-			if (abs(enc_delta) < ENC_CALIB_DIRECTION_THRESHOLD) {
+			if (ABS(enc_delta) < ENC_CALIB_DIRECTION_THRESHOLD) {
 				enc->state = ENC_CALIB_ERROR_NO_RESPONSE;
 				inverter_disable(inverter);
 				return true;

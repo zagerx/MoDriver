@@ -15,15 +15,11 @@ static struct inverter m1_inverter;
 /** @brief 电机1电流采样实例 */
 static struct currsmp m1_currsmp;
 
-/** @brief 电机1状态机实例 */
-static struct statemachine m1_sm;
-
 /** @brief 电机1实例 */
 static struct motor motor1 = {
 	.feedback = &m1_feedback,
 	.inverter = &m1_inverter,
 	.currsmp = &m1_currsmp,
-	.sm = &m1_sm,
 };
 
 /** @brief 电机1全局指针 */

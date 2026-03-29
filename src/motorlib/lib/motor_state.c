@@ -5,10 +5,9 @@
 #include "calibration.h"
 #include "inverter.h"
 #include "motor_state.h"
-
+#include "motor_mode.h"
 #include <stdint.h>
 
-#include "motorlib_control_param.h"
 #include "open_loop.h"
 #include "close_loop.h"
 
@@ -143,24 +142,26 @@ void motor_runing_state(struct statemachine *sm)
 
 	struct motor *motor = (struct motor *)(sm->data);
 	struct inverter *inverter = motor->inverter;
-
+	struct statemachine *sm_mode = &motor->sm_mode;
 	switch (sm->phase) {
 	case ENTER:
 		inverter_enable(inverter);
+
+		if (sm_mode->current_state != motor_mode_none) {
+			TRAN_STATE(sm_mode, motor_mode_none);
+		}
 		sm->phase = RUNING;
 		sm->count = 0;
 		break;
 
 	case RUNING:
-		if (sm->count++ > SPEED_LOOP_INTERVAL) {
-			sm->count = 0;
-
-			motor_velocity_loop(motor);
-		}
-		motor_currment_loop(motor);
+		sm_dispatch(sm_mode);
 		break;
 
 	case EXIT:
+		if (sm_mode->current_state != motor_mode_none) {
+			TRAN_STATE(sm_mode, motor_mode_none);
+		}
 		break;
 
 	default:

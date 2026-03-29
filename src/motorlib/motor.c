@@ -19,7 +19,7 @@
 #include "motor_state.h"
 #include "foc.h"
 #include "motorlib_control_param.h"
-
+#include "motor_mode.h"
 #include <stdint.h>
 
 #undef NULL
@@ -119,7 +119,8 @@ void motor_init(struct motor *motor)
 		return;
 	}
 
-	struct statemachine *sm = motor->sm;
+	struct statemachine *sm = &motor->sm;
+	struct statemachine *sm_mode = &motor->sm_mode;
 	struct feedback *fb = motor->feedback;
 	struct currsmp *currsmp = motor->currsmp;
 
@@ -134,6 +135,7 @@ void motor_init(struct motor *motor)
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
 	}
 
+	statemachine_init(sm_mode, motor, motor_mode_none, NULL, 0);
 	struct foc *foc = &motor->foc;
 	if (!motor->param_ext) {
 		/* 参数未绑定 */
@@ -161,7 +163,7 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 
 	struct feedback *feedback = motor->feedback;
 	struct currsmp *currsmp = motor->currsmp;
-	struct statemachine *sm = motor->sm;
+	struct statemachine *sm = &motor->sm;
 
 	currsmp_update_raw(currsmp, adc_raw);
 	feedback_update_raw(feedback);
