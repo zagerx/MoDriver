@@ -113,8 +113,10 @@ void process_data(uint8_t *data, uint16_t len)
 				}
 
 				if (cmd_map[i].data_index == INDEX_TAR) {
-					m1_param_ext.foc_param.target_pos = input[0];
-					m1_param_ext.foc_param.target_vel = input[0];
+					*m1_param_ext.foc_param.target_pos =
+						(int32_t)(input[0] * 1000); // 转换为整数位置
+					*m1_param_ext.foc_param.target_vel =
+						(int32_t)(input[0] * 1000); // 转换为整数速度
 				} else if (cmd_map[i].data_index == INDEX_VP_PI) {
 
 					// m1_param_ext.foc_param.d_axis.kp = input[0];

@@ -32,7 +32,9 @@ void motor_velocity_loop(struct motor *motor)
 	struct foc_pid *velocity_pi = &foc->ctrl.velocity;
 	struct foc_param *param = foc->parm;
 	struct foc_measurement *meas = &foc->meas;
-	float target = param->target_vel;
+	float target =
+		(*param->target_vel) /
+		1000.0f; /* 目标速度转换为实际单位（假设输入为整数形式的m/s，转换为浮点数） */
 	float vel = meas->fd_out->velocity_rad_s;
 
 	foc->ref.i_q = foc_pid_run(velocity_pi, target, vel, SPEED_PERIOD_DT);

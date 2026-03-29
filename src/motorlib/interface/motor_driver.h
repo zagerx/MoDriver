@@ -84,9 +84,9 @@ struct foc_param {
 	struct foc_pid_param q_axis; /**< @brief q轴电流环PID参数 */
 	struct foc_pid_param vel;    /**< @brief 速度环PID参数 */
 	struct foc_pid_param pos;    /**< @brief 位置环PID参数 */
-	float target_pos;            /**< @brief 目标位置，位置模式的输入 */
-	float target_vel;            /**< @brief 目标速度，速度模式的输入 */
-	float target_torque;         /**< @brief 目标转矩，力矩模式的输入 */
+	int32_t *target_pos;         /**< @brief 位置模式目标位置 */
+	int32_t *target_vel;         /**< @brief 速度模式目标速度 */
+	int32_t *target_torque;      /**< @brief 力矩模式目标转矩 */
 };
 
 /**

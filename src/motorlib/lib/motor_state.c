@@ -195,7 +195,7 @@ void motor_openloop_encoder_state(struct statemachine *sm)
 		break;
 
 	case RUNING:
-		target = motor->param_ext->foc_param.target_pos;
+		target = (float)(*motor->param_ext->foc_param.target_pos) / 1000.0f;
 		open_loop_encoder(motor, target);
 		// if (++debug_cnt % 500 == 0) {
 		// 	debug_cnt = 0;

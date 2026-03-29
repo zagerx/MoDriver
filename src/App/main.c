@@ -4,6 +4,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+// #include <cstddef>
 
 #include "hardware.h"
 #include "motor.h"
@@ -12,6 +13,7 @@
 #include "motorlib_control_param.h"
 #include "canopen_app.h"
 
+#include "OD.h"
 /*============================================================================
  * 电机 1 硬件接口配置
  *===========================================================================*/
@@ -59,9 +61,10 @@ struct motor_param_ext m1_param_ext = {
 				.kd = 0.0f,
 				.limit = SPEED_LOOP_LIMIT},
 			.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = 100.0f},
-			.target_pos = 0.0f,
-			.target_vel = 0.0f,
-			.target_torque = 0.0f,
+			.target_pos = NULL,
+			.target_vel =
+				&OD_RAM.x60FF_targetVelocity, /* OD中有0x60FF Target Velocity */
+			.target_torque = NULL,
 		},
 };
 
