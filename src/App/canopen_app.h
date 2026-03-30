@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "CANopen.h"
-
+#include "cia402.h"
 /*============================================================================
  * 前向声明
  *===========================================================================*/
@@ -32,9 +32,10 @@ struct canopen_app {
 	uint8_t node_id;       /**< 节点 ID (1-127) */
 	uint16_t heartbeat_ms; /**< 心跳周期 (ms) */
 
-	CO_t *co;                  /**< CANopen 协议栈实例 */
-	bool initialized;          /**< 初始化标志 */
-	CO_ReturnError_t last_err; /**< 最后一次错误码 */
+	struct cia402_instance cia402_inst; /**< CiA 402 实例 */
+	CO_t *co;                           /**< CANopen 协议栈实例 */
+	bool initialized;                   /**< 初始化标志 */
+	CO_ReturnError_t last_err;          /**< 最后一次错误码 */
 };
 
 /*============================================================================

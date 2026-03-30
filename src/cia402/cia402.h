@@ -37,4 +37,11 @@ struct cia402_instance {
 	uint16_t fault_code; /*!< 内部故障码缓存 */
 };
 
+void cia402_params_bind(struct cia402_instance *instance, struct motor *motor,
+			uint16_t *controlword, uint16_t *statusword, int8_t *modes_of_operation,
+			int8_t *mode_display, int32_t *target_velocity, int32_t *actual_velocity,
+			uint16_t *error_code, int32_t *target_position, int16_t *target_torque,
+			int32_t *actual_position, int16_t *actual_torque);
+void cia402_init(struct cia402_instance *instance);
+void cia402_update(struct cia402_instance *instance, float dt);
 #endif /* CIA402_H */

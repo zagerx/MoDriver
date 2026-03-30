@@ -57,3 +57,12 @@ void cia402_init(struct cia402_instance *instance)
 	/* 初始化 PDS 状态机 */
 	statemachine_init(&instance->pds_sm, instance, cia402_pds_not_ready_state, NULL, 0);
 }
+
+void cia402_update(struct cia402_instance *instance, float dt)
+{
+	(void)dt; /* 当前版本未使用 dt 参数，保留供将来使用 */
+	if (!instance || !instance->is_initialized) {
+		return;
+	}
+	sm_dispatch(&instance->pds_sm); /* 先处理状态机事件 */
+}

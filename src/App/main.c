@@ -97,6 +97,20 @@ int main(void)
 		}
 	}
 
+	/* 绑定 CiA 402 实例参数 */
+	// cia402_params_bind(&canopen_app.cia402_inst, motor_1, &OD_RAM.x6040_controlword,
+	// 		   &OD_RAM.x6041_statusword, &OD_RAM.x6060_modesOfOperation,
+	// 		   &OD_RAM.x6061_modeDisplay, &OD_RAM.x60FF_targetVelocity,
+	// 		   &OD_RAM.x606C_actualVelocity, &OD_RAM.x603F_errorCode,
+	// 		   &OD_RAM.x607A_targetPosition, &OD_RAM.x6071_targetTorque,
+	// 		   &OD_RAM.x6064_actualPosition, &OD_RAM.x6077_actualTorque);
+
+	cia402_params_bind(&canopen_app.cia402_inst, motor_1, &OD_RAM.x6040_controlword,
+			   &OD_RAM.x6041_statusword, NULL, &OD_RAM.x6061_modeDisplay,
+			   &OD_RAM.x60FF_targetVelocity, NULL, NULL, NULL, NULL, NULL, NULL);
+
+	cia402_init(&canopen_app.cia402_inst);
+
 	/* 关联电机硬件接口 */
 	motor_bind_hardware(motor_1, &m1_hw_ops);
 
@@ -121,6 +135,7 @@ int main(void)
 		uint32_t dt_ms = current_tick - last_tick;
 		last_tick = current_tick;
 		canopen_app_process(&canopen_app, dt_ms);
+		cia402_update(&canopen_app.cia402_inst, dt_ms / 1000.0f);
 	}
 }
 
