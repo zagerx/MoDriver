@@ -59,13 +59,13 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     },
     .x1402_RPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x05,
-        .COB_IDUsedByRPDO = 0x80000400,
+        .COB_IDUsedByRPDO = 0x40000400,
         .transmissionType = 0xFE,
         .eventTimer = 0x0000
     },
     .x1403_RPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x05,
-        .COB_IDUsedByRPDO = 0x80000500,
+        .COB_IDUsedByRPDO = 0x40000500,
         .transmissionType = 0xFE,
         .eventTimer = 0x0000
     },
@@ -82,7 +82,7 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     },
     .x1601_RPDOMappingParameter = {
         .numberOfMappedApplicationObjectsInPDO = 0x01,
-        .applicationObject1 = 0x60FF0020,
+        .applicationObject1 = 0x607A0020,
         .applicationObject2 = 0x00000000,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
@@ -92,8 +92,8 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
         .applicationObject8 = 0x00000000
     },
     .x1602_RPDOMappingParameter = {
-        .numberOfMappedApplicationObjectsInPDO = 0x00,
-        .applicationObject1 = 0x00000000,
+        .numberOfMappedApplicationObjectsInPDO = 0x01,
+        .applicationObject1 = 0x60FF0020,
         .applicationObject2 = 0x00000000,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
@@ -103,8 +103,8 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
         .applicationObject8 = 0x00000000
     },
     .x1603_RPDOMappingParameter = {
-        .numberOfMappedApplicationObjectsInPDO = 0x00,
-        .applicationObject1 = 0x00000000,
+        .numberOfMappedApplicationObjectsInPDO = 0x01,
+        .applicationObject1 = 0x60710010,
         .applicationObject2 = 0x00000000,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
@@ -131,10 +131,10 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     },
     .x1802_TPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x06,
-        .COB_IDUsedByTPDO = 0xC0000380,
+        .COB_IDUsedByTPDO = 0x40000380,
         .transmissionType = 0xFE,
         .inhibitTime = 0x0000,
-        .eventTimer = 0x0000,
+        .eventTimer = 0x000A,
         .SYNCStartValue = 0x00
     },
     .x1803_TPDOCommunicationParameter = {
@@ -151,9 +151,9 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
         .applicationObject2 = 0x60610008
     },
     .x1A01_TPDOMappingParameter = {
-        .numberOfMappedApplicationObjectsInPDO = 0x01,
-        .applicationObject1 = 0x606C0020,
-        .applicationObject2 = 0x00000000,
+        .numberOfMappedApplicationObjectsInPDO = 0x02,
+        .applicationObject1 = 0x60640020,
+        .applicationObject2 = 0x606C0020,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
         .applicationObject5 = 0x00000000,
@@ -162,9 +162,9 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
         .applicationObject8 = 0x00000000
     },
     .x1A02_TPDOMappingParameter = {
-        .numberOfMappedApplicationObjectsInPDO = 0x00,
-        .applicationObject1 = 0x00000000,
-        .applicationObject2 = 0x00000000,
+        .numberOfMappedApplicationObjectsInPDO = 0x02,
+        .applicationObject1 = 0x603F0010,
+        .applicationObject2 = 0x60770010,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
         .applicationObject5 = 0x00000000,
@@ -196,11 +196,16 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .COB_IDClientToServerRx = 0x00000600,
         .COB_IDServerToClientTx = 0x00000580
     },
+    .x603F_errorCode = 0x0000,
     .x6040_controlword = 0x0000,
     .x6041_statusword = 0x0000,
-    .x6060_modeworld = 0x00,
-    .x6061_modeDisplay = 0x00,
+    .x6060_modeworld = 0,
+    .x6061_modeDisplay = 0,
+    .x6064_position = 0,
     .x606C_velocity = 0,
+    .x6071_targetTorque = 0,
+    .x6077_torque = 0,
+    .x607A_targetPosition = 0,
     .x60FF_targetVelocity = 0
 };
 
@@ -243,11 +248,16 @@ typedef struct {
     OD_obj_record_t o_1A01_TPDOMappingParameter[9];
     OD_obj_record_t o_1A02_TPDOMappingParameter[9];
     OD_obj_record_t o_1A03_TPDOMappingParameter[9];
+    OD_obj_var_t o_603F_errorCode;
     OD_obj_var_t o_6040_controlword;
     OD_obj_var_t o_6041_statusword;
     OD_obj_var_t o_6060_modeworld;
     OD_obj_var_t o_6061_modeDisplay;
+    OD_obj_var_t o_6064_position;
     OD_obj_var_t o_606C_velocity;
+    OD_obj_var_t o_6071_targetTorque;
+    OD_obj_var_t o_6077_torque;
+    OD_obj_var_t o_607A_targetPosition;
     OD_obj_var_t o_60FF_targetVelocity;
 } ODObjs_t;
 
@@ -1080,6 +1090,11 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 4
         }
     },
+    .o_603F_errorCode = {
+        .dataOrig = &OD_RAM.x603F_errorCode,
+        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
+        .dataLength = 2
+    },
     .o_6040_controlword = {
         .dataOrig = &OD_RAM.x6040_controlword,
         .attribute = ODA_SDO_RW | ODA_RPDO | ODA_MB,
@@ -1087,7 +1102,7 @@ static CO_PROGMEM ODObjs_t ODObjs = {
     },
     .o_6041_statusword = {
         .dataOrig = &OD_RAM.x6041_statusword,
-        .attribute = ODA_SDO_RW | ODA_TPDO | ODA_MB,
+        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 2
     },
     .o_6060_modeworld = {
@@ -1097,12 +1112,32 @@ static CO_PROGMEM ODObjs_t ODObjs = {
     },
     .o_6061_modeDisplay = {
         .dataOrig = &OD_RAM.x6061_modeDisplay,
-        .attribute = ODA_SDO_RW | ODA_TPDO,
+        .attribute = ODA_SDO_R | ODA_TPDO,
         .dataLength = 1
+    },
+    .o_6064_position = {
+        .dataOrig = &OD_RAM.x6064_position,
+        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
+        .dataLength = 4
     },
     .o_606C_velocity = {
         .dataOrig = &OD_RAM.x606C_velocity,
-        .attribute = ODA_SDO_RW | ODA_TPDO | ODA_MB,
+        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
+        .dataLength = 4
+    },
+    .o_6071_targetTorque = {
+        .dataOrig = &OD_RAM.x6071_targetTorque,
+        .attribute = ODA_SDO_RW | ODA_RPDO | ODA_MB,
+        .dataLength = 2
+    },
+    .o_6077_torque = {
+        .dataOrig = &OD_RAM.x6077_torque,
+        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
+        .dataLength = 2
+    },
+    .o_607A_targetPosition = {
+        .dataOrig = &OD_RAM.x607A_targetPosition,
+        .attribute = ODA_SDO_RW | ODA_RPDO | ODA_MB,
         .dataLength = 4
     },
     .o_60FF_targetVelocity = {
@@ -1150,11 +1185,16 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1A01, 0x09, ODT_REC, &ODObjs.o_1A01_TPDOMappingParameter, NULL},
     {0x1A02, 0x09, ODT_REC, &ODObjs.o_1A02_TPDOMappingParameter, NULL},
     {0x1A03, 0x09, ODT_REC, &ODObjs.o_1A03_TPDOMappingParameter, NULL},
+    {0x603F, 0x01, ODT_VAR, &ODObjs.o_603F_errorCode, NULL},
     {0x6040, 0x01, ODT_VAR, &ODObjs.o_6040_controlword, NULL},
     {0x6041, 0x01, ODT_VAR, &ODObjs.o_6041_statusword, NULL},
     {0x6060, 0x01, ODT_VAR, &ODObjs.o_6060_modeworld, NULL},
     {0x6061, 0x01, ODT_VAR, &ODObjs.o_6061_modeDisplay, NULL},
+    {0x6064, 0x01, ODT_VAR, &ODObjs.o_6064_position, NULL},
     {0x606C, 0x01, ODT_VAR, &ODObjs.o_606C_velocity, NULL},
+    {0x6071, 0x01, ODT_VAR, &ODObjs.o_6071_targetTorque, NULL},
+    {0x6077, 0x01, ODT_VAR, &ODObjs.o_6077_torque, NULL},
+    {0x607A, 0x01, ODT_VAR, &ODObjs.o_607A_targetPosition, NULL},
     {0x60FF, 0x01, ODT_VAR, &ODObjs.o_60FF_targetVelocity, NULL},
     {0x0000, 0x00, 0, NULL, NULL}
 };
