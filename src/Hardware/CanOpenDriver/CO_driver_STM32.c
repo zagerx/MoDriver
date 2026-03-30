@@ -64,7 +64,8 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 				   uint16_t rxSize, CO_CANtx_t txArray[], uint16_t txSize,
 				   uint16_t CANbitRate)
 {
-	(void)CANptr;  /* 不使用参数，直接使用 hfdcan2 */
+	(void)CANptr;      /* 不使用参数，直接使用 hfdcan2 */
+	(void)CANbitRate;  /* 不使用参数，CAN波特率在CubeMX中配置 */
 
 	/* verify arguments */
 	if (CANmodule == NULL || rxArray == NULL || txArray == NULL) {
@@ -203,7 +204,7 @@ CO_CANtx_t *CO_CANtxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, uint16
  */
 static uint8_t prv_send_can_message(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
 {
-
+	(void)CANmodule;  /* 不使用参数，直接使用 hfdcan2 */
 	uint8_t success = 0;
 
 	/* Check if TX FIFO is ready to accept more messages */
@@ -331,7 +332,8 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule)
 /******************************************************************************/
 /* Get error counters from the module. If necessary, function may use
  * different way to determine errors. */
-static uint16_t rxErrors = 0, txErrors = 0, overflow = 0;
+/* 错误计数器保留供将来使用 */
+/* static uint16_t rxErrors = 0, txErrors = 0, overflow = 0; */
 
 void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 {
@@ -383,6 +385,7 @@ void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 static void prv_read_can_received_msg(FDCAN_HandleTypeDef *hfdcan, uint32_t fifo,
 				      uint32_t fifo_isrs)
 {
+	(void)fifo_isrs;  /* 不使用参数，保留供将来使用 */
 
 	CO_CANrxMsg_t rcvMsg;
 	CO_CANrx_t *buffer = NULL; /* receive message buffer from CO_CANmodule_t object. */
@@ -492,6 +495,8 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo1ITs)
  */
 void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes)
 {
+	(void)hfdcan;        /* 不使用参数，直接使用 CANModule_local */
+	(void)BufferIndexes; /* 不使用参数，保留供将来使用 */
 	CANModule_local->firstCANtxMessage =
 		false; /* First CAN message (bootup) was sent successfully */
 	CANModule_local->bufferInhibitFlag = false; /* Clear flag from previous message */
