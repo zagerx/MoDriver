@@ -83,6 +83,7 @@ add_subdirectory(motorlib)
 add_subdirectory(CMSIS-DSP)
 add_subdirectory(statemachine)
 add_subdirectory(CANopenNode)
+add_subdirectory(cia402)
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
@@ -91,7 +92,6 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     App/canopen_app.c
     App/OD.c
     Hardware/CanOpenDriver/CO_driver_STM32.c
-    App/motor_402.c
 )
 
 # 工程依赖
@@ -100,6 +100,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     motor
     canopennode
     sm
+    cia402
 )
 
 

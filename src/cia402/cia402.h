@@ -1,5 +1,5 @@
-#ifndef MOTOR_402_H
-#define MOTOR_402_H
+#ifndef CIA402_H
+#define CIA402_H
 #include <stdint.h>
 #include <stdbool.h>
 #include "statemachine.h"
@@ -37,4 +37,4 @@ struct cia402_instance {
 	uint16_t fault_code; /*!< 内部故障码缓存 */
 };
 
-#endif /* MOTOR_402_H */
+#endif /* CIA402_H */
