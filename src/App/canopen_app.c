@@ -43,8 +43,14 @@ int canopen_app_init(canopen_app_t *app, uint8_t node_id)
 		return -1;
 	}
 
+	/* 保存用户设置的回调函数（如果有） */
+	void (*saved_sys_reset)(void) = app->sys_reset_ops;
+
 	/* 清零结构体 */
 	memset(app, 0, sizeof(canopen_app_t));
+
+	/* 恢复回调函数 */
+	app->sys_reset_ops = saved_sys_reset;
 
 	/* 填充配置 */
 	app->node_id = node_id;
@@ -135,7 +141,14 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 		case CO_RESET_APP:
 			/* 应用复位 - 系统重启 */
 
-			app->sys_reset_ops();
+			if (app->sys_reset_ops) {
+				app->sys_reset_ops();
+			} else {
+				// 没有定义系统复位操作，执行软件复位
+				// NVIC_SystemReset();
+			}
+			// HAL_NVIC_SystemReset();
+			// app->sys_reset_ops();
 			break;
 
 		case CO_RESET_NOT:

@@ -3,3 +3,4 @@ src/build/
 src/.cache/
 src/.vscode/
 src/CanOpenSTM32
+src/ros2_ws
