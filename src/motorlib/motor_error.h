@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 #ifndef MOTOR_ERROR_H
 #define MOTOR_ERROR_H

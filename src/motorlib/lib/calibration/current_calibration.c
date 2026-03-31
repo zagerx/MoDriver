@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 #include "current_calibration.h"
 #include "_motorlib_internal.h"

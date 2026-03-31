@@ -1,4 +1,10 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
+
+/**
+ * @file svpwm.h
+ * @brief 空间矢量脉宽调制（SVPWM）头文件
+ * @details 实现三相逆变器的SVPWM控制算法，包括电压限幅、坐标变换和占空比计算
+ */
 
 #ifndef SVPWM_H
 #define SVPWM_H

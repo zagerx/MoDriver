@@ -1,4 +1,10 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
+
+/**
+ * @file open_loop.h
+ * @brief 电机开环控制头文件
+ * @details 实现电机开环控制功能，包括强制对齐、强制拖动和调试模式
+ */
 
 #ifndef OPEN_LOOP_H
 #define OPEN_LOOP_H

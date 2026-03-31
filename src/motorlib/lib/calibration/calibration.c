@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 #include "calibration.h"
 #include "current_calibration.h"
@@ -139,16 +139,14 @@ enum calibration_status calibration_task(struct motor *motor)
 		calib->status = CALIBRATION_STATUS_CURRENT;
 		break;
 
-	case CALIBRATION_STATUS_CURRENT:
-		{
-			int16_t curr_ret = current_phase_handle(motor);
-			if (curr_ret == 0) {
-				calib->status = CALIBRATION_STATUS_ENCODER;
-			} else if (curr_ret < 0) {
-				calib->status = CALIBRATION_STATUS_FAILED;
-			}
+	case CALIBRATION_STATUS_CURRENT: {
+		int16_t curr_ret = current_phase_handle(motor);
+		if (curr_ret == 0) {
+			calib->status = CALIBRATION_STATUS_ENCODER;
+		} else if (curr_ret < 0) {
+			calib->status = CALIBRATION_STATUS_FAILED;
 		}
-		break;
+	} break;
 
 	case CALIBRATION_STATUS_ENCODER:
 		/* 执行编码器校准 */

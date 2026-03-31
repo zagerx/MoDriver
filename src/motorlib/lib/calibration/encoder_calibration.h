@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 #ifndef ENCODER_CALIBRATION_H
 #define ENCODER_CALIBRATION_H

@@ -1,10 +1,6 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-
 /**
  * @file close_loop.c
  * @brief 电机闭环控制实现
- *
- * 本文件包含电机速度闭环控制的相关函数实现。
  */
 
 #include "close_loop.h"

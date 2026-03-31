@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 #ifndef _MOTOR_INTERNAL_H
 #define _MOTOR_INTERNAL_H

@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 /**
  * @file current_calibration.h
@@ -24,9 +24,9 @@ struct current_calib {
 
 /** 电流校准阶段 */
 enum current_calib_state {
-	CURRENT_STATE_IDLE = 0,  /**< 空闲状态 */
-	CURRENT_STATE_SAMPLING,  /**< 采样中 */
-	CURRENT_STATE_FINISH     /**< 校准完成 */
+	CURRENT_STATE_IDLE = 0, /**< 空闲状态 */
+	CURRENT_STATE_SAMPLING, /**< 采样中 */
+	CURRENT_STATE_FINISH    /**< 校准完成 */
 };
 
 /**

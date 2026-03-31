@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 /**
  * @file motor.c
  * @brief 电机控制模块主文件

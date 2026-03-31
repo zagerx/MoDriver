@@ -1,4 +1,10 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
+
+/**
+ * @file inverter.h
+ * @brief 逆变器驱动头文件
+ * @details 实现三相逆变器的使能、禁用和电压设置功能
+ */
 
 #ifndef INVERTER_H
 #define INVERTER_H

@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 #include "inverter.h"
 #include "motor_driver.h"

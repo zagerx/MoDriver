@@ -29,10 +29,40 @@ enum motor_mode {
 	/* 制造商特定 (0x7F-0xFF 保留) */
 	MODE_MANUFACTURER = 0xFF, /*!< 制造商特定模式 */
 };
+/**
+ * @brief 电机无模式状态处理函数
+ * @param[in] sm 状态机实例指针
+ * @details 当电机未分配任何操作模式时调用此状态函数
+ */
 void motor_mode_none(struct statemachine *sm);
+
+/**
+ * @brief 电机原点回归模式状态处理函数
+ * @param[in] sm 状态机实例指针
+ * @details 执行原点回归（Homing）操作，寻找机械零点
+ */
 void motor_mode_HOMING(struct statemachine *sm);
+
+/**
+ * @brief 电机轮廓位置模式状态处理函数
+ * @param[in] sm 状态机实例指针
+ * @details 执行轮廓位置模式（PP）控制，内部规划轨迹
+ */
 void motor_mode_PP(struct statemachine *sm);
+
+/**
+ * @brief 电机轮廓速度模式状态处理函数
+ * @param[in] sm 状态机实例指针
+ * @details 执行轮廓速度模式（PV）控制，内部规划轨迹
+ */
 void motor_mode_PV(struct statemachine *sm);
+
+/**
+ * @brief 切换电机操作模式
+ * @param[in] motor 电机实例指针
+ * @param[in] new_mode 新的操作模式
+ * @details 内部函数，用于状态机切换操作模式
+ */
 void _tran_mode(struct motor *motor, enum motor_mode new_mode);
 
 #endif

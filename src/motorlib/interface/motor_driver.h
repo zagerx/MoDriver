@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 #ifndef MOTOR_DRIVER_H
 #define MOTOR_DRIVER_H

@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+
 
 #include "trajectory_plan.h"
 #include <math.h>
