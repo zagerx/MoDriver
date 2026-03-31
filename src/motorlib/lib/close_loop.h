@@ -22,7 +22,7 @@ void motor_position_loop(struct motor *motor, float dt);
  * @param[in] motor 电机实例指针
  * @details 执行速度闭环控制，计算电流指令（q轴电流）
  */
-void motor_velocity_loop(struct motor *motor);
+void motor_velocity_loop(struct motor *motor, float target_vel);
 
 /**
  * @brief 电机电流环控制

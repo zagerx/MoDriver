@@ -34,7 +34,11 @@ static const struct motor_hw_ops m1_hw_ops = {
 };
 
 struct motor_param_ext m1_param_ext = {
-	.feedback_param = {0},
+	.feedback_param =
+		{
+			.gear_ratio = 1.0f,
+			.wheel_radius = 17.5f / 1000.0f, // 17.5mm 轮子半径
+		},
 	.currsmp_param =
 		{
 			.gain_phase = PHASE_CURRENT_GAIN, /* 电流采样增益（A/LSB） */
@@ -60,7 +64,7 @@ struct motor_param_ext m1_param_ext = {
 				.ki = SPEED_LOOP_KI,
 				.kd = 0.0f,
 				.limit = SPEED_LOOP_LIMIT},
-			.pos = {.kp = 0.1f, .ki = 1.0f, .kd = 0.0f, .limit = 100.0f},
+			.pos = {.kp = 4000.0f, .ki = 8000.0f, .kd = 0.0f, .limit = 300.0f},
 			.target_pos = NULL,
 			.target_vel =
 				&OD_RAM.x60FF_targetVelocity, /* OD中有0x60FF Target Velocity */

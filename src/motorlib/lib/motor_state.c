@@ -145,6 +145,7 @@ void motor_runing_state(struct statemachine *sm)
 	struct statemachine *sm_mode = &motor->sm_mode;
 	switch (sm->phase) {
 	case ENTER:
+		inverter_set_voltage(inverter, 0.0f, 0.0f, 0.0f);
 		inverter_enable(inverter);
 
 		if (sm_mode->current_state != motor_mode_none) {

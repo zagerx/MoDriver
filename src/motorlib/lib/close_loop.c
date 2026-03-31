@@ -20,9 +20,12 @@ void motor_position_loop(struct motor *motor, float dt)
 	struct foc_measurement *meas = &foc->meas;
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
 	float plan_position = trajectory_planner_get_pos(traj_plan);
-	float plan_velocity = trajectory_planner_get_vel(traj_plan);
+	float plan_velocity = trajectory_planner_get_vel(traj_plan) / (17.5f / 1000.0f);
 	float current_pos = meas->fd_out->odometer;
-
+	static volatile float test_tar_pos, test_real_pos, test_plann_vel;
+	test_tar_pos = plan_position * 1000.0f;
+	test_real_pos = current_pos * 1000.0f;
+	test_plann_vel = plan_velocity * 1000.0f;
 	float temp = foc_pid_run(position_pi, plan_position, current_pos, dt);
 	/* 将位置环输出作为速度环的目标输入 */
 	foc->ref.velocity = temp + plan_velocity; /* 前馈项：轨迹规划的速度 */
@@ -37,18 +40,15 @@ void motor_position_loop(struct motor *motor, float dt)
  *
  * @return 无返回值
  */
-void motor_velocity_loop(struct motor *motor)
+void motor_velocity_loop(struct motor *motor, float target_vel)
 {
 	struct foc *foc = &motor->foc;
 	struct foc_pid *velocity_pi = &foc->ctrl.velocity;
-	struct foc_param *param = foc->parm;
 	struct foc_measurement *meas = &foc->meas;
-	float target =
-		(*param->target_vel) /
-		1000.0f; /* 目标速度转换为实际单位（假设输入为整数形式的m/s，转换为浮点数） */
+
 	float vel = meas->fd_out->velocity_rad_s;
 
-	foc->ref.i_q = foc_pid_run(velocity_pi, target, vel, SPEED_PERIOD_DT);
+	foc->ref.i_q = foc_pid_run(velocity_pi, target_vel, vel, SPEED_PERIOD_DT);
 	foc->ref.i_d = 0.0f;
 }
 void motor_currment_loop(struct motor *motor)

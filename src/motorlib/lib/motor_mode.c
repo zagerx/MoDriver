@@ -3,6 +3,7 @@
 #include "close_loop.h"
 #include "motorlib_control_param.h"
 #include "_motorlib_internal.h"
+#include <stdint.h>
 void motor_mode_none(struct statemachine *sm)
 {
 	enum {
@@ -34,7 +35,8 @@ void motor_mode_PP(struct statemachine *sm)
 	enum {
 		RUNING = USER_STATUS,
 	};
-
+	static uint16_t test_flag1 = 1;
+	static uint16_t test_flag2 = 1;
 	struct motor *motor = (struct motor *)(sm->data);
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
 	struct foc *foc = &motor->foc;
@@ -44,15 +46,20 @@ void motor_mode_PP(struct statemachine *sm)
 		sm->phase = RUNING;
 		sm->count = 0;
 		trajectory_planner_init(traj_plan, start_pos, 0.0f, 0.0f, POSITION_PERIOD_DT);
+		foc->ref.velocity = 0.0f; /* 初始速度为0 */
+		foc->ref.i_q = 0.0f;
+		foc->ref.i_d = 0.0f;
 		break;
 
 	case RUNING:
-		if (sm->count >= POSITION_LOOP_INTERVAL) {
-			sm->count = 0;
+		if (sm->count % (uint16_t)POSITION_LOOP_INTERVAL == 0) {
+			trajectory_planner_action(traj_plan, POSITION_PERIOD_DT);
 			motor_position_loop(motor, POSITION_PERIOD_DT);
+			test_flag1 = -test_flag1;
 		}
 		if (sm->count % (uint16_t)(SPEED_LOOP_INTERVAL) == 0) {
-			motor_velocity_loop(motor);
+			motor_velocity_loop(motor, foc->ref.velocity);
+			test_flag2 = -test_flag2;
 		}
 		motor_currment_loop(motor);
 		sm->count++;
@@ -73,6 +80,7 @@ void motor_mode_PV(struct statemachine *sm)
 
 	struct motor *motor = (struct motor *)(sm->data);
 	(void)motor;
+	struct trajectory_plan *traj_plan = &motor->traj_plan;
 
 	switch (sm->phase) {
 	case ENTER:
@@ -83,8 +91,9 @@ void motor_mode_PV(struct statemachine *sm)
 	case RUNING:
 		if (sm->count++ > SPEED_LOOP_INTERVAL) {
 			sm->count = 0;
-
-			motor_velocity_loop(motor);
+			trajectory_planner_action(traj_plan, SPEED_PERIOD_DT);
+			float target_vel = trajectory_planner_get_vel(&motor->traj_plan);
+			motor_velocity_loop(motor, target_vel);
 		}
 		motor_currment_loop(motor);
 		break;
