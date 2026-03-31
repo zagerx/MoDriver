@@ -65,7 +65,7 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
 	motor->param_ext = param_ext;
 	feedback_bind_encoder_param(motor->feedback, &param_ext->feedback_param);
 	currsmp_bind_param(motor->currsmp, &param_ext->currsmp_param);
-	/* trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param); */
+	trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param);
 }
 
 /**
@@ -178,4 +178,56 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 	}
 
 	sm_dispatch(sm);
+}
+
+void motor_tran_runing(struct motor *motor)
+{
+	if (!motor) {
+		return;
+	}
+
+	_tran_state(motor, MOTOR_STATUS_RUNING);
+}
+void motor_tran_idle(struct motor *motor)
+{
+	if (!motor) {
+		return;
+	}
+
+	_tran_state(motor, MOTOR_STATUS_IDLE);
+}
+
+void motor_tran_pp_mode(struct motor *motor)
+{
+	if (!motor) {
+		return;
+	}
+
+	_tran_mode(motor, MODE_PP);
+}
+
+void motor_tran_pv_mode(struct motor *motor)
+{
+	if (!motor) {
+		return;
+	}
+
+	_tran_mode(motor, MODE_PV);
+}
+void motor_tran_none_mode(struct motor *motor)
+{
+	if (!motor) {
+		return;
+	}
+
+	_tran_mode(motor, MODE_NONE);
+}
+
+void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel)
+{
+	if (!motor) {
+		return;
+	}
+	struct trajectory_plan *traj_plan = &motor->traj_plan;
+	trajectory_planner_update_target(traj_plan, target_pos, target_vel);
 }

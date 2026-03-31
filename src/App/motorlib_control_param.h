@@ -27,6 +27,11 @@
 #define SPEED_LOOP_INTERVAL                                                                        \
 	(SPEED_PERIOD_DT / CONTROL_PERIOD_DT) /* 速度环执行间隔，单位为控制周期数 */
 
+#define POSITION_LOOP_FREQ 500.0f                      /* 位置环频率 500Hz */
+#define POSITION_PERIOD_DT (1.0f / POSITION_LOOP_FREQ) /* 位置环 周期 10ms */
+#define POSITION_LOOP_INTERVAL                                                                     \
+	(10.0f / CONTROL_PERIOD_DT) /* 位置环执行间隔，单位为控制周期数（例如10ms） */
+
 #define MIN_MECH_ROUNDS 0.02f
 #define MIN_ELEC_ROUNDS 0.20f
 #define ALIGN_VOLTAGE   0.55f

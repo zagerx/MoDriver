@@ -10,6 +10,7 @@ target_sources(motor PRIVATE
         lib/calibration/calibration.c
         lib/calibration/current_calibration.c
         lib/calibration/encoder_calibration.c
+        lib/trajectory_plan_bridgemode.c
         lib/open_loop.c
         lib/close_loop.c
         lib/foc_pid.c

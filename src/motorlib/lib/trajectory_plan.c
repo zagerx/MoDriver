@@ -15,10 +15,10 @@ static traj_plan_status_t traj_plan(traj_plan_data_t *d, float target_pos, float
 static void traj_plan_init(traj_plan_data_t *d, float start_pos, float start_v, float acc_max,
 			   float exec_cycle);
 static traj_plan_status_t traj_plan_three_segment(const traj_plan_input_t *in,
-					  traj_plan_output_t *out, float target_pos,
-					  float target_vel);
+						  traj_plan_output_t *out, float target_pos,
+						  float target_vel);
 static traj_plan_status_t traj_plan_deceleration_only(const traj_plan_input_t *in,
-					      traj_plan_output_t *out, float brake_acc);
+						      traj_plan_output_t *out, float brake_acc);
 
 /**
  * @brief 绑定轨迹规划器参数
@@ -174,7 +174,7 @@ void trajectory_planner_stop(struct trajectory_plan *trajectory)
  * @note 从当前速度使用紧急减速度减速到0
  */
 static traj_plan_status_t traj_plan_deceleration_only(const traj_plan_input_t *in,
-					      traj_plan_output_t *out, float brake_acc)
+						      traj_plan_output_t *out, float brake_acc)
 {
 	out->seg_cnt = 0;
 
@@ -314,8 +314,8 @@ static traj_plan_status_t traj_plan(traj_plan_data_t *d, float target_pos, float
 #define TRAJ_TIME_EPSILON 1e-7f
 
 static traj_plan_status_t traj_plan_three_segment(const traj_plan_input_t *in,
-					  traj_plan_output_t *out, float target_pos,
-					  float target_vel)
+						  traj_plan_output_t *out, float target_pos,
+						  float target_vel)
 {
 	out->seg_cnt = 0;
 
@@ -614,7 +614,6 @@ float trajectory_planner_get_pos(const struct trajectory_plan *trajectory)
 	const trajectory_data_t *data = &trajectory->data;
 	return data->exec_data.pos;
 }
-
 /**
  * @brief 获取当前速度
  *
@@ -651,7 +650,5 @@ float trajectory_planner_get_acc(const struct trajectory_plan *trajectory)
 float trajectory_planner_read_plantarget(const struct trajectory_plan *trajectory)
 {
 	const trajectory_data_t *data = &trajectory->data;
-	volatile static float test_act_pos;
-	test_act_pos = data->plan_data.act_pos * 1000.0f;
 	return data->plan_data.act_pos;
 }

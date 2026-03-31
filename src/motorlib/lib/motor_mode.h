@@ -2,6 +2,7 @@
 #define MOTOR_MODE_H
 #include "statemachine.h"
 struct statemachine;
+struct motor;
 /**
  * @brief CiA 402 操作模式定义
  * @note 对应对象字典 0x6060 (Modes of Operation) 和 0x6061 (Modes of Operation Display)
@@ -32,4 +33,6 @@ void motor_mode_none(struct statemachine *sm);
 void motor_mode_HOMING(struct statemachine *sm);
 void motor_mode_PP(struct statemachine *sm);
 void motor_mode_PV(struct statemachine *sm);
+void _tran_mode(struct motor *motor, enum motor_mode new_mode);
+
 #endif

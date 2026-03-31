@@ -26,6 +26,9 @@ void USER_UART_IRQHandler(UART_HandleTypeDef *huart)
 enum foc_data_index {
 	INDEX_TAR = 0,
 	INDEX_VP_PI,
+	INDEX_STATE,
+	INDEX_MODE,
+	INDEX_MAX,
 };
 
 // 命令映射表结构
@@ -37,8 +40,10 @@ typedef struct {
 
 // 命令表定义
 static const command_map_t cmd_map[] = {
-	{"tar", 1, INDEX_TAR},
+	{"tar", 2, INDEX_TAR},
 	{"pid", 6, INDEX_VP_PI},
+	{"state", 1, INDEX_STATE},
+	{"mode", 1, INDEX_MODE},
 };
 void process_data(uint8_t *data, uint16_t len)
 {
@@ -113,10 +118,11 @@ void process_data(uint8_t *data, uint16_t len)
 				}
 
 				if (cmd_map[i].data_index == INDEX_TAR) {
-					*m1_param_ext.foc_param.target_pos =
-						(int32_t)(input[0] * 1000); // 转换为整数位置
-					*m1_param_ext.foc_param.target_vel =
-						(int32_t)(input[0] * 1000); // 转换为整数速度
+					// *m1_param_ext.foc_param.target_pos =
+					// 	(int32_t)(input[0] * 1000); // 转换为整数位置
+					// *m1_param_ext.foc_param.target_vel =
+					// 	(int32_t)(input[0] * 1000); // 转换为整数速度
+					motor_set_target_pos(motor_1, input[0], input[1]);
 				} else if (cmd_map[i].data_index == INDEX_VP_PI) {
 
 					// m1_param_ext.foc_param.d_axis.kp = input[0];
@@ -127,6 +133,24 @@ void process_data(uint8_t *data, uint16_t len)
 					m1_param_ext.foc_param.vel.ki = input[5];
 					m1_param_ext.foc_param.pos.kp = input[6];
 					m1_param_ext.foc_param.pos.ki = input[7];
+				} else if (cmd_map[i].data_index == INDEX_STATE) {
+					// 处理状态命令
+					if (input[0] == 0) {
+						// 进入空闲状态
+						motor_tran_idle(motor_1);
+					} else if (input[0] == 1) {
+						// 进入运行状态
+						motor_tran_runing(motor_1);
+					}
+				} else if (cmd_map[i].data_index == INDEX_MODE) {
+					// 处理模式命令
+					if (input[0] == 0x01) {
+						// 切换到pp模式
+						motor_tran_pp_mode(motor_1);
+					} else if (input[0] == 0x03) {
+						// 切换到pv模式
+						motor_tran_pv_mode(motor_1);
+					}
 				}
 			}
 			return;

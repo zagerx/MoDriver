@@ -14,6 +14,7 @@ struct motor;
  * @brief Execute motor velocity loop control
  * @param motor Pointer to motor structure
  */
+void motor_position_loop(struct motor *motor, float dt);
 void motor_velocity_loop(struct motor *motor);
 void motor_currment_loop(struct motor *motor);
 

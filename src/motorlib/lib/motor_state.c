@@ -214,3 +214,38 @@ void motor_openloop_encoder_state(struct statemachine *sm)
 		break;
 	}
 }
+
+void _tran_state(struct motor *motor, enum motor_status new_state)
+{
+
+	struct statemachine *sm = &motor->sm;
+	if (!motor || !sm) {
+		return;
+	}
+
+	switch (new_state) {
+	case MOTOR_STATUS_INIT:
+		if (sm->current_state != motor_init_state) {
+			TRAN_STATE(sm, motor_init_state);
+		}
+		break;
+
+	case MOTOR_STATUS_CALIB:
+		if (sm->current_state != motor_carib_state) {
+			TRAN_STATE(sm, motor_carib_state);
+		}
+		break;
+	case MOTOR_STATUS_IDLE:
+		if (sm->current_state != motor_idle_state) {
+			TRAN_STATE(sm, motor_idle_state);
+		}
+		break;
+	case MOTOR_STATUS_RUNING:
+		if (sm->current_state != motor_runing_state) {
+			TRAN_STATE(sm, motor_runing_state);
+		}
+		break;
+	default:
+		break;
+	}
+}
