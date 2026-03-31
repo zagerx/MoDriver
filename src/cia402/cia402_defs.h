@@ -225,6 +225,20 @@ extern "C" {
 #define CIA402_STATE_MASK 0x006FU
 
 /*============================================================================
+ * 操作模式 (Modes of Operation - 0x6060)
+ *===========================================================================*/
+
+#define CIA402_MODE_NONE                    0   /*!< 无模式 */
+#define CIA402_MODE_PROFILE_POSITION        1   /*!< 轮廓位置模式 (PP) */
+#define CIA402_MODE_PROFILE_VELOCITY        3   /*!< 轮廓速度模式 (PV) */
+#define CIA402_MODE_PROFILE_TORQUE          4   /*!< 轮廓转矩模式 (PT) */
+#define CIA402_MODE_HOMING                  6   /*!< 原点回归模式 (HM) */
+#define CIA402_MODE_INTERPOLATED_POSITION   7   /*!< 插补位置模式 (IP) */
+#define CIA402_MODE_CYCLIC_SYNC_POSITION    8   /*!< 循环同步位置模式 (CSP) */
+#define CIA402_MODE_CYCLIC_SYNC_VELOCITY    9   /*!< 循环同步速度模式 (CSV) */
+#define CIA402_MODE_CYCLIC_SYNC_TORQUE      10  /*!< 循环同步转矩模式 (CST) */
+
+/*============================================================================
  * 辅助宏函数
  *===========================================================================*/
 

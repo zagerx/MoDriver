@@ -15,10 +15,10 @@ struct cia402_instance;
 
 /**
  * @brief Not Ready to Switch On 状态
- * 
+ *
  * 初始状态，驱动器正在初始化
  * 状态字: CIA402_STATE_NOT_READY_TO_SWITCH_ON (0x0000)
- * 
+ *
  * 状态转换:
  * - Trans 0/1: 初始化完成 -> Switch On Disabled
  */
@@ -26,10 +26,10 @@ void cia402_pds_not_ready_state(struct statemachine *sm);
 
 /**
  * @brief Switch On Disabled 状态
- * 
+ *
  * 驱动器已初始化，但未准备好使能
  * 状态字: CIA402_STATE_SWITCH_ON_DISABLED (0x0040)
- * 
+ *
  * 有效命令:
  * - Shutdown (CIA402_CMD_SHUTDOWN / 0x06) -> Ready to Switch On (Trans 2)
  */
@@ -37,10 +37,10 @@ void cia402_pds_switch_on_disabled_state(struct statemachine *sm);
 
 /**
  * @brief Ready to Switch On 状态
- * 
+ *
  * 驱动器已准备好使能
  * 状态字: CIA402_STATE_READY_TO_SWITCH_ON (0x0021)
- * 
+ *
  * 有效命令:
  * - Switch On (CIA402_CMD_SWITCH_ON / 0x07) -> Switched On (Trans 3)
  * - Disable Voltage (CIA402_CMD_DISABLE_VOLTAGE / 0x00) -> Switch On Disabled (Trans 7)
@@ -50,10 +50,10 @@ void cia402_pds_ready_to_switch_on_state(struct statemachine *sm);
 
 /**
  * @brief Switched On 状态
- * 
+ *
  * 驱动器电源已开启，但输出未使能
  * 状态字: CIA402_STATE_SWITCHED_ON (0x0023)
- * 
+ *
  * 有效命令:
  * - Enable Operation (CIA402_CMD_ENABLE_OPERATION / 0x0F) -> Operation Enabled (Trans 4)
  * - Shutdown (CIA402_CMD_SHUTDOWN / 0x06) -> Ready to Switch On (Trans 6)
@@ -64,10 +64,10 @@ void cia402_pds_switched_on_state(struct statemachine *sm);
 
 /**
  * @brief Operation Enabled 状态
- * 
+ *
  * 驱动器完全使能，可以执行运动
  * 状态字: CIA402_STATE_OPERATION_ENABLED (0x0027)
- * 
+ *
  * 有效命令:
  * - Disable Operation (CIA402_CMD_DISABLE_OPERATION / 0x07, bit3=0) -> Switched On (Trans 5)
  * - Shutdown (CIA402_CMD_SHUTDOWN / 0x06) -> Ready to Switch On (Trans 8)
@@ -78,11 +78,11 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm);
 
 /**
  * @brief Quick Stop Active 状态
- * 
+ *
  * 快速停止正在执行
  * 状态字: CIA402_STATE_QUICK_STOP_ACTIVE (0x0007)
  * 注意: Quick Stop位(CIA402_SW_QUICK_STOP_MASK / bit5)在此状态为0
- * 
+ *
  * 有效命令:
  * - Quick Stop 完成 -> Switch On Disabled (Trans 12)
  * - Enable Operation (CIA402_CMD_ENABLE_OPERATION / 0x0F) -> Operation Enabled (Trans 16, 可选)
@@ -91,41 +91,42 @@ void cia402_pds_quick_stop_active_state(struct statemachine *sm);
 
 /**
  * @brief Fault Reaction Active 状态
- * 
+ *
  * 故障反应正在执行，电机正在安全停机
  * 状态字: CIA402_STATE_FAULT_REACTION_ACTIVE (0x000F)
- * 
+ *
  * 此状态自动执行，完成后进入 Fault 状态 (Trans 14)
  */
 void cia402_pds_fault_reaction_state(struct statemachine *sm);
 
 /**
  * @brief Fault 状态
- * 
+ *
  * 故障状态，驱动器已停止
  * 状态字: CIA402_STATE_FAULT (0x0008)
- * 
+ *
  * 有效命令:
  * - Fault Reset (CIA402_CMD_FAULT_RESET / 0x80) -> Switch On Disabled (Trans 15)
  */
 void cia402_pds_fault_state(struct statemachine *sm);
+void fault_handler(struct cia402_instance *inst);
 
 /*================== 控制字命令枚举 ==================*/
 
 /**
  * @brief CIA 402 控制字命令类型
- * 
+ *
  * 对应控制字(0x6040)的不同命令组合
  */
 enum cia402_command {
-	CMD_NONE,                   /*!< 无有效命令 */
-	CMD_SHUTDOWN_REQ,           /*!< Shutdown (0x06): bit2=1, bit1=1, bit0=0 */
-	CMD_SWITCH_ON_REQ,          /*!< Switch On (0x07): bit2=1, bit1=1, bit0=1, bit3=0 */
-	CMD_DISABLE_VOLTAGE_REQ,    /*!< Disable Voltage (0x00): bit1=0 */
-	CMD_ENABLE_OP_REQ,          /*!< Enable Operation (0x0F): bit3=1, bit2=1, bit1=1, bit0=1 */
-	CMD_DISABLE_OP_REQ,         /*!< Disable Operation (0x07): bit3=0, bit2=1, bit1=1, bit0=1 */
-	CMD_QUICK_STOP_REQ,         /*!< Quick Stop (0x02): bit2=0, bit1=1 */
-	CMD_FAULT_RESET_REQ,        /*!< Fault Reset (0x80): bit7=1 */
+	CMD_NONE,                /*!< 无有效命令 */
+	CMD_SHUTDOWN_REQ,        /*!< Shutdown (0x06): bit2=1, bit1=1, bit0=0 */
+	CMD_SWITCH_ON_REQ,       /*!< Switch On (0x07): bit2=1, bit1=1, bit0=1, bit3=0 */
+	CMD_DISABLE_VOLTAGE_REQ, /*!< Disable Voltage (0x00): bit1=0 */
+	CMD_ENABLE_OP_REQ,       /*!< Enable Operation (0x0F): bit3=1, bit2=1, bit1=1, bit0=1 */
+	CMD_DISABLE_OP_REQ,      /*!< Disable Operation (0x07): bit3=0, bit2=1, bit1=1, bit0=1 */
+	CMD_QUICK_STOP_REQ,      /*!< Quick Stop (0x02): bit2=0, bit1=1 */
+	CMD_FAULT_RESET_REQ,     /*!< Fault Reset (0x80): bit7=1 */
 };
 
 /*================== 内联辅助函数 ==================*/

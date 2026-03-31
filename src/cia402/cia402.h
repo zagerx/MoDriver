@@ -27,11 +27,13 @@ struct cia402_instance {
 	uint16_t quick_stop_decel; /*!< 0x6085 - 快速停止减速度 */
 
 	/* ========== 状态机 ========== */
-	struct statemachine pds_sm; /*!< PDS 状态机实例 */
+	struct statemachine pds_sm;
 	/* ========== 关联的 motor 实例 ========== */
-	struct motor *motor; /*!< 关联的电机实例 */
+	struct motor *motor;
 
 	/* ========== 内部标志 ========== */
+	uint16_t cache_controlword; /*!< 内部缓存的控制字值，用于检测变化 */
+	uint8_t cache_mode;         /*!< 内部缓存的操作模式值 */
 	bool is_initialized;
 	bool halt_active;    /*!< 暂停标志 */
 	uint16_t fault_code; /*!< 内部故障码缓存 */

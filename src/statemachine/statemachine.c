@@ -41,3 +41,18 @@ void sm_dispatch(struct statemachine *sm)
 		sm->current_state(sm);
 	}
 }
+
+void sm_transition(struct statemachine *sm, sm_state_t new_state)
+{
+	if (!sm || !new_state || new_state == sm->current_state) {
+		return;
+	}
+	if (sm->current_state) {
+		sm->phase = EXIT;
+		sm->current_state(sm);
+	}
+	sm->previous_state = sm->current_state;
+	sm->current_state = new_state;
+	sm->phase = ENTER;
+	sm->current_state(sm);
+}
