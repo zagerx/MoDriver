@@ -17,21 +17,23 @@
 bool check_temp(struct motor_t *motor, uint32_t *fault_bit)
 {
     struct prot_temp_cfg *cfg = &motor->prot_mgr.temp_cfg;
-    
+
     float temp = motor->data.temperature;
-    
+
     // 过温检测
-    if (temp > cfg->overtemp) {
+    if (temp > cfg->overtemp)
+    {
         *fault_bit = FAULT_OVERTEMP;
         return true;
     }
-    
+
     // 低温检测
-    if (temp < cfg->lowtemp) {
+    if (temp < cfg->lowtemp)
+    {
         *fault_bit = FAULT_UNDERTEMP;
         return true;
     }
-    
+
     return false;
 }
 
@@ -43,12 +45,13 @@ bool check_temp(struct motor_t *motor, uint32_t *fault_bit)
 void enter_temp_fault(struct motor_t *motor, uint32_t fault_bit)
 {
     (void)fault_bit;
-    
+
     // 过温保护：立即关闭逆变器
     inverter_set_3phase_disable(motor->inverter);
-    
+    s_planner_stop(&motor->scp);
+
     // 切换到故障状态
-    TRAN_STATE(motor->state_machine, motor_falut_state);
+    // TRAN_STATE(motor->state_machine, motor_falut_state);
 }
 
 /**
@@ -58,5 +61,6 @@ void enter_temp_fault(struct motor_t *motor, uint32_t fault_bit)
 void recover_temp_fault(struct motor_t *motor)
 {
     // 温度恢复：回到空闲状态
-    TRAN_STATE(motor->state_machine, motor_idle_state);
+    // TRAN_STATE(motor->state_machine, motor_idle_state);
+    motor_protection_clear_fault(motor, PROT_TYPE_TEMP);
 }

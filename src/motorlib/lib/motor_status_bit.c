@@ -1,0 +1,47 @@
+
+/**
+ * @file motor_status_bit.c
+ * @brief 电机状态标志位相关实现
+ * @details 提供外部只读访问 motor_data.status_flag 的 Getter API
+ */
+
+#include "_motorlib_internal.h"
+/**
+ * @brief 将状态标志位枚举转换为位掩码
+ * @param x 枚举值
+ * @return 对应的位掩码（1U << x）
+ */
+#define MOTOR_STATUS_BIT(x) (1U << (x))
+
+/**
+ * @brief 状态标志位操作宏
+ * @note 所有操作均通过 MOTOR_STATUS_BIT() 转换枚举值为位掩码
+ * @{
+ */
+
+/** @brief 设置状态位 */
+#define MOTOR_STATUS_SET(flags, bit) ((flags) |= MOTOR_STATUS_BIT(bit))
+
+/** @brief 清除状态位 */
+#define MOTOR_STATUS_CLEAR(flags, bit) ((flags) &= ~MOTOR_STATUS_BIT(bit))
+
+/** @brief 测试状态位是否置位 */
+#define MOTOR_STATUS_TEST(flags, bit) ((flags) & MOTOR_STATUS_BIT(bit))
+
+/** @brief 是否有任何状态标志 */
+#define MOTOR_STATUS_ANY(flags) ((flags) != 0)
+
+/** @brief 是否无任何状态标志 */
+#define MOTOR_STATUS_NONE(flags) ((flags) == 0)
+
+/** @brief 清除所有状态标志 */
+#define MOTOR_STATUS_CLEAR_ALL(flags) ((flags) = 0)
+uint32_t motor_get_status_flag(const struct motor *motor)
+{
+	return motor ? motor->data.status_flag : 0;
+}
+
+int motor_is_status_set(const struct motor *motor, enum motor_status_bits bit)
+{
+	return motor ? MOTOR_STATUS_TEST(motor->data.status_flag, bit) != 0 : 0;
+}

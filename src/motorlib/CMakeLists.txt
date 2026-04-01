@@ -15,6 +15,7 @@ target_sources(motor PRIVATE
         lib/close_loop.c
         lib/foc_pid.c
         lib/motor_state.c
+        lib/motor_status_bit.c
         lib/motor_mode.c
         lib/svpwm.c
         lib/foc.c

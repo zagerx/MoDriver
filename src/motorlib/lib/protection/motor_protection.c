@@ -8,9 +8,13 @@
 #include <string.h>
 
 // ========== 外部保护函数声明 ==========
-extern bool check_voltage(struct motor_t *motor, uint32_t *fault_bit);
-extern void enter_voltage_fault(struct motor_t *motor, uint32_t fault_bit);
-extern void recover_voltage_fault(struct motor_t *motor);
+extern bool check_overvoltage(struct motor_t *motor, uint32_t *fault_bit);
+extern void enter_overvoltage_fault(struct motor_t *motor, uint32_t fault_bit);
+extern void recover_overvoltage_fault(struct motor_t *motor);
+
+extern bool check_undervoltage(struct motor_t *motor, uint32_t *fault_bit);
+extern void enter_undervoltage_fault(struct motor_t *motor, uint32_t fault_bit);
+extern void recover_undervoltage_fault(struct motor_t *motor);
 
 extern bool check_stall(struct motor_t *motor, uint32_t *fault_bit);
 extern void enter_stall_fault(struct motor_t *motor, uint32_t fault_bit);
@@ -71,22 +75,32 @@ void motor_protection_init(struct motor_t *motor)
     // 清空所有数据（包括 descs 数组）
     memset(mgr, 0, sizeof(*mgr));
 
-    // 初始化电压保护描述符
-    struct protection_desc *v_desc = &mgr->descs[PROT_TYPE_VOLTAGE];
-    v_desc->type = PROT_TYPE_VOLTAGE;
-    v_desc->fault_bit = FAULT_OVERVOLTAGE; // 过压和欠压共用此位，具体由检测函数判断
-    v_desc->debounce_ms = 5;
-    v_desc->recover_ms = 1000;
-    v_desc->check_fn = check_voltage;
-    v_desc->enter_fn = enter_voltage_fault;
-    v_desc->recover_fn = recover_voltage_fault;
+    // 初始化过压保护描述符
+    struct protection_desc *ov_desc = &mgr->descs[PROT_TYPE_OVERVOLTAGE];
+    ov_desc->type = PROT_TYPE_OVERVOLTAGE;
+    ov_desc->fault_bit = FAULT_OVERVOLTAGE;
+    ov_desc->debounce_ms = 200;
+    ov_desc->recover_ms = 1000;
+    ov_desc->check_fn = check_overvoltage;
+    ov_desc->enter_fn = enter_overvoltage_fault;
+    ov_desc->recover_fn = recover_overvoltage_fault;
+
+    // 初始化欠压保护描述符
+    struct protection_desc *uv_desc = &mgr->descs[PROT_TYPE_UNDERVOLTAGE];
+    uv_desc->type = PROT_TYPE_UNDERVOLTAGE;
+    uv_desc->fault_bit = FAULT_UNDERVOLTAGE;
+    uv_desc->debounce_ms = 200;
+    uv_desc->recover_ms = 1000;
+    uv_desc->check_fn = check_undervoltage;
+    uv_desc->enter_fn = enter_undervoltage_fault;
+    uv_desc->recover_fn = recover_undervoltage_fault;
 
     // 初始化堵转保护描述符
     struct protection_desc *s_desc = &mgr->descs[PROT_TYPE_STALL];
     s_desc->type = PROT_TYPE_STALL;
     s_desc->fault_bit = FAULT_STALL;
     s_desc->debounce_ms = 500;
-    s_desc->recover_ms = 0;
+    s_desc->recover_ms = 5000;
     s_desc->check_fn = check_stall;
     s_desc->enter_fn = enter_stall_fault;
     s_desc->recover_fn = recover_stall_fault;
@@ -95,15 +109,15 @@ void motor_protection_init(struct motor_t *motor)
     struct protection_desc *t_desc = &mgr->descs[PROT_TYPE_TEMP];
     t_desc->type = PROT_TYPE_TEMP;
     t_desc->fault_bit = FAULT_OVERTEMP;
-    t_desc->debounce_ms = 5000; // 1秒防抖
+    t_desc->debounce_ms = 3000; // 1秒防抖
     t_desc->recover_ms = 3000;
     t_desc->check_fn = check_temp;
     t_desc->enter_fn = enter_temp_fault;
     t_desc->recover_fn = recover_temp_fault;
 
     // 初始化配置
-    mgr->voltage_cfg.overvoltage = 50.0f;
-    mgr->voltage_cfg.undervoltage = 46.0f;
+    mgr->overvoltage_cfg.threshold = 50.0f;  // 过压阈值52V
+    mgr->undervoltage_cfg.threshold = 46.0f; // 欠压阈值12V
 
     mgr->stall_cfg.current_threshold = 8.0f; // A
     mgr->stall_cfg.vel_threshold = 30.0f;    // 30mm/s
@@ -162,6 +176,27 @@ void motor_protection_clear_fault(struct motor_t *motor, enum protection_type ty
     desc->debounce_acc = 0;
     desc->recover_acc = 0;
     mgr->fault_bitmap &= ~desc->fault_bit; // 清除对应的故障位
+}
+
+void motor_protection_clear_all_faults(struct motor_t *motor)
+{
+    if (!motor)
+        return;
+
+    struct protection_manager *mgr = &motor->prot_mgr;
+
+    // 清除所有保护类型的故障状态
+    for (int i = PROT_TYPE_NONE + 1; i < PROT_TYPE_COUNT; i++)
+    {
+        struct protection_desc *desc = &mgr->descs[i];
+        desc->is_triggered = false;
+        desc->status = PROT_STATUS_NORMAL;
+        desc->debounce_acc = 0;
+        desc->recover_acc = 0;
+    }
+
+    // 清空故障位图
+    mgr->fault_bitmap = 0;
 }
 
 bool motor_protection_has_fault(struct motor_t *motor)

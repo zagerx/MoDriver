@@ -52,4 +52,20 @@ void motor_tran_pv_mode(struct motor *motor);
 void motor_tran_none_mode(struct motor *motor);
 void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel);
 
+/**
+ * @brief 获取电机当前状态标志位
+ * @param[in] motor 电机实例
+ * @return uint32_t 状态标志位组合值
+ * @note 对应 motor_data.status_flag，外部只读获取
+ */
+uint32_t motor_get_status_flag(const struct motor *motor);
+
+/**
+ * @brief 检查指定状态标志位是否置位
+ * @param[in] motor 电机实例
+ * @param[in] bit 状态标志位枚举值
+ * @return int 1 表示置位，0 表示未置位或实例为空
+ */
+int motor_is_status_set(const struct motor *motor, enum motor_status_bits bit);
+
 #endif /* MOTOR_H */

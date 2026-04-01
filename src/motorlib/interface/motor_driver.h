@@ -88,6 +88,50 @@ struct foc_param {
 	int32_t *target_vel;         /**< @brief 速度模式目标速度 */
 	int32_t *target_torque;      /**< @brief 力矩模式目标转矩 */
 };
+/**
+ * @brief 电机状态标志位定义（按位组合）
+ * @note 低16位为动态运行状态，高16位为事件/完成/持久标志
+ * @note 配合 MOTOR_STATUS_BIT() 宏使用，status_flag 为 uint32_t 类型
+ */
+enum motor_status_bits {
+	/* ===== 低16位：动态运行状态 ===== */
+
+	/**< @brief 逆变器已使能 */
+	MOTOR_STATUS_ENABLED = 0,
+	/**< @brief 闭环控制正在运行 */
+	MOTOR_STATUS_RUNNING = 1,
+	/**< @brief 正在校准中 */
+	MOTOR_STATUS_CALIBRATING = 4,
+	/**< @brief 轮廓位置模式(PP)运行中 */
+	MOTOR_STATUS_MODE_PP_ACTIVE = 5,
+	/**< @brief 轮廓速度模式(PV)运行中 */
+	MOTOR_STATUS_MODE_PV_ACTIVE = 6,
+	/**< @brief 原点回归模式(HM)运行中 */
+	MOTOR_STATUS_MODE_HOMING_ACTIVE = 7,
+	/**< @brief 开环控制运行中 */
+	MOTOR_STATUS_OPEN_LOOP_ACTIVE = 8,
+	/**< @brief 目标已到达 */
+	MOTOR_STATUS_TARGET_REACHED = 9,
+	/**< @brief 电机正在运动 */
+	MOTOR_STATUS_MOVING = 10,
+
+	/* bit13~15 预留 */
+
+	/* ===== 高16位：事件/完成/持久标志 ===== */
+
+	/**< @brief 原点回归完成 */
+	MOTOR_STATUS_HOMING_DONE = 16,
+	/**< @brief 校准完成 */
+	MOTOR_STATUS_CALIBRATION_DONE = 17,
+	/**< @brief 速度接近零 */
+	MOTOR_STATUS_SPEED_ZERO = 18,
+	/**< @brief 位置锁存完成 */
+	MOTOR_STATUS_POSITION_LATCH_DONE = 22,
+	/**< @brief 轨迹规划器运行中 */
+
+	MOTOR_STATUS_TRAJECTORY_BUSY = 23,
+	/* bit24~31 预留 */
+};
 
 /**
  * @brief 电机扩展参数结构体

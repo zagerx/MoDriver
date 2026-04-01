@@ -26,9 +26,10 @@ struct motor_t;
 enum protection_type
 {
     PROT_TYPE_NONE = 0,
-    PROT_TYPE_VOLTAGE, // 母线电压保护
-    PROT_TYPE_STALL,   // 堵转保护
-    PROT_TYPE_TEMP,    // 温度保护
+    PROT_TYPE_OVERVOLTAGE,  // 过压保护
+    PROT_TYPE_UNDERVOLTAGE, // 欠压保护
+    PROT_TYPE_STALL,        // 堵转保护
+    PROT_TYPE_TEMP,         // 温度保护
     PROT_TYPE_COUNT
 };
 
@@ -62,12 +63,19 @@ struct protection_desc
 };
 
 /**
- * @brief 电压保护配置
+ * @brief 过压保护配置
  */
-struct prot_voltage_cfg
+struct prot_overvoltage_cfg
 {
-    float overvoltage;  // 过压阈值 (V)
-    float undervoltage; // 欠压阈值 (V)
+    float threshold;  // 过压阈值 (V)
+};
+
+/**
+ * @brief 欠压保护配置
+ */
+struct prot_undervoltage_cfg
+{
+    float threshold;  // 欠压阈值 (V)
 };
 
 /**
@@ -93,51 +101,21 @@ struct prot_temp_cfg
  */
 struct protection_manager
 {
-    struct protection_desc descs[PROT_TYPE_COUNT]; // 保护描述符数组（每个电机独立）
-    struct prot_voltage_cfg voltage_cfg;           // 电压保护配置
-    struct prot_stall_cfg stall_cfg;               // 堵转保护配置
-    struct prot_temp_cfg temp_cfg;                 // 温度保护配置
-    uint32_t fault_bitmap;                         // 故障位图
+    struct protection_desc descs[PROT_TYPE_COUNT];      // 保护描述符数组（每个电机独立）
+    struct prot_overvoltage_cfg overvoltage_cfg;        // 过压保护配置
+    struct prot_undervoltage_cfg undervoltage_cfg;      // 欠压保护配置
+    struct prot_stall_cfg stall_cfg;                    // 堵转保护配置
+    struct prot_temp_cfg temp_cfg;                      // 温度保护配置
+    uint32_t fault_bitmap;                              // 故障位图
 };
 
 /* ============ 接口函数 ============ */
 
-/**
- * @brief 初始化电机保护模块
- * @param[in] motor 电机实例指针
- * @details 初始化保护管理器，配置各保护类型的参数和回调函数
- */
 void motor_protection_init(struct motor_t *motor);
-
-/**
- * @brief 更新电机保护状态
- * @param[in] motor 电机实例指针
- * @param[in] dt 时间步长
- * @details 周期性调用，检查各保护条件，更新故障状态
- */
 void motor_protection_update(struct motor_t *motor, float dt);
-
-/**
- * @brief 清除指定类型的故障
- * @param[in] motor 电机实例指针
- * @param[in] type 保护类型
- * @details 清除指定保护类型的故障标志和状态
- */
 void motor_protection_clear_fault(struct motor_t *motor, enum protection_type type);
-
-/**
- * @brief 检查是否有故障
- * @param[in] motor 电机实例指针
- * @return true 有故障，false 无故障
- */
+void motor_protection_clear_all_faults(struct motor_t *motor);
 bool motor_protection_has_fault(struct motor_t *motor);
-
-/**
- * @brief 获取故障位图
- * @param[in] motor 电机实例指针
- * @return 故障位图
- * @details 返回当前所有故障状态的位组合
- */
 uint32_t motor_protection_get_faults(struct motor_t *motor);
 
 #endif

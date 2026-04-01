@@ -17,8 +17,10 @@ struct currsmp;
  * @brief 电机数据结构体
  */
 struct motor_data {
-	uint32_t error_code; /**< @brief 错误码（位组合，使用 enum motor_error_bits +
+	uint32_t error_code; /**< @brief 错误码（位组合，使用 enum motor_error +
 				MOTOR_ERR_BIT()） */
+	uint32_t status_flag; /**< @brief 状态标志位（位组合，使用 enum motor_status_bits +
+				MOTOR_STATUS_BIT()） */
 };
 
 /**
