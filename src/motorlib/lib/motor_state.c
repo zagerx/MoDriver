@@ -229,7 +229,7 @@ void motor_openloop_encoder_state(struct statemachine *sm)
  * @param[in] new_state 新的电机状态
  * @details 内部函数，用于状态机切换主运行状态
  */
-void _tran_state(struct motor *motor, enum motor_status new_state)
+void motor_tran_state(struct motor *motor, enum motor_status new_state)
 {
 
 	struct statemachine *sm = &motor->sm;

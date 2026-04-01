@@ -14,6 +14,7 @@ set(CMAKE_C_EXTENSIONS ON)
 
 # 将特定警告设置为错误（全局生效）
 add_compile_options(-Werror=implicit-int)
+add_compile_options(-Werror=implicit-function-declaration)  # 添加这一行
 
 
 # Define the build type

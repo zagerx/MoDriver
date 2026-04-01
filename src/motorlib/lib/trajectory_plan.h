@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "motor_driver.h"
+#include "motor_interface_params.h"
 
 /**
  * @brief 轨迹执行器状态枚举

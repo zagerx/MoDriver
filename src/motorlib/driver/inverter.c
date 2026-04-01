@@ -6,7 +6,7 @@
  */
 
 #include "inverter.h"
-#include "motor_driver.h"
+#include "motor_interface_driver.h"
 
 /**
  * @brief 绑定逆变器操作接口

@@ -9,8 +9,8 @@
 #define FEEDBACK_H
 
 #include <stdint.h>
-#include "motor_driver.h"
-
+#include "motor_interface_driver.h"
+#include "motor_interface_params.h"
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif

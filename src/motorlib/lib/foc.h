@@ -13,7 +13,6 @@
 struct motor;
 
 #include "foc_pid.h"
-#include "motor_driver.h"
 
 struct currsmp_output;
 struct feedback_output;

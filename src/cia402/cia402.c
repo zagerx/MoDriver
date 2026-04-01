@@ -68,11 +68,11 @@ void cia402_update(struct cia402_instance *instance, float dt)
 
 	if (*instance->modes_of_operation == CIA402_MODE_PROFILE_POSITION) {
 		/* 根据当前模式转换 motor 状态 */
-		motor_tran_pp_mode(instance->motor);
+		// motor_tran_pp_mode(instance->motor);
 	} else if (*instance->modes_of_operation == CIA402_MODE_PROFILE_VELOCITY) {
-		motor_tran_pv_mode(instance->motor);
+		// motor_tran_pv_mode(instance->motor);
 	} else {
-		motor_tran_none_mode(instance->motor);
+		// motor_tran_none_mode(instance->motor);
 	}
 	sm_dispatch(&instance->pds_sm); /* 先处理状态机事件 */
 }

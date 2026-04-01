@@ -14,7 +14,6 @@
 #include "feedback.h"
 #include "currsmp.h"
 #include "arm_math.h"
-#include "motor_driver.h"
 
 #undef RAD_TO_DEG
 #define RAD_TO_DEG (180.0f / M_PI)

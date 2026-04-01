@@ -181,33 +181,6 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 }
 
 /**
- * @brief 切换电机到运行状态
- * @param[in] motor 电机实例
- * @return 无
- */
-void motor_tran_runing(struct motor *motor)
-{
-	if (!motor) {
-		return;
-	}
-
-	_tran_state(motor, MOTOR_STATUS_RUNING);
-}
-/**
- * @brief 切换电机到空闲状态
- * @param[in] motor 电机实例
- * @return 无
- */
-void motor_tran_idle(struct motor *motor)
-{
-	if (!motor) {
-		return;
-	}
-
-	_tran_state(motor, MOTOR_STATUS_IDLE);
-}
-
-/**
  * @brief 设置电机目标位置与速度
  * @param[in] motor 电机实例
  * @param[in] target_pos 目标位置

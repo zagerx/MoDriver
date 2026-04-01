@@ -11,7 +11,7 @@
 #define __FOC_PID_H
 
 #include <stdint.h>
-#include "motor_driver.h"
+#include "motor_interface_params.h"
 
 /**
  * @brief FOC PID控制器结构体

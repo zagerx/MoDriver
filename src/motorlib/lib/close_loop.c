@@ -29,6 +29,9 @@ void motor_position_loop(struct motor *motor, float dt)
 	float plan_velocity = trajectory_planner_get_vel(traj_plan) / (17.5f / 1000.0f);
 	float current_pos = meas->fd_out->odometer;
 	static volatile float test_tar_pos, test_real_pos, test_plann_vel;
+	(void)test_tar_pos;
+	(void)test_real_pos;
+	(void)test_plann_vel;
 	test_tar_pos = plan_position * 1000.0f;
 	test_real_pos = current_pos * 1000.0f;
 	test_plann_vel = plan_velocity * 1000.0f;

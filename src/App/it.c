@@ -137,10 +137,10 @@ void process_data(uint8_t *data, uint16_t len)
 					// 处理状态命令
 					if (input[0] == 0) {
 						// 进入空闲状态
-						motor_tran_idle(motor_1);
+						motor_tran_state(motor_1, MOTOR_STATUS_IDLE);
 					} else if (input[0] == 1) {
 						// 进入运行状态
-						motor_tran_runing(motor_1);
+						motor_tran_state(motor_1, MOTOR_STATUS_RUNING);
 					}
 				} else if (cmd_map[i].data_index == INDEX_MODE) {
 					// 处理模式命令

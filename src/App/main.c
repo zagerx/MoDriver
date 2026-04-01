@@ -8,7 +8,6 @@
 
 #include "hardware.h"
 #include "motor.h"
-#include "motor_driver.h"
 #include "stm32g4xx_hal.h"
 #include "motorlib_control_param.h"
 #include "canopen_app.h"

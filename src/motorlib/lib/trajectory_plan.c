@@ -477,6 +477,7 @@ static traj_plan_status_t traj_plan_three_segment(const traj_plan_input_t *in,
 static void traj_plan_init(traj_plan_data_t *d, float start_pos, float start_v, float acc_max,
 			   float exec_cycle)
 {
+	(void)exec_cycle; // 当前未使用执行周期参数，预留接口
 	memset(d, 0, sizeof(*d));
 
 	d->plan_in.acc = acc_max;

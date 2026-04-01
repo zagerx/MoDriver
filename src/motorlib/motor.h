@@ -9,7 +9,7 @@
 #define MOTOR_H
 
 #include <stdint.h>
-#include "motor_driver.h"
+#include "motor_interface.h"
 
 struct motor;
 
@@ -50,19 +50,7 @@ void motor_init(struct motor *motor);
  * @note 应在定时器中断中周期性调用（默认10kHz），执行反馈更新和状态机调度
  */
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw);
-/**
- * @brief 切换电机到运行状态
- * @param[in] motor 电机实例
- * @return 无
- */
-void motor_tran_runing(struct motor *motor);
 
-/**
- * @brief 切换电机到空闲状态
- * @param[in] motor 电机实例
- * @return 无
- */
-void motor_tran_idle(struct motor *motor);
 /**
  * @brief 获取电机当前状态标志位
  * @param[in] motor 电机实例
@@ -86,5 +74,8 @@ int motor_is_status_set(const struct motor *motor, enum motor_status_bits bit);
  * @details 内部函数，用于状态机切换操作模式
  */
 void motor_tran_mode(struct motor *motor, enum motor_mode new_mode);
+void motor_tran_state(struct motor *motor, enum motor_status new_state);
+
+void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel);
 
 #endif /* MOTOR_H */
