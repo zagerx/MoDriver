@@ -143,6 +143,8 @@ void motor_init(struct motor *motor)
 	}
 
 	foc_bind(foc, fb, currsmp, &motor->param_ext->foc_param);
+
+	motor_protection_init(motor);
 }
 
 /**
@@ -177,6 +179,7 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 		currsmp_update_bus(currsmp);
 	}
 
+	motor_protection_update(motor, CONTROL_PERIOD_DT);
 	sm_dispatch(sm);
 }
 

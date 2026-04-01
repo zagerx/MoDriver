@@ -39,6 +39,21 @@ void motor_position_loop(struct motor *motor, float dt)
 	/* 将位置环输出作为速度环的目标输入 */
 	foc->ref.velocity = temp + plan_velocity; /* 前馈项：轨迹规划的速度 */
 }
+void motor_position_loop_reset(struct motor *motor)
+{
+	struct foc *foc = &motor->foc;
+	struct foc_pid *position_pi = &foc->ctrl.position;
+	struct foc_pid *velocity_pi = &foc->ctrl.velocity;
+	struct foc_pid *current_d_pi = &foc->ctrl.d_axis;
+	struct foc_pid *current_q_pi = &foc->ctrl.q_axis;
+	foc->ref.velocity = 0.0f;
+	foc->ref.i_q = 0.0f;
+	foc->ref.i_d = 0.0f;
+	foc_pid_reset(position_pi);
+	foc_pid_reset(velocity_pi);
+	foc_pid_reset(current_d_pi);
+	foc_pid_reset(current_q_pi);
+}
 /**
  * @brief 电机速度闭环控制
  *
@@ -60,6 +75,19 @@ void motor_velocity_loop(struct motor *motor, float target_vel)
 	foc->ref.i_q = foc_pid_run(velocity_pi, target_vel, vel, SPEED_PERIOD_DT);
 	foc->ref.i_d = 0.0f;
 }
+void motor_velocity_loop_reset(struct motor *motor)
+{
+	struct foc *foc = &motor->foc;
+	struct foc_pid *velocity_pi = &foc->ctrl.velocity;
+	struct foc_pid *current_d_pi = &foc->ctrl.d_axis;
+	struct foc_pid *current_q_pi = &foc->ctrl.q_axis;
+	foc->ref.i_q = 0.0f;
+	foc->ref.i_d = 0.0f;
+	foc_pid_reset(velocity_pi);
+	foc_pid_reset(current_d_pi);
+	foc_pid_reset(current_q_pi);
+}
+
 /**
  * @brief 电机电流环控制
  * @param[in] motor 电机实例指针
@@ -90,4 +118,14 @@ void motor_currment_loop(struct motor *motor)
 	svpwm_normalize(eangle, vbus, ud_limit, uq_limit, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
+}
+void motor_current_loop_reset(struct motor *motor)
+{
+	struct foc *foc = &motor->foc;
+	struct foc_pid *d_axis_pid = &foc->ctrl.d_axis;
+	struct foc_pid *q_axis_pid = &foc->ctrl.q_axis;
+	foc->ref.i_q = 0.0f;
+	foc->ref.i_d = 0.0f;
+	foc_pid_reset(d_axis_pid);
+	foc_pid_reset(q_axis_pid);
 }

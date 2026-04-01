@@ -4,6 +4,7 @@
  * @details 实现CiA 402轮廓位置(PP)、轮廓速度(PV)、原点回归(HM)等模式的状态处理
  */
 
+#include "foc_pid.h"
 #include "motor_mode.h"
 #include "statemachine.h"
 #include "close_loop.h"
@@ -62,9 +63,7 @@ void motor_mode_PP(struct statemachine *sm)
 		sm->phase = RUNING;
 		sm->count = 0;
 		trajectory_planner_init(traj_plan, start_pos, 0.0f, 0.0f, POSITION_PERIOD_DT);
-		foc->ref.velocity = 0.0f; /* 初始速度为0 */
-		foc->ref.i_q = 0.0f;
-		foc->ref.i_d = 0.0f;
+		motor_position_loop_reset(motor);
 		break;
 
 	case RUNING:

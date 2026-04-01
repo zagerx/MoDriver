@@ -13,7 +13,7 @@
 #include "calibration.h"
 #include "trajectory_plan.h"
 #include "statemachine.h"
-
+#include "motor_protection.h"
 struct inverter;
 struct feedback;
 struct currsmp;
@@ -39,17 +39,18 @@ struct motor_config {
  * @brief 电机实例结构体
  */
 struct motor {
-	struct motor_param_ext *param_ext; /**< @brief 扩展参数 */
-	struct inverter *inverter;         /**< @brief 逆变器实例 */
-	struct feedback *feedback;         /**< @brief 反馈实例 */
-	struct currsmp *currsmp;           /**< @brief 电流采样实例 */
-	struct statemachine sm;            /**< @brief 状态机实例 */
-	struct statemachine sm_mode;       /**< @brief 模式状态机实例 */
-	struct motor_data data;            /**< @brief 数据 */
-	struct motor_config config;        /**< @brief 配置 */
-	struct calibration calib;          /**< @brief 校准实例 */
-	struct trajectory_plan traj_plan;  /**< @brief 轨迹规划实例 */
-	struct foc foc;                    /**< @brief FOC相关数据 */
+	struct motor_param_ext *param_ext;  /**< @brief 扩展参数 */
+	struct inverter *inverter;          /**< @brief 逆变器实例 */
+	struct feedback *feedback;          /**< @brief 反馈实例 */
+	struct currsmp *currsmp;            /**< @brief 电流采样实例 */
+	struct statemachine sm;             /**< @brief 状态机实例 */
+	struct statemachine sm_mode;        /**< @brief 模式状态机实例 */
+	struct motor_data data;             /**< @brief 数据 */
+	struct motor_config config;         /**< @brief 配置 */
+	struct calibration calib;           /**< @brief 校准实例 */
+	struct trajectory_plan traj_plan;   /**< @brief 轨迹规划实例 */
+	struct foc foc;                     /**< @brief FOC相关数据 */
+	struct protection_manager prot_mgr; /**< @brief 保护模块实例 */
 };
 
 #endif /* _MOTOR_INTERNAL_H */

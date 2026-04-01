@@ -16,6 +16,7 @@ struct motor;
  * @details 执行位置闭环控制，计算速度指令
  */
 void motor_position_loop(struct motor *motor, float dt);
+void motor_position_loop_reset(struct motor *motor);
 
 /**
  * @brief 电机速度环控制
@@ -23,6 +24,7 @@ void motor_position_loop(struct motor *motor, float dt);
  * @details 执行速度闭环控制，计算电流指令（q轴电流）
  */
 void motor_velocity_loop(struct motor *motor, float target_vel);
+void motor_velocity_loop_reset(struct motor *motor);
 
 /**
  * @brief 电机电流环控制
@@ -30,5 +32,6 @@ void motor_velocity_loop(struct motor *motor, float target_vel);
  * @details 执行电流闭环控制，计算电压指令（d/q轴电压）
  */
 void motor_currment_loop(struct motor *motor);
+void motor_current_loop_reset(struct motor *motor);
 
 #endif /* CLOSE_LOOP_H */

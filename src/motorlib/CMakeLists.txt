@@ -7,6 +7,11 @@ target_sources(motor PRIVATE
         driver/inverter.c
         driver/feedback.c
         driver/currsmp.c
+        lib/protection/motor_protection.c
+        lib/protection/prot_overvoltage.c
+        lib/protection/prot_undervoltage.c
+        lib/protection/prot_stall.c
+        lib/protection/prot_temp.c
         lib/calibration/calibration.c
         lib/calibration/current_calibration.c
         lib/calibration/encoder_calibration.c
@@ -27,6 +32,7 @@ target_include_directories(motor PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/driver
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/calibration
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/protection
         ${CMAKE_CURRENT_SOURCE_DIR}/inc
         ${MOTORLIB_PARAMCONFIG_PATH}
 )
