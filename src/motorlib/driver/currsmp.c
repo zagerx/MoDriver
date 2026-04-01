@@ -1,4 +1,9 @@
 
+/**
+ * @file currsmp.c
+ * @brief 电流采样模块实现
+ * @details 实现电流采样参数绑定、原始数据更新、物理量转换及增益/偏移配置
+ */
 
 #include "currsmp.h"
 

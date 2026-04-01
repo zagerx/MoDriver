@@ -1,4 +1,9 @@
 
+/**
+ * @file encoder_calibration.c
+ * @brief 编码器校准实现
+ * @details 通过双向电角度扫描检测编码器方向、极对数及零位偏移
+ */
 
 #include "encoder_calibration.h"
 #include "_motorlib_internal.h"

@@ -1,4 +1,9 @@
 
+/**
+ * @file motor_error.h
+ * @brief 电机错误码定义头文件
+ * @details 定义电机运行过程中可能出现的错误位枚举及错误码操作宏
+ */
 
 #ifndef MOTOR_ERROR_H
 #define MOTOR_ERROR_H

@@ -1,4 +1,9 @@
 
+/**
+ * @file trajectory_plan.h
+ * @brief 轨迹规划器头文件
+ * @details 定义轨迹执行器状态、轨迹段结构、规划输入输出及轨迹规划器API
+ */
 
 #ifndef FOC_TRAJECTORY_PLAN_H
 #define FOC_TRAJECTORY_PLAN_H

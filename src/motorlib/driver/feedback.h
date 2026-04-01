@@ -1,4 +1,9 @@
 
+/**
+ * @file feedback.h
+ * @brief 编码器反馈模块头文件
+ * @details 提供编码器读取、角度解算、速度计算及里程统计功能
+ */
 
 #ifndef FEEDBACK_H
 #define FEEDBACK_H

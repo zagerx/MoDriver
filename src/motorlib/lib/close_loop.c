@@ -12,6 +12,12 @@
 #include "foc_pid.h"
 #include "svpwm.h"
 #include "motorlib_control_param.h"
+/**
+ * @brief 电机位置环控制
+ * @param[in] motor 电机实例指针
+ * @param[in] dt 时间步长
+ * @details 执行位置闭环控制，读取轨迹规划位置并与实际位置做PID运算，输出速度指令
+ */
 void motor_position_loop(struct motor *motor, float dt)
 {
 	/* 位置环控制逻辑 */
@@ -51,6 +57,11 @@ void motor_velocity_loop(struct motor *motor, float target_vel)
 	foc->ref.i_q = foc_pid_run(velocity_pi, target_vel, vel, SPEED_PERIOD_DT);
 	foc->ref.i_d = 0.0f;
 }
+/**
+ * @brief 电机电流环控制
+ * @param[in] motor 电机实例指针
+ * @details 执行d/q轴电流环PID控制，经SVPWM变换后输出三相占空比到逆变器
+ */
 void motor_currment_loop(struct motor *motor)
 {
 

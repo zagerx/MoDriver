@@ -180,6 +180,11 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 	sm_dispatch(sm);
 }
 
+/**
+ * @brief 切换电机到运行状态
+ * @param[in] motor 电机实例
+ * @return 无
+ */
 void motor_tran_runing(struct motor *motor)
 {
 	if (!motor) {
@@ -188,6 +193,11 @@ void motor_tran_runing(struct motor *motor)
 
 	_tran_state(motor, MOTOR_STATUS_RUNING);
 }
+/**
+ * @brief 切换电机到空闲状态
+ * @param[in] motor 电机实例
+ * @return 无
+ */
 void motor_tran_idle(struct motor *motor)
 {
 	if (!motor) {
@@ -197,6 +207,14 @@ void motor_tran_idle(struct motor *motor)
 	_tran_state(motor, MOTOR_STATUS_IDLE);
 }
 
+/**
+ * @brief 设置电机目标位置与速度
+ * @param[in] motor 电机实例
+ * @param[in] target_pos 目标位置
+ * @param[in] target_vel 目标速度
+ * @return 无
+ * @details 更新轨迹规划器的目标位置与速度，用于PP模式
+ */
 void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel)
 {
 	if (!motor) {

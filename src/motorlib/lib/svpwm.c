@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 
+/**
+ * @file svpwm.c
+ * @brief 空间矢量脉宽调制（SVPWM）实现
+ * @details 实现电压矢量限幅、dq到αβ变换归一化及七段式SVPWM占空比计算
+ */
+
 // #include "foc_data.h"
 #include "arm_math.h"
 #include <float.h>

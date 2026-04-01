@@ -1,4 +1,9 @@
 
+/**
+ * @file calibration.c
+ * @brief 电机校准模块主控实现
+ * @details 按顺序调度电流校准和编码器校准两个阶段的状态机
+ */
 
 #include "calibration.h"
 #include "current_calibration.h"

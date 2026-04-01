@@ -1,4 +1,9 @@
 
+/**
+ * @file encoder_calibration.h
+ * @brief 编码器校准模块头文件
+ * @details 实现编码器零位偏移、极对数及旋转方向的自动检测与校准
+ */
 
 #ifndef ENCODER_CALIBRATION_H
 #define ENCODER_CALIBRATION_H

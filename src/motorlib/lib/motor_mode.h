@@ -1,3 +1,9 @@
+/**
+ * @file motor_mode.h
+ * @brief 电机操作模式状态机头文件
+ * @details 定义CiA 402标准操作模式（PP/PV/HM等）及模式切换接口
+ */
+
 #ifndef MOTOR_MODE_H
 #define MOTOR_MODE_H
 struct statemachine;

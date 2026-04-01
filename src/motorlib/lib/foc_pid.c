@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 
+/**
+ * @file foc_pid.c
+ * @brief FOC PID控制器实现
+ * @details 实现位置环、速度环、电流环通用PID计算，包含动态抗饱和处理
+ */
+
 #include "foc_pid.h"
 
 /**

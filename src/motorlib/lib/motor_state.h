@@ -1,4 +1,9 @@
 
+/**
+ * @file motor_state.h
+ * @brief 电机主状态机头文件
+ * @details 定义电机主运行状态（INIT/CALIB/IDLE/RUNING）及状态切换接口
+ */
 
 #ifndef MOTOR_STATE_H
 #define MOTOR_STATE_H

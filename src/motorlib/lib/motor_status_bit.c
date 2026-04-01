@@ -36,11 +36,23 @@
 
 /** @brief 清除所有状态标志 */
 #define MOTOR_STATUS_CLEAR_ALL(flags) ((flags) = 0)
+/**
+ * @brief 获取电机当前状态标志位
+ * @param[in] motor 电机实例
+ * @return uint32_t 状态标志位组合值
+ * @note 对应 motor_data.status_flag，外部只读获取
+ */
 uint32_t motor_get_status_flag(const struct motor *motor)
 {
 	return motor ? motor->data.status_flag : 0;
 }
 
+/**
+ * @brief 检查指定状态标志位是否置位
+ * @param[in] motor 电机实例
+ * @param[in] bit 状态标志位枚举值
+ * @return int 1 表示置位，0 表示未置位或实例为空
+ */
 int motor_is_status_set(const struct motor *motor, enum motor_status_bits bit)
 {
 	return motor ? MOTOR_STATUS_TEST(motor->data.status_flag, bit) != 0 : 0;

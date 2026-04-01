@@ -1,4 +1,9 @@
 
+/**
+ * @file inverter.c
+ * @brief 逆变器驱动实现
+ * @details 通过操作接口回调实现对三相逆变器的使能、禁用和电压设置
+ */
 
 #include "inverter.h"
 #include "motor_driver.h"

@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 
+/**
+ * @file open_loop.c
+ * @brief 电机开环控制实现
+ * @details 实现开环强制对齐、强制拖动、编码器反馈开环运行及电流调试模式
+ */
+
 #include "open_loop.h"
 #include "_motorlib_internal.h"
 #include "svpwm.h"

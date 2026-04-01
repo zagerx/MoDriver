@@ -1,4 +1,9 @@
 
+/**
+ * @file motor.h
+ * @brief 电机控制模块公共头文件
+ * @details 提供电机初始化、硬件绑定、高频任务调度及状态查询API
+ */
 
 #ifndef MOTOR_H
 #define MOTOR_H
@@ -45,7 +50,18 @@ void motor_init(struct motor *motor);
  * @note 应在定时器中断中周期性调用（默认10kHz），执行反馈更新和状态机调度
  */
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw);
+/**
+ * @brief 切换电机到运行状态
+ * @param[in] motor 电机实例
+ * @return 无
+ */
 void motor_tran_runing(struct motor *motor);
+
+/**
+ * @brief 切换电机到空闲状态
+ * @param[in] motor 电机实例
+ * @return 无
+ */
 void motor_tran_idle(struct motor *motor);
 /**
  * @brief 获取电机当前状态标志位
@@ -62,6 +78,13 @@ uint32_t motor_get_status_flag(const struct motor *motor);
  * @return int 1 表示置位，0 表示未置位或实例为空
  */
 int motor_is_status_set(const struct motor *motor, enum motor_status_bits bit);
+/**
+ * @brief 切换电机操作模式
+ * @param[in] motor 电机实例
+ * @param[in] new_mode 新的操作模式
+ * @return 无
+ * @details 内部函数，用于状态机切换操作模式
+ */
 void motor_tran_mode(struct motor *motor, enum motor_mode new_mode);
 
 #endif /* MOTOR_H */

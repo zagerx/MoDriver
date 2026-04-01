@@ -1,4 +1,9 @@
 
+/**
+ * @file foc.h
+ * @brief FOC（磁场定向控制）模块头文件
+ * @details 定义FOC测量、参考输入、控制器结构体及电流更新接口
+ */
 
 #ifndef FOC_H
 #define FOC_H

@@ -1,4 +1,9 @@
 
+/**
+ * @file current_calibration.c
+ * @brief 电流校准实现
+ * @details 实现电流采样偏移量的自动采集、累加平均及应用
+ */
 
 #include "current_calibration.h"
 #include "_motorlib_internal.h"

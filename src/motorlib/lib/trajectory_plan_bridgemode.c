@@ -1,4 +1,9 @@
 
+/**
+ * @file trajectory_plan_bridgemode.c
+ * @brief 轨迹规划器桥接模式实现（简化版）
+ * @details 提供轨迹规划器的简化实现，用于快速验证或桥接测试
+ */
 
 #include "trajectory_plan.h"
 #include <math.h>
@@ -42,12 +47,25 @@ int trajectory_planner_init(struct trajectory_plan *trajectory, float start_pos,
 	return 0;
 }
 
+/**
+ * @brief 轨迹规划器动作执行（桥接模式空实现）
+ * @param[in] trajectory 轨迹规划器实例指针
+ * @param[in] dt 时间步长
+ * @return 无
+ * @note 当前为桥接模式占位实现
+ */
 void trajectory_planner_action(struct trajectory_plan *trajectory, float dt)
 {
 	(void)trajectory; // 避免未使用警告
 	(void)dt;         // 避免未使用警告
 }
 
+/**
+ * @brief 紧急停止（桥接模式空实现）
+ * @param[in] trajectory 轨迹规划器实例指针
+ * @return 无
+ * @note 当前为桥接模式占位实现
+ */
 void trajectory_planner_stop(struct trajectory_plan *trajectory)
 {
 	(void)trajectory; // 避免未使用警告

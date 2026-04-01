@@ -1,4 +1,9 @@
 
+/**
+ * @file trajectory_plan.c
+ * @brief 轨迹规划器实现
+ * @details 实现三段式梯形速度规划、在线重规划、紧急停止及轨迹执行步进
+ */
 
 #include "trajectory_plan.h"
 #include <math.h>
@@ -17,6 +22,7 @@ static void traj_plan_init(traj_plan_data_t *d, float start_pos, float start_v, 
 static traj_plan_status_t traj_plan_three_segment(const traj_plan_input_t *in,
 						  traj_plan_output_t *out, float target_pos,
 						  float target_vel);
+/** @brief 纯减速轨迹规划（紧急停止专用） */
 static traj_plan_status_t traj_plan_deceleration_only(const traj_plan_input_t *in,
 						      traj_plan_output_t *out, float brake_acc);
 

@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 
+/**
+ * @file motor_state.c
+ * @brief 电机主状态机实现
+ * @details 实现电机的初始化、校准、空闲、运行及开环编码器测试等主状态处理
+ */
+
 #include "statemachine.h"
 #include "_motorlib_internal.h"
 #include "calibration.h"
@@ -11,6 +17,7 @@
 #include "open_loop.h"
 #include "close_loop.h"
 
+/** @brief 电机开环编码器测试状态（前向声明） */
 void motor_openloop_encoder_state(struct statemachine *sm);
 
 /**
@@ -216,6 +223,12 @@ void motor_openloop_encoder_state(struct statemachine *sm)
 	}
 }
 
+/**
+ * @brief 切换电机主状态
+ * @param[in] motor 电机实例指针
+ * @param[in] new_state 新的电机状态
+ * @details 内部函数，用于状态机切换主运行状态
+ */
 void _tran_state(struct motor *motor, enum motor_status new_state)
 {
 

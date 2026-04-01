@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 
+/**
+ * @file foc.c
+ * @brief FOC（磁场定向控制）模块实现
+ * @details 实现FOC数据源绑定及Clarke/Park变换，更新d/q轴电流测量值
+ */
+
 #include "_motorlib_internal.h"
 #include "arm_math_types.h"
 #include "foc.h"

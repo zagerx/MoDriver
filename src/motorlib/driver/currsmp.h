@@ -1,4 +1,9 @@
 
+/**
+ * @file currsmp.h
+ * @brief 电流采样模块头文件
+ * @details 定义电流采样数据结构、参数接口及原始数据/物理量转换API
+ */
 
 #ifndef CURRSMP_H
 #define CURRSMP_H

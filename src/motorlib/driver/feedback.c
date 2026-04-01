@@ -1,4 +1,9 @@
 
+/**
+ * @file feedback.c
+ * @brief 编码器反馈模块实现
+ * @details 实现编码器绑定、初始化、溢出处理、角度/速度/里程计算
+ */
 
 #include <stdint.h>
 #include <math.h>

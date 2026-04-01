@@ -26,6 +26,15 @@ extern void recover_temp_fault(struct motor_t *motor);
 
 // ========== 辅助函数 ==========
 
+/**
+ * @brief 辅助函数：检查保护是否触发（防抖处理）
+ * @param[in,out] is_triggered 触发状态指针
+ * @param[in,out] debounce_acc 防抖时间累积指针
+ * @param[in] debounce_ms 防抖时间（毫秒）
+ * @param[in] triggered 当前是否满足触发条件
+ * @param[in] dt 时间步长（秒）
+ * @return true 触发确认，false 未触发
+ */
 static bool check_trigger(bool *is_triggered, float *debounce_acc, uint16_t debounce_ms, bool triggered, float dt)
 {
     if (triggered)
@@ -48,6 +57,14 @@ static bool check_trigger(bool *is_triggered, float *debounce_acc, uint16_t debo
     return false;
 }
 
+/**
+ * @brief 辅助函数：检查保护是否恢复（恢复时间处理）
+ * @param[in,out] is_triggered 触发状态指针
+ * @param[in,out] recover_acc 恢复时间累积指针
+ * @param[in] recover_ms 恢复时间（毫秒）
+ * @param[in] dt 时间步长（秒）
+ * @return true 恢复确认，false 未恢复
+ */
 static bool check_recover(bool *is_triggered, float *recover_acc, uint16_t recover_ms, float dt)
 {
     if (!*is_triggered || recover_ms == 0)
@@ -65,6 +82,12 @@ static bool check_recover(bool *is_triggered, float *recover_acc, uint16_t recov
 
 // ========== 接口实现 ==========
 
+/**
+ * @brief 初始化电机保护管理器
+ * @param[in] motor 电机实例
+ * @return 无
+ * @details 配置过压、欠压、堵转、温度等保护类型的阈值与回调函数
+ */
 void motor_protection_init(struct motor_t *motor)
 {
     if (!motor)
@@ -126,6 +149,13 @@ void motor_protection_init(struct motor_t *motor)
     mgr->temp_cfg.lowtemp = -20.0f; // 默认-20°C低温
 }
 
+/**
+ * @brief 更新电机保护状态
+ * @param[in] motor 电机实例
+ * @param[in] dt 时间步长，单位：s
+ * @return 无
+ * @details 周期性调用，检测各保护条件并根据防抖/恢复时间进行状态转移
+ */
 void motor_protection_update(struct motor_t *motor, float dt)
 {
     if (!motor || dt <= 0)
@@ -163,6 +193,12 @@ void motor_protection_update(struct motor_t *motor, float dt)
     }
 }
 
+/**
+ * @brief 清除指定类型的保护故障
+ * @param[in] motor 电机实例
+ * @param[in] type 保护类型
+ * @return 无
+ */
 void motor_protection_clear_fault(struct motor_t *motor, enum protection_type type)
 {
     if (!motor || type <= PROT_TYPE_NONE || type >= PROT_TYPE_COUNT)
@@ -178,6 +214,11 @@ void motor_protection_clear_fault(struct motor_t *motor, enum protection_type ty
     mgr->fault_bitmap &= ~desc->fault_bit; // 清除对应的故障位
 }
 
+/**
+ * @brief 清除所有保护故障
+ * @param[in] motor 电机实例
+ * @return 无
+ */
 void motor_protection_clear_all_faults(struct motor_t *motor)
 {
     if (!motor)
@@ -199,11 +240,21 @@ void motor_protection_clear_all_faults(struct motor_t *motor)
     mgr->fault_bitmap = 0;
 }
 
+/**
+ * @brief 检查是否存在活跃故障
+ * @param[in] motor 电机实例
+ * @return true 存在故障，false 无故障
+ */
 bool motor_protection_has_fault(struct motor_t *motor)
 {
     return motor ? (motor->prot_mgr.fault_bitmap != 0) : false;
 }
 
+/**
+ * @brief 获取当前故障位图
+ * @param[in] motor 电机实例
+ * @return uint32_t 故障位组合值
+ */
 uint32_t motor_protection_get_faults(struct motor_t *motor)
 {
     return motor ? motor->prot_mgr.fault_bitmap : 0;
