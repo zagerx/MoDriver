@@ -197,32 +197,6 @@ void motor_tran_idle(struct motor *motor)
 	_tran_state(motor, MOTOR_STATUS_IDLE);
 }
 
-void motor_tran_pp_mode(struct motor *motor)
-{
-	if (!motor) {
-		return;
-	}
-
-	_tran_mode(motor, MODE_PP);
-}
-
-void motor_tran_pv_mode(struct motor *motor)
-{
-	if (!motor) {
-		return;
-	}
-
-	_tran_mode(motor, MODE_PV);
-}
-void motor_tran_none_mode(struct motor *motor)
-{
-	if (!motor) {
-		return;
-	}
-
-	_tran_mode(motor, MODE_NONE);
-}
-
 void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel)
 {
 	if (!motor) {

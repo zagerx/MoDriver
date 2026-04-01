@@ -47,11 +47,6 @@ void motor_init(struct motor *motor);
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw);
 void motor_tran_runing(struct motor *motor);
 void motor_tran_idle(struct motor *motor);
-void motor_tran_pp_mode(struct motor *motor);
-void motor_tran_pv_mode(struct motor *motor);
-void motor_tran_none_mode(struct motor *motor);
-void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel);
-
 /**
  * @brief 获取电机当前状态标志位
  * @param[in] motor 电机实例
@@ -67,5 +62,6 @@ uint32_t motor_get_status_flag(const struct motor *motor);
  * @return int 1 表示置位，0 表示未置位或实例为空
  */
 int motor_is_status_set(const struct motor *motor, enum motor_status_bits bit);
+void motor_tran_mode(struct motor *motor, enum motor_mode new_mode);
 
 #endif /* MOTOR_H */

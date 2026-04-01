@@ -131,7 +131,7 @@ void motor_mode_HOMING(struct statemachine *sm)
 	}
 }
 
-void _tran_mode(struct motor *motor, enum motor_mode new_mode)
+void motor_tran_mode(struct motor *motor, enum motor_mode new_mode)
 {
 	struct statemachine *sm_mode = &motor->sm_mode;
 	switch (new_mode) {

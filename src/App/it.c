@@ -146,10 +146,10 @@ void process_data(uint8_t *data, uint16_t len)
 					// 处理模式命令
 					if (input[0] > 0.5f && input[0] < 1.5f) {
 						// 切换到pp模式
-						motor_tran_pp_mode(motor_1);
+						motor_tran_mode(motor_1, MODE_PP);
 					} else if (input[0] > 2.5f && input[0] < 3.5f) {
 						// 切换到pv模式
-						motor_tran_pv_mode(motor_1);
+						motor_tran_mode(motor_1, MODE_PV);
 					}
 				}
 			}
