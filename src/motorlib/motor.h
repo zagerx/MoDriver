@@ -65,7 +65,7 @@ uint32_t motor_get_status_flag(const struct motor *motor);
  * @param[in] bit 状态标志位枚举值
  * @return int 1 表示置位，0 表示未置位或实例为空
  */
-int motor_is_status_set(const struct motor *motor, enum motor_status_bits bit);
+int motor_is_status_set(const struct motor *motor, enum motor_flag_bits bit);
 /**
  * @brief 切换电机操作模式
  * @param[in] motor 电机实例

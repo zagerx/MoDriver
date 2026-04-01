@@ -44,7 +44,7 @@
  */
 uint32_t motor_get_status_flag(const struct motor *motor)
 {
-	return motor ? motor->data.status_flag : 0;
+	return motor ? motor->data.flags : 0;
 }
 
 /**
@@ -53,7 +53,7 @@ uint32_t motor_get_status_flag(const struct motor *motor)
  * @param[in] bit 状态标志位枚举值
  * @return int 1 表示置位，0 表示未置位或实例为空
  */
-int motor_is_status_set(const struct motor *motor, enum motor_status_bits bit)
+int motor_is_status_set(const struct motor *motor, enum motor_flag_bits bit)
 {
-	return motor ? MOTOR_STATUS_TEST(motor->data.status_flag, bit) != 0 : 0;
+	return motor ? MOTOR_STATUS_TEST(motor->data.flags, bit) != 0 : 0;
 }

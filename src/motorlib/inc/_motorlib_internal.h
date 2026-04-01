@@ -11,6 +11,7 @@
 #include "motor_interface.h"
 #include "foc.h"
 #include "calibration.h"
+#include "motor_interface_flag.h"
 #include "trajectory_plan.h"
 #include "statemachine.h"
 #include "motor_protection.h"
@@ -22,10 +23,10 @@ struct currsmp;
  * @brief 电机数据结构体
  */
 struct motor_data {
-	uint32_t error_code;  /**< @brief 错误码（位组合，使用 enum motor_error +
-				 MOTOR_ERR_BIT()） */
-	uint32_t status_flag; /**< @brief 状态标志位（位组合，使用 enum motor_status_bits +
-				MOTOR_STATUS_BIT()） */
+	/**< @brief 状态标志位枚举值，使用 MOTOR_STATUS_BIT(bit) 转换为位掩码 */
+	enum motor_flag_bits flags;
+	/**< @brief 错误码位枚举值，使用 MOTOR_ERRORCODE_BIT(bit) 转换为位掩码 */
+	enum motor_errorcode_bits errorcode;
 };
 
 /**

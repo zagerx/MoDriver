@@ -15,19 +15,30 @@
  * @note 低16位为动态运行状态，高16位为事件/完成/持久标志
  * @note 配合 MOTOR_STATUS_BIT() 宏使用，status_flag 为 uint32_t 类型
  */
-enum motor_status_bits {
+enum motor_flag_bits {
 
-	MOTOR_STATUS_ENABLED = 0,              /**< @brief 逆变器使能 */
-	MOTOR_STATUS_HOMING = 1,               /**< @brief 原点回归中 */
-	MOTOR_STATUS_POSITION_LATCH = 2,       /**< @brief 位置锁存中 */
-	MOTOR_STATUS_TARGET_REACHED = 9,       /**< @brief 目标已到达 */
-	MOTOR_STATUS_MOVING = 10,              /**< @brief 电机正在运动 */
-	MOTOR_STATUS_HOMING_DONE = 16,         /**< @brief 原点回归完成 */
-	MOTOR_STATUS_CALIBRATION_DONE = 17,    /**< @brief 校准完成 */
-	MOTOR_STATUS_SPEED_ZERO = 18,          /**< @brief 速度接近零 */
-	MOTOR_STATUS_POSITION_LATCH_DONE = 22, /**< @brief 位置锁存完成 */
-	MOTOR_STATUS_TRAJECTORY_BUSY = 23,     /**< @brief 轨迹规划器运行中 */
+	MOTOR_FLAGS_ENABLED = 0,             /**< @brief 逆变器使能 */
+	MOTOR_FLAGS_HOMING = 1,              /**< @brief 原点回归中 */
+	MOTOR_FLAGS_POSITION_LATCH = 2,      /**< @brief 位置锁存中 */
+	MOTOR_FLAGS_TARGET_REACHED = 3,      /**< @brief 目标已到达 */
+	MOTOR_FLAGS_MOVING = 4,              /**< @brief 电机正在运动 */
+	MOTOR_FLAGS_HOMING_DONE = 5,         /**< @brief 原点回归完成 */
+	MOTOR_FLAGS_CALIBRATION_DONE = 6,    /**< @brief 校准完成 */
+	MOTOR_FLAGS_SPEED_ZERO = 7,          /**< @brief 速度接近零 */
+	MOTOR_FLAGS_POSITION_LATCH_DONE = 8, /**< @brief 位置锁存完成 */
+	MOTOR_FLAGS_TRAJECTORY_BUSY = 9,     /**< @brief 轨迹规划器运行中 */
 };
+
+enum motor_errorcode_bits {
+	MOTOR_ERROR_NONE = 0,         /**< @brief 无错误 */
+	MOTOR_ERROR_HW_FAILURE = 1,   /**< @brief 硬件故障 */
+	MOTOR_ERROR_PARAM = 2,        /**< @brief 参数错误 */
+	MOTOR_ERROR_OVERVOLTAGE = 3,  /**< @brief 过压保护触发 */
+	MOTOR_ERROR_UNDERVOLTAGE = 4, /**< @brief 欠压保护触发 */
+	MOTOR_ERROR_OVERCURRENT = 5,  /**< @brief 过流保护触发 */
+	MOTOR_ERROR_OVERTEMP = 6,     /**< @brief 过热保护触发 */
+};
+
 enum motor_status {
 	MOTOR_STATUS_INIT = 0,
 	MOTOR_STATUS_CALIB,
