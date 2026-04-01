@@ -1,8 +1,8 @@
 
 /**
- * @file motor_status_bit.c
+ * @file motor_flag_bits.c
  * @brief 电机状态标志位相关实现
- * @details 提供外部只读访问 motor_data.status_flag 的 Getter API
+ * @details 提供外部只读访问 motor_data.flags 的 Getter API
  */
 
 #include "_motorlib_internal.h"

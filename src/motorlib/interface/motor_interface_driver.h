@@ -1,3 +1,10 @@
+/**
+ * @file motor_interface_driver.h
+ * @brief 电机硬件操作接口定义头文件
+ * @details 定义编码器和逆变器的抽象操作接口，由 Hardware 层实现并通过 main.c 注册到 motorlib
+ * @note 此文件为 Hardware 层与 motorlib 之间的契约，实现这些接口即可适配不同硬件平台
+ */
+
 #ifndef MOTOR_INTERFACE_DRIVER_H
 #define MOTOR_INTERFACE_DRIVER_H
 

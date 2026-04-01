@@ -1,5 +1,13 @@
+/**
+ * @file motor_interface_params.h
+ * @brief 电机参数配置结构体定义头文件
+ * @details 定义电机运行所需的所有参数结构体，包括反馈参数、电流采样参数、轨迹规划参数及FOC参数
+ * @note 这些参数由上层应用配置，通过 motor_bind_param_ext() 绑定到电机实例
+ */
+
 #ifndef MOTOR_INTERFACE_PARAMS_H
 #define MOTOR_INTERFACE_PARAMS_H
+
 #include <stdint.h>
 /**
  * @brief 反馈参数配置结构体

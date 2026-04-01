@@ -3,6 +3,7 @@
  * @file _motorlib_internal.h
  * @brief motorlib 内部头文件
  * @details 定义电机实例结构体、数据结构体及配置结构体，仅供 motorlib 内部模块使用
+ * @note 此文件为内部头文件，外部模块不应直接包含和使用
  */
 
 #ifndef _MOTOR_INTERNAL_H

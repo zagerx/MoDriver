@@ -9,7 +9,6 @@
 #include "inverter.h"
 #include "feedback.h"
 #include "currsmp.h"
-#include "statemachine.h"
 
 /** @brief 电机1反馈实例 */
 static struct feedback m1_feedback;

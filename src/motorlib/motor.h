@@ -74,8 +74,24 @@ int motor_is_status_set(const struct motor *motor, enum motor_flag_bits bit);
  * @details 内部函数，用于状态机切换操作模式
  */
 void motor_tran_mode(struct motor *motor, enum motor_mode new_mode);
+
+/**
+ * @brief 切换电机主状态
+ * @param[in] motor 电机实例
+ * @param[in] new_state 新的电机主状态
+ * @return 无
+ * @details 用于状态机切换电机主运行状态（INIT/CALIB/IDLE/RUNING）
+ */
 void motor_tran_state(struct motor *motor, enum motor_status new_state);
 
+/**
+ * @brief 设置电机目标位置与速度
+ * @param[in] motor 电机实例
+ * @param[in] target_pos 目标位置
+ * @param[in] target_vel 目标速度
+ * @return 无
+ * @details 更新轨迹规划器的目标位置与速度，用于PP模式
+ */
 void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel);
 
 #endif /* MOTOR_H */

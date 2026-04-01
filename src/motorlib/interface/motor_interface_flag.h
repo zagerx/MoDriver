@@ -1,6 +1,6 @@
 
 /**
- * @file motor_driver.h
+ * @file motor_interface_flag.h
  * @brief 电机驱动公共接口头文件
  * @details 定义硬件操作接口、参数结构体及状态/模式枚举，供Hardware层与motorlib交互使用
  */
