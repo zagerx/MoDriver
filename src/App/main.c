@@ -82,22 +82,12 @@ int main(void)
 	HAL_TIM_Base_Start_IT(&htim6);
 
 	/* 初始化 CANopen 应用（节点 ID = 21） */
-	if (canopen_app_init(&canopen_app, 21) != 0) {
+	if (canopen_app_init(&canopen_app, motor_1) != 0) {
 		/* 初始化失败处理 */
 		while (1) {
 			HAL_Delay(100);
 		}
 	}
-
-	/* 绑定 CiA 402 实例参数 */
-	cia402_params_bind(&canopen_app.cia402_inst, motor_1, &OD_RAM.x6040_controlword,
-			   &OD_RAM.x6041_statusword, &OD_RAM.x6060_modeworld,
-			   &OD_RAM.x6061_modeDisplay, &OD_RAM.x60FF_targetVelocity,
-			   &OD_RAM.x606C_velocity, &OD_RAM.x603F_errorCode,
-			   &OD_RAM.x607A_targetPosition, &OD_RAM.x6071_targetTorque,
-			   &OD_RAM.x6064_position, &OD_RAM.x6077_torque);
-
-	cia402_init(&canopen_app.cia402_inst);
 
 	/* 关联电机硬件接口 */
 	motor_bind_hardware(motor_1, &m1_hw_ops);
@@ -123,7 +113,7 @@ int main(void)
 		uint32_t dt_ms = current_tick - last_tick;
 		last_tick = current_tick;
 		canopen_app_process(&canopen_app, dt_ms);
-		// cia402_update(&canopen_app.cia402_inst, dt_ms / 1000.0f);
+		cia402_update(&canopen_app.cia402_inst, dt_ms / 1000.0f);
 	}
 }
 

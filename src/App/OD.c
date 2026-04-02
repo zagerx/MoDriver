@@ -148,13 +148,7 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     .x1A00_TPDOMappingParameter = {
         .numberOfMappedApplicationObjectsInPDO = 0x02,
         .applicationObject1 = 0x60410010,
-        .applicationObject2 = 0x60610008,
-        .applicationObject3 = 0x00000000,
-        .applicationObject4 = 0x00000000,
-        .applicationObject5 = 0x00000000,
-        .applicationObject6 = 0x00000000,
-        .applicationObject7 = 0x00000000,
-        .applicationObject8 = 0x00000000
+        .applicationObject2 = 0x60610008
     },
     .x1A01_TPDOMappingParameter = {
         .numberOfMappedApplicationObjectsInPDO = 0x02,
@@ -212,7 +206,8 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
     .x6071_targetTorque = 0,
     .x6077_torque = 0,
     .x607A_targetPosition = 0,
-    .x60FF_targetVelocity = 0
+    .x60FF_targetVelocity = 0,
+    .x6502_supportedDriveModes = 0x00000025
 };
 
 
@@ -250,7 +245,7 @@ typedef struct {
     OD_obj_record_t o_1801_TPDOCommunicationParameter[6];
     OD_obj_record_t o_1802_TPDOCommunicationParameter[6];
     OD_obj_record_t o_1803_TPDOCommunicationParameter[6];
-    OD_obj_record_t o_1A00_TPDOMappingParameter[9];
+    OD_obj_record_t o_1A00_TPDOMappingParameter[3];
     OD_obj_record_t o_1A01_TPDOMappingParameter[9];
     OD_obj_record_t o_1A02_TPDOMappingParameter[9];
     OD_obj_record_t o_1A03_TPDOMappingParameter[9];
@@ -265,6 +260,7 @@ typedef struct {
     OD_obj_var_t o_6077_torque;
     OD_obj_var_t o_607A_targetPosition;
     OD_obj_var_t o_60FF_targetVelocity;
+    OD_obj_var_t o_6502_supportedDriveModes;
 } ODObjs_t;
 
 static CO_PROGMEM ODObjs_t ODObjs = {
@@ -926,42 +922,6 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .subIndex = 2,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_PERSIST_COMM.x1A00_TPDOMappingParameter.applicationObject3,
-            .subIndex = 3,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_PERSIST_COMM.x1A00_TPDOMappingParameter.applicationObject4,
-            .subIndex = 4,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_PERSIST_COMM.x1A00_TPDOMappingParameter.applicationObject5,
-            .subIndex = 5,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_PERSIST_COMM.x1A00_TPDOMappingParameter.applicationObject6,
-            .subIndex = 6,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_PERSIST_COMM.x1A00_TPDOMappingParameter.applicationObject7,
-            .subIndex = 7,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_PERSIST_COMM.x1A00_TPDOMappingParameter.applicationObject8,
-            .subIndex = 8,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
         }
     },
     .o_1A01_TPDOMappingParameter = {
@@ -1186,6 +1146,11 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .dataOrig = &OD_RAM.x60FF_targetVelocity,
         .attribute = ODA_SDO_RW | ODA_RPDO | ODA_MB,
         .dataLength = 4
+    },
+    .o_6502_supportedDriveModes = {
+        .dataOrig = &OD_RAM.x6502_supportedDriveModes,
+        .attribute = ODA_SDO_R | ODA_MB,
+        .dataLength = 4
     }
 };
 
@@ -1223,7 +1188,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1801, 0x06, ODT_REC, &ODObjs.o_1801_TPDOCommunicationParameter, NULL},
     {0x1802, 0x06, ODT_REC, &ODObjs.o_1802_TPDOCommunicationParameter, NULL},
     {0x1803, 0x06, ODT_REC, &ODObjs.o_1803_TPDOCommunicationParameter, NULL},
-    {0x1A00, 0x09, ODT_REC, &ODObjs.o_1A00_TPDOMappingParameter, NULL},
+    {0x1A00, 0x03, ODT_REC, &ODObjs.o_1A00_TPDOMappingParameter, NULL},
     {0x1A01, 0x09, ODT_REC, &ODObjs.o_1A01_TPDOMappingParameter, NULL},
     {0x1A02, 0x09, ODT_REC, &ODObjs.o_1A02_TPDOMappingParameter, NULL},
     {0x1A03, 0x09, ODT_REC, &ODObjs.o_1A03_TPDOMappingParameter, NULL},
@@ -1238,6 +1203,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x6077, 0x01, ODT_VAR, &ODObjs.o_6077_torque, NULL},
     {0x607A, 0x01, ODT_VAR, &ODObjs.o_607A_targetPosition, NULL},
     {0x60FF, 0x01, ODT_VAR, &ODObjs.o_60FF_targetVelocity, NULL},
+    {0x6502, 0x01, ODT_VAR, &ODObjs.o_6502_supportedDriveModes, NULL},
     {0x0000, 0x00, 0, NULL, NULL}
 };
 

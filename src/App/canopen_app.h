@@ -58,7 +58,7 @@ extern "C" {
  * canopen_app_init(&canopen_app, 21);
  * @endcode
  */
-int canopen_app_init(canopen_app_t *app, uint8_t node_id);
+int canopen_app_init(canopen_app_t *app, struct motor *motor);
 
 /**
  * @brief 反初始化 CANopen 应用

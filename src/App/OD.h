@@ -189,12 +189,6 @@ typedef struct {
         uint8_t numberOfMappedApplicationObjectsInPDO;
         uint32_t applicationObject1;
         uint32_t applicationObject2;
-        uint32_t applicationObject3;
-        uint32_t applicationObject4;
-        uint32_t applicationObject5;
-        uint32_t applicationObject6;
-        uint32_t applicationObject7;
-        uint32_t applicationObject8;
     } x1A00_TPDOMappingParameter;
     struct {
         uint8_t numberOfMappedApplicationObjectsInPDO;
@@ -253,6 +247,7 @@ typedef struct {
     int16_t x6077_torque;
     int32_t x607A_targetPosition;
     int32_t x60FF_targetVelocity;
+    uint32_t x6502_supportedDriveModes;
 } OD_RAM_t;
 
 #ifndef OD_ATTR_PERSIST_COMM
@@ -318,6 +313,7 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6077 &OD->list[41]
 #define OD_ENTRY_H607A &OD->list[42]
 #define OD_ENTRY_H60FF &OD->list[43]
+#define OD_ENTRY_H6502 &OD->list[44]
 
 
 /*******************************************************************************
@@ -367,6 +363,7 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6077_torque &OD->list[41]
 #define OD_ENTRY_H607A_targetPosition &OD->list[42]
 #define OD_ENTRY_H60FF_targetVelocity &OD->list[43]
+#define OD_ENTRY_H6502_supportedDriveModes &OD->list[44]
 
 
 /*******************************************************************************

@@ -8,7 +8,7 @@
 #include "canopen_app.h"
 #include "OD.h"
 #include <string.h>
-
+#include "motor.h"
 /*============================================================================
  * 默认配置参数
  *===========================================================================*/
@@ -17,11 +17,9 @@
 #define DEFAULT_SDO_SRV_TIMEOUT_TIME 1000
 #define DEFAULT_SDO_CLI_TIMEOUT_TIME 500
 #define DEFAULT_SDO_CLI_BLOCK        false
-
+#define NODE_ID                      (21)
 /* NMT 控制字 */
-#define NMT_CONTROL                                                                                \
-	(CO_NMT_STARTUP_TO_OPERATIONAL | CO_NMT_ERR_ON_ERR_REG | CO_ERR_REG_GENERIC_ERR |          \
-	 CO_ERR_REG_COMMUNICATION)
+#define NMT_CONTROL                  (CO_NMT_ERR_ON_ERR_REG | CO_ERR_REG_GENERIC_ERR | CO_ERR_REG_COMMUNICATION)
 
 /*============================================================================
  * 内部函数声明
@@ -36,10 +34,10 @@ static int canopen_app_resetCommunication(canopen_app_t *app);
 /**
  * @brief 初始化 CANopen 应用
  */
-int canopen_app_init(canopen_app_t *app, uint8_t node_id)
+int canopen_app_init(canopen_app_t *app, struct motor *motor)
 {
 	/* 参数检查 */
-	if (app == NULL || node_id < 1 || node_id > 127) {
+	if (app == NULL || NODE_ID < 1 || NODE_ID > 127) {
 		return -1;
 	}
 
@@ -53,7 +51,7 @@ int canopen_app_init(canopen_app_t *app, uint8_t node_id)
 	app->sys_reset_ops = saved_sys_reset;
 
 	/* 填充配置 */
-	app->node_id = node_id;
+	app->node_id = NODE_ID;
 	app->heartbeat_ms = DEFAULT_FIRST_HB_TIME;
 
 	/* Allocate CANopen object */
@@ -80,6 +78,15 @@ int canopen_app_init(canopen_app_t *app, uint8_t node_id)
 	}
 
 	app->initialized = true;
+
+	/* 绑定 CiA 402 实例参数 */
+	cia402_params_bind(
+		&app->cia402_inst, motor, &OD_RAM.x6040_controlword, &OD_RAM.x6041_statusword,
+		&OD_RAM.x6060_modeworld, &OD_RAM.x6061_modeDisplay, &OD_RAM.x60FF_targetVelocity,
+		&OD_RAM.x606C_velocity, &OD_RAM.x603F_errorCode, &OD_RAM.x607A_targetPosition,
+		&OD_RAM.x6071_targetTorque, &OD_RAM.x6064_position, &OD_RAM.x6077_torque);
+
+	cia402_init(&app->cia402_inst);
 
 	return 0;
 }
@@ -120,11 +127,10 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 		uint32_t timeDifference_us = dt_ms * 1000;
 
 		/* 处理 CANopen */
-		CO_NMT_reset_cmd_t reset_status =
-			CO_process(app->co, false, timeDifference_us, NULL);
+		// CO_NMT_reset_cmd_t reset_status = ;
 
 		/* 处理复位命令 */
-		switch (reset_status) {
+		switch (CO_process(app->co, false, timeDifference_us, NULL)) {
 		case CO_RESET_COMM:
 			/* 通信复位 - 不停止定时器，定时器持续运行 */
 			CO_CANsetConfigurationMode(NULL);
@@ -133,7 +139,7 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 			app->initialized = false;
 
 			/* 重新初始化 */
-			if (canopen_app_init(app, app->node_id) != 0) {
+			if (canopen_app_init(app, motor_1) != 0) {
 				/* 重新初始化失败，标记错误 */
 			}
 			break;
@@ -146,7 +152,13 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 			}
 			break;
 
-		case CO_RESET_NOT:
+		case CO_RESET_NOT: {
+			CO_NMT_internalState_t nmt_state = CO_NMT_getInternalState(app->co->NMT);
+			if (nmt_state == CO_NMT_OPERATIONAL ||
+			    nmt_state == CO_NMT_PRE_OPERATIONAL) {
+				cia402_update(&app->cia402_inst, dt_ms);
+			}
+		} break;
 		default:
 			break;
 		}

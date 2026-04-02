@@ -125,7 +125,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=41
+SupportedObjects=42
 1=0x1003
 2=0x1005
 3=0x1006
@@ -167,6 +167,7 @@ SupportedObjects=41
 39=0x6077
 40=0x607A
 41=0x60FF
+42=0x6502
 
 [1003]
 ParameterName=Pre-defined error field
@@ -1423,7 +1424,7 @@ PDOMapping=0
 ParameterName=TPDO mapping parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x9
+SubNumber=0x3
 
 [1A00sub0]
 ParameterName=Number of mapped application objects in PDO
@@ -1450,60 +1451,6 @@ ObjectType=0x7
 DataType=0x0007
 AccessType=rw
 DefaultValue=0x60610008
-PDOMapping=0
-
-[1A00sub3]
-ParameterName=Application object 3
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0007
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[1A00sub4]
-ParameterName=Application object 4
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0007
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[1A00sub5]
-ParameterName=Application object 5
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0007
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[1A00sub6]
-ParameterName=Application object 6
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0007
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[1A00sub7]
-ParameterName=Application object 7
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0007
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[1A00sub8]
-ParameterName=Application object 8
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0007
-AccessType=rw
-DefaultValue=0
 PDOMapping=0
 
 [1A01]
@@ -1865,6 +1812,15 @@ DataType=0x0004
 AccessType=rww
 DefaultValue=0
 PDOMapping=1
+
+[6502]
+ParameterName=Supported Drive Modes
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000025
+PDOMapping=0
 
 [ManufacturerObjects]
 SupportedObjects=0

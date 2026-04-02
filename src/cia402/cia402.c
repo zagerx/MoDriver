@@ -42,7 +42,7 @@ void cia402_params_bind(struct cia402_instance *instance, struct motor *motor,
 
 void cia402_init(struct cia402_instance *instance)
 {
-	if (!instance || !instance->is_initialized) {
+	if (!instance) {
 		return;
 	}
 	/* 初始化配置 */
