@@ -22,13 +22,13 @@
 
 // 	// 过温检测
 // 	if (temp > cfg->overtemp) {
-// 		*fault_bit = FAULT_OVERTEMP;
+// 		*fault_bit = MOTOR_ERROR_OVERTEMP;
 // 		return true;
 // 	}
 
 // 	// 低温检测
 // 	if (temp < cfg->lowtemp) {
-// 		*fault_bit = FAULT_UNDERTEMP;
+// 		*fault_bit = MOTOR_ERROR_UNDERTEMP;
 // 		return true;
 // 	}
 

@@ -25,7 +25,7 @@ bool check_stall(struct motor *motor, uint32_t *fault_bit)
 
 	// 堵转判定：电流大且速度低
 	if (fabsf(current) > cfg->current_threshold && fabsf(vel) < cfg->vel_threshold) {
-		*fault_bit = FAULT_STALL;
+		*fault_bit = MOTOR_ERROR_STALL;
 		return true;
 	}
 

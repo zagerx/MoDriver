@@ -30,14 +30,42 @@ enum motor_flag_bits {
 };
 
 enum motor_errorcode_bits {
-	MOTOR_ERROR_NONE = 0,         /**< @brief 无错误 */
-	MOTOR_ERROR_HW_FAILURE = 1,   /**< @brief 硬件故障 */
-	MOTOR_ERROR_PARAM = 2,        /**< @brief 参数错误 */
-	MOTOR_ERROR_OVERVOLTAGE = 3,  /**< @brief 过压保护触发 */
-	MOTOR_ERROR_UNDERVOLTAGE = 4, /**< @brief 欠压保护触发 */
-	MOTOR_ERROR_OVERCURRENT = 5,  /**< @brief 过流保护触发 */
-	MOTOR_ERROR_OVERTEMP = 6,     /**< @brief 过热保护触发 */
+	MOTOR_ERROR_NONE = 0U,              /**< @brief 无错误 */
+	MOTOR_ERROR_HW_FAILURE = 1U << 0,   /**< @brief 硬件故障 */
+	MOTOR_ERROR_PARAM = 1U << 1,        /**< @brief 参数错误 */
+	MOTOR_ERROR_OVERVOLTAGE = 1U << 2,  /**< @brief 过压保护触发 */
+	MOTOR_ERROR_UNDERVOLTAGE = 1U << 3, /**< @brief 欠压保护触发 */
+	MOTOR_ERROR_OVERCURRENT = 1U << 4,  /**< @brief 过流保护触发 */
+	MOTOR_ERROR_OVERTEMP = 1U << 5,     /**< @brief 过热保护触发 */
+	MOTOR_ERROR_UNDERTEMP = 1U << 6,    /**< @brief 欠热保护触发 */
+	MOTOR_ERROR_STALL = 1U << 7,        /**< @brief 堵转保护触发 */
 };
+
+/**
+ * @brief 错误码操作宏
+ * @note 错误枚举值本身即为位掩码，无需额外转换
+ * @{
+ */
+
+/** @brief 设置错误位 */
+#define MOTOR_ERR_SET(err, bit) ((err) |= (bit))
+
+/** @brief 清除错误位 */
+#define MOTOR_ERR_CLEAR(err, bit) ((err) &= ~(bit))
+
+/** @brief 测试错误位是否置位 */
+#define MOTOR_ERR_TEST(err, bit) ((err) & (bit))
+
+/** @brief 是否有任何错误 */
+#define MOTOR_ERR_ANY(err) ((err) != 0)
+
+/** @brief 是否无错误 */
+#define MOTOR_ERR_NONE(err) ((err) == 0)
+
+/** @brief 清除所有错误 */
+#define MOTOR_ERR_CLEAR_ALL(err) ((err) = 0)
+
+/** @} */
 
 enum motor_status {
 	MOTOR_STATUS_INIT = 0,

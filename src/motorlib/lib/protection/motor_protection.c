@@ -97,7 +97,7 @@ void motor_protection_init(struct motor *motor)
 	// 初始化过压保护描述符
 	struct protection_desc *ov_desc = &mgr->descs[PROT_TYPE_OVERVOLTAGE];
 	ov_desc->type = PROT_TYPE_OVERVOLTAGE;
-	ov_desc->fault_bit = FAULT_OVERVOLTAGE;
+	ov_desc->fault_bit = MOTOR_ERROR_OVERVOLTAGE;
 	ov_desc->debounce_ms = 200;
 	ov_desc->recover_ms = 1000;
 	ov_desc->check_fn = check_overvoltage;
@@ -107,7 +107,7 @@ void motor_protection_init(struct motor *motor)
 	// 初始化欠压保护描述符
 	struct protection_desc *uv_desc = &mgr->descs[PROT_TYPE_UNDERVOLTAGE];
 	uv_desc->type = PROT_TYPE_UNDERVOLTAGE;
-	uv_desc->fault_bit = FAULT_UNDERVOLTAGE;
+	uv_desc->fault_bit = MOTOR_ERROR_UNDERVOLTAGE;
 	uv_desc->debounce_ms = 200;
 	uv_desc->recover_ms = 1000;
 	uv_desc->check_fn = check_undervoltage;
@@ -117,7 +117,7 @@ void motor_protection_init(struct motor *motor)
 	// 初始化堵转保护描述符
 	struct protection_desc *s_desc = &mgr->descs[PROT_TYPE_STALL];
 	s_desc->type = PROT_TYPE_STALL;
-	s_desc->fault_bit = FAULT_STALL;
+	s_desc->fault_bit = MOTOR_ERROR_STALL;
 	s_desc->debounce_ms = 500;
 	s_desc->recover_ms = 5000;
 	s_desc->check_fn = check_stall;
@@ -127,7 +127,7 @@ void motor_protection_init(struct motor *motor)
 	// 初始化温度保护描述符
 	// struct protection_desc *t_desc = &mgr->descs[PROT_TYPE_TEMP];
 	// t_desc->type = PROT_TYPE_TEMP;
-	// t_desc->fault_bit = FAULT_OVERTEMP;
+	// t_desc->fault_bit = MOTOR_ERROR_OVERTEMP;
 	// t_desc->debounce_ms = 3000; // 1秒防抖
 	// t_desc->recover_ms = 3000;
 	// t_desc->check_fn = check_temp;
@@ -175,7 +175,7 @@ void motor_protection_update(struct motor *motor, float dt)
 		// 触发处理（使用返回的 fault_bit 记录到管理器的位图）
 		if (check_trigger(&desc->is_triggered, &desc->debounce_acc, desc->debounce_ms,
 				  triggered, dt)) {
-			mgr->fault_bitmap |= fault_bit; // 位或，不覆盖其他故障
+			motor->data.errorcode |= fault_bit; // 位或，不覆盖其他故障
 			if (desc->enter_fn) {
 				desc->enter_fn(motor, fault_bit);
 			}
@@ -184,7 +184,7 @@ void motor_protection_update(struct motor *motor, float dt)
 		// 恢复处理
 		if (!triggered &&
 		    check_recover(&desc->is_triggered, &desc->recover_acc, desc->recover_ms, dt)) {
-			mgr->fault_bitmap &= ~fault_bit; // 清除该故障位
+			motor->data.errorcode &= ~fault_bit; // 清除该故障位
 			if (desc->recover_fn) {
 				desc->recover_fn(motor);
 			}
@@ -211,7 +211,7 @@ void motor_protection_clear_fault(struct motor *motor, enum protection_type type
 	desc->status = PROT_STATUS_NORMAL;
 	desc->debounce_acc = 0;
 	desc->recover_acc = 0;
-	mgr->fault_bitmap &= ~desc->fault_bit; // 清除对应的故障位
+	motor->data.errorcode &= ~desc->fault_bit; // 清除对应的故障位
 }
 
 /**
@@ -236,8 +236,8 @@ void motor_protection_clear_all_faults(struct motor *motor)
 		desc->recover_acc = 0;
 	}
 
-	// 清空故障位图
-	mgr->fault_bitmap = 0;
+	// 清空错误码
+	motor->data.errorcode = 0;
 }
 
 /**
@@ -247,7 +247,7 @@ void motor_protection_clear_all_faults(struct motor *motor)
  */
 bool motor_protection_has_fault(struct motor *motor)
 {
-	return motor ? (motor->prot_mgr.fault_bitmap != 0) : false;
+	return motor ? (motor->data.errorcode != 0) : false;
 }
 
 /**
@@ -257,5 +257,5 @@ bool motor_protection_has_fault(struct motor *motor)
  */
 uint32_t motor_protection_get_faults(struct motor *motor)
 {
-	return motor ? motor->prot_mgr.fault_bitmap : 0;
+	return motor ? motor->data.errorcode : 0;
 }

@@ -26,7 +26,7 @@ bool check_undervoltage(struct motor *motor, uint32_t *fault_bit)
 	float vbus = motor->foc.meas.cs_out->v_bus; // 使用FOC测量的母线电压作为过压判定依据
 
 	if (vbus <= cfg->threshold) {
-		*fault_bit = FAULT_UNDERVOLTAGE;
+		*fault_bit = MOTOR_ERROR_UNDERVOLTAGE;
 		return true;
 	}
 

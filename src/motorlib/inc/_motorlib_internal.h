@@ -24,10 +24,8 @@ struct currsmp;
  * @brief 电机数据结构体
  */
 struct motor_data {
-	/**< @brief 状态标志位枚举值，使用 MOTOR_STATUS_BIT(bit) 转换为位掩码 */
-	enum motor_flag_bits flags;
-	/**< @brief 错误码位枚举值，使用 MOTOR_ERRORCODE_BIT(bit) 转换为位掩码 */
-	enum motor_errorcode_bits errorcode;
+	uint32_t flags;    /**< @brief 状态标志位组合值（位掩码） */
+	uint32_t errorcode; /**< @brief 错误码位组合值（位掩码） */
 };
 
 /**

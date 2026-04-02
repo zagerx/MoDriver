@@ -9,13 +9,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// 故障位图定义
-#define FAULT_NONE         (0u)
-#define FAULT_OVERVOLTAGE  (1u << 0)
-#define FAULT_UNDERVOLTAGE (1u << 1)
-#define FAULT_STALL        (1u << 2)
-#define FAULT_OVERTEMP     (1u << 3)
-#define FAULT_UNDERTEMP    (1u << 4)
 
 // 前置声明
 struct motor;
@@ -49,7 +42,7 @@ struct protection_desc {
 	float debounce_acc;            // 防抖时间累积（秒）
 	float recover_acc;             // 恢复时间累积（秒）
 	bool is_triggered;             // 是否触发
-	uint32_t fault_bit;            // 故障位（如 FAULT_OVERVOLTAGE）
+	uint32_t fault_bit;            // 故障位（如 MOTOR_ERROR_OVERVOLTAGE）
 	uint16_t debounce_ms;          // 防抖时间（毫秒）
 	uint16_t recover_ms;           // 恢复时间（毫秒）
 
@@ -98,7 +91,7 @@ struct protection_manager {
 	struct prot_undervoltage_cfg undervoltage_cfg; // 欠压保护配置
 	struct prot_stall_cfg stall_cfg;               // 堵转保护配置
 	// struct prot_temp_cfg temp_cfg;                 // 温度保护配置
-	uint32_t fault_bitmap; // 故障位图
+
 };
 
 /* ============ 接口函数 ============ */

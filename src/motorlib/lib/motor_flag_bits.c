@@ -57,3 +57,24 @@ int motor_is_flag_set(const struct motor *motor, enum motor_flag_bits bit)
 {
 	return motor ? MOTOR_FLAGS_TEST(motor->data.flags, bit) != 0 : 0;
 }
+
+/**
+ * @brief 获取电机当前错误码位组合值
+ * @param[in] motor 电机实例
+ * @return uint32_t 错误码位组合值
+ */
+uint32_t motor_get_errorcode(const struct motor *motor)
+{
+	return motor ? motor->data.errorcode : 0;
+}
+
+/**
+ * @brief 检查指定错误码位是否置位
+ * @param[in] motor 电机实例
+ * @param[in] bit 错误码位枚举值
+ * @return int 1 表示置位，0 表示未置位或实例为空
+ */
+int motor_is_error_set(const struct motor *motor, enum motor_errorcode_bits bit)
+{
+	return motor ? MOTOR_ERR_TEST(motor->data.errorcode, bit) != 0 : 0;
+}
