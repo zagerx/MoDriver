@@ -16,6 +16,7 @@
 #include "trajectory_plan.h"
 #include "statemachine.h"
 #include "motor_protection.h"
+#include "motor_bits.h"
 struct inverter;
 struct feedback;
 struct currsmp;

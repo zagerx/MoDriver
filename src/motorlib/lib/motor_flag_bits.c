@@ -7,36 +7,6 @@
 
 #include "_motorlib_internal.h"
 /**
- * @brief 将状态标志位枚举转换为位掩码
- * @param x 枚举值
- * @return 对应的位掩码（1U << x）
- */
-#define MOTOR_FLAGS_BIT(x) (1U << (x))
-
-/**
- * @brief 状态标志位操作宏
- * @note 所有操作均通过 MOTOR_FLAGS_BIT() 转换枚举值为位掩码
- * @{
- */
-
-/** @brief 设置状态位 */
-#define MOTOR_FLAGS_SET(flags, bit) ((flags) |= MOTOR_FLAGS_BIT(bit))
-
-/** @brief 清除状态位 */
-#define MOTOR_FLAGS_CLEAR(flags, bit) ((flags) &= ~MOTOR_FLAGS_BIT(bit))
-
-/** @brief 测试状态位是否置位 */
-#define MOTOR_FLAGS_TEST(flags, bit) ((flags) & MOTOR_FLAGS_BIT(bit))
-
-/** @brief 是否有任何状态标志 */
-#define MOTOR_FLAGS_ANY(flags) ((flags) != 0)
-
-/** @brief 是否无任何状态标志 */
-#define MOTOR_FLAGS_NONE(flags) ((flags) == 0)
-
-/** @brief 清除所有状态标志 */
-#define MOTOR_FLAGS_CLEAR_ALL(flags) ((flags) = 0)
-/**
  * @brief 获取电机当前状态标志位
  * @param[in] motor 电机实例
  * @return uint32_t 状态标志位组合值

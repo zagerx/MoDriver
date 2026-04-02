@@ -13,22 +13,20 @@
 /**
  * @brief 电机状态标志位定义（按位组合）
  * @note 低16位为动态运行状态，高16位为事件/完成/持久标志
- * @note 配合 MOTOR_STATUS_BIT() 宏使用，status_flag 为 uint32_t 类型
+ * @note 枚举值本身即为位掩码，status_flag 为 uint32_t 类型
  */
 enum motor_flag_bits {
-
-	MOTOR_FLAGS_ENABLED = 0,             /**< @brief 逆变器使能 */
-	MOTOR_FLAGS_HOMING = 1,              /**< @brief 原点回归中 */
-	MOTOR_FLAGS_POSITION_LATCH = 2,      /**< @brief 位置锁存中 */
-	MOTOR_FLAGS_TARGET_REACHED = 3,      /**< @brief 目标已到达 */
-	MOTOR_FLAGS_MOVING = 4,              /**< @brief 电机正在运动 */
-	MOTOR_FLAGS_HOMING_DONE = 5,         /**< @brief 原点回归完成 */
-	MOTOR_FLAGS_CALIBRATION_DONE = 6,    /**< @brief 校准完成 */
-	MOTOR_FLAGS_SPEED_ZERO = 7,          /**< @brief 速度接近零 */
-	MOTOR_FLAGS_POSITION_LATCH_DONE = 8, /**< @brief 位置锁存完成 */
-	MOTOR_FLAGS_TRAJECTORY_BUSY = 9,     /**< @brief 轨迹规划器运行中 */
+	MOTOR_FLAGS_ENABLED = 1U << 0,             /**< @brief 逆变器使能 */
+	MOTOR_FLAGS_HOMING = 1U << 1,              /**< @brief 原点回归中 */
+	MOTOR_FLAGS_POSITION_LATCH = 1U << 2,      /**< @brief 位置锁存中 */
+	MOTOR_FLAGS_TARGET_REACHED = 1U << 3,      /**< @brief 目标已到达 */
+	MOTOR_FLAGS_MOVING = 1U << 4,              /**< @brief 电机正在运动 */
+	MOTOR_FLAGS_HOMING_DONE = 1U << 5,         /**< @brief 原点回归完成 */
+	MOTOR_FLAGS_CALIBRATION_DONE = 1U << 6,    /**< @brief 校准完成 */
+	MOTOR_FLAGS_SPEED_ZERO = 1U << 7,          /**< @brief 速度接近零 */
+	MOTOR_FLAGS_POSITION_LATCH_DONE = 1U << 8, /**< @brief 位置锁存完成 */
+	MOTOR_FLAGS_TRAJECTORY_BUSY = 1U << 9,     /**< @brief 轨迹规划器运行中 */
 };
-
 enum motor_errorcode_bits {
 	MOTOR_ERROR_NONE = 0U,              /**< @brief 无错误 */
 	MOTOR_ERROR_HW_FAILURE = 1U << 0,   /**< @brief 硬件故障 */
@@ -40,33 +38,6 @@ enum motor_errorcode_bits {
 	MOTOR_ERROR_UNDERTEMP = 1U << 6,    /**< @brief 欠热保护触发 */
 	MOTOR_ERROR_STALL = 1U << 7,        /**< @brief 堵转保护触发 */
 };
-
-/**
- * @brief 错误码操作宏
- * @note 错误枚举值本身即为位掩码，无需额外转换
- * @{
- */
-
-/** @brief 设置错误位 */
-#define MOTOR_ERR_SET(err, bit) ((err) |= (bit))
-
-/** @brief 清除错误位 */
-#define MOTOR_ERR_CLEAR(err, bit) ((err) &= ~(bit))
-
-/** @brief 测试错误位是否置位 */
-#define MOTOR_ERR_TEST(err, bit) ((err) & (bit))
-
-/** @brief 是否有任何错误 */
-#define MOTOR_ERR_ANY(err) ((err) != 0)
-
-/** @brief 是否无错误 */
-#define MOTOR_ERR_NONE(err) ((err) == 0)
-
-/** @brief 清除所有错误 */
-#define MOTOR_ERR_CLEAR_ALL(err) ((err) = 0)
-
-/** @} */
-
 enum motor_status {
 	MOTOR_STATUS_INIT = 0,
 	MOTOR_STATUS_CALIB,
