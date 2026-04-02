@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: GPL-2.0
-
 /**
  * @file motor_state.c
  * @brief 电机主状态机实现
@@ -35,6 +33,7 @@ void motor_carib_state(struct statemachine *sm)
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
+	struct inverter *inverter = &motor->inverter;
 	enum calibration_status calib_status;
 
 	switch (sm->phase) {
@@ -60,8 +59,8 @@ void motor_carib_state(struct statemachine *sm)
 	case EXIT:
 		/* 退出校准状态，确保逆变器禁用（安全考虑） */
 		/* 注：即使校准模块内部已禁用，这里再禁一次确保万无一失 */
-		if (motor->inverter) {
-			inverter_disable(motor->inverter);
+		if (inverter) {
+			inverter_disable(inverter);
 		}
 		break;
 
@@ -148,7 +147,7 @@ void motor_runing_state(struct statemachine *sm)
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
-	struct inverter *inverter = motor->inverter;
+	struct inverter *inverter = &motor->inverter;
 	struct statemachine *sm_mode = &motor->sm_mode;
 	switch (sm->phase) {
 	case ENTER:
@@ -191,9 +190,7 @@ void motor_openloop_encoder_state(struct statemachine *sm)
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
-	struct inverter *inverter = motor->inverter;
-	// struct feedback *feedback = motor->feedback;
-	// static uint32_t debug_cnt = 0;
+	struct inverter *inverter = &motor->inverter;
 
 	switch (sm->phase) {
 	case ENTER:

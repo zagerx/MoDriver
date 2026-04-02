@@ -18,8 +18,8 @@
 bool check_undervoltage(struct motor *motor, uint32_t *fault_bit)
 {
 	struct prot_undervoltage_cfg *cfg = &motor->prot_mgr.undervoltage_cfg;
-
-	if (!motor->currsmp) {
+	struct currsmp *currsmp = &motor->currsmp;
+	if (!motor || !currsmp) {
 		return false;
 	}
 
@@ -43,7 +43,8 @@ void enter_undervoltage_fault(struct motor *motor, uint32_t fault_bit)
 	(void)fault_bit;
 
 	// 欠压保护：立即关闭逆变器
-	inverter_disable(motor->inverter);
+	struct inverter *inverter = &motor->inverter;
+	inverter_disable(inverter);
 	// 切换到故障状态
 	// TRAN_STATE(motor->state_machine, motor_falut_state);
 }

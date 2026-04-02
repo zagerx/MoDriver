@@ -134,7 +134,7 @@ void motor_currment_loop(struct motor *motor)
 	struct foc_control *ctrl = &foc->ctrl;
 	struct foc_pid *d_axis_pid = &ctrl->d_axis;
 	struct foc_pid *q_axis_pid = &ctrl->q_axis;
-
+	struct inverter *inverter = &motor->inverter;
 	float ud, uq;
 	float ualpha, ubeta;
 	float duty[3];
@@ -165,7 +165,7 @@ void motor_currment_loop(struct motor *motor)
 	svpwm_calc_duty(ualpha, ubeta, duty);
 
 	/* 输出到逆变器 */
-	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
+	inverter_set_voltage(inverter, duty[0], duty[1], duty[2]);
 }
 
 /**

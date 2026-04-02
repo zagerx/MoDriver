@@ -38,13 +38,14 @@ void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
 	if (!motor || !hw) {
 		return;
 	}
-
+	struct inverter *inverter = &motor->inverter;
+	struct feedback *feedback = &motor->feedback;
 	if (hw->encoder) {
-		feedback_bind_encoder(motor->feedback, hw->encoder);
+		feedback_bind_encoder(feedback, hw->encoder);
 	}
 
 	if (hw->inverter) {
-		inverter_bind_inverter(motor->inverter, hw->inverter);
+		inverter_bind_inverter(inverter, hw->inverter);
 	}
 }
 
@@ -61,10 +62,11 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
 	if (!motor || !param_ext) {
 		return;
 	}
-
+	struct currsmp *currsmp = &motor->currsmp;
+	struct feedback *feedback = &motor->feedback;
 	motor->param_ext = param_ext;
-	feedback_bind_encoder_param(motor->feedback, &param_ext->feedback_param);
-	currsmp_bind_param(motor->currsmp, &param_ext->currsmp_param);
+	feedback_bind_encoder_param(feedback, &param_ext->feedback_param);
+	currsmp_bind_param(currsmp, &param_ext->currsmp_param);
 	trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param);
 }
 
@@ -121,8 +123,8 @@ void motor_init(struct motor *motor)
 
 	struct statemachine *sm = &motor->sm;
 	struct statemachine *sm_mode = &motor->sm_mode;
-	struct feedback *fb = motor->feedback;
-	struct currsmp *currsmp = motor->currsmp;
+	struct feedback *fb = &motor->feedback;
+	struct currsmp *currsmp = &motor->currsmp;
 
 	if (!sm || !fb || !currsmp) {
 		/* 关键指针为空，无法初始化 */
@@ -163,8 +165,8 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 		return;
 	}
 
-	struct feedback *feedback = motor->feedback;
-	struct currsmp *currsmp = motor->currsmp;
+	struct feedback *feedback = &motor->feedback;
+	struct currsmp *currsmp = &motor->currsmp;
 	struct statemachine *sm = &motor->sm;
 
 	currsmp_update_raw(currsmp, adc_raw);

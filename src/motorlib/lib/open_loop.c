@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: GPL-2.0
-
 /**
  * @file open_loop.c
  * @brief 电机开环控制实现
@@ -27,13 +25,14 @@ void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eang
 	if (!motor) {
 		return;
 	}
-
+	struct currsmp *currsmp = &motor->currsmp;
+	struct inverter *inverter = &motor->inverter;
 	float uq = 0.0f;
 	float ualpha, ubeta;
 	float duty[3];
 	struct currsmp_output out;
 
-	currsmp_get_output(motor->currsmp, &out);
+	currsmp_get_output(currsmp, &out);
 
 	float vbus;
 	vbus = out.v_bus;
@@ -43,7 +42,7 @@ void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eang
 	// 直接输出d轴电压，q轴为0，保持固定角度eangle
 	svpwm_calc_duty(ualpha, ubeta, duty);
 
-	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
+	inverter_set_voltage(inverter, duty[0], duty[1], duty[2]);
 }
 
 /**
@@ -60,7 +59,8 @@ void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, f
 	if (!motor) {
 		return;
 	}
-
+	struct currsmp *currsmp = &motor->currsmp;
+	struct inverter *inverter = &motor->inverter;
 	struct foc *foc = &motor->foc;
 	foc->self_eangle += omega * dt; // 电角度增量 = 角速度 * 时间
 
@@ -69,7 +69,7 @@ void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, f
 	float duty[3];
 	struct currsmp_output out;
 
-	currsmp_get_output(motor->currsmp, &out);
+	currsmp_get_output(currsmp, &out);
 
 	float vbus = out.v_bus;
 
@@ -77,7 +77,7 @@ void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, f
 	svpwm_normalize(foc->self_eangle, vbus, d_axis_voltage, 0.0f, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
 
-	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
+	inverter_set_voltage(inverter, duty[0], duty[1], duty[2]);
 }
 
 /**
@@ -106,15 +106,16 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage)
 	if (!motor) {
 		return;
 	}
-
-	struct feedback *feedback = motor->feedback;
+	struct currsmp *currsmp = &motor->currsmp;
+	struct inverter *inverter = &motor->inverter;
+	struct feedback *feedback = &motor->feedback;
 	float eangle = feedback_get_elec_angle(feedback);
 	float ud = 0.0f;
 	float ualpha, ubeta;
 	float duty[3];
 
 	struct currsmp_output out;
-	currsmp_get_output(motor->currsmp, &out);
+	currsmp_get_output(currsmp, &out);
 
 	float vbus = out.v_bus;
 
@@ -122,7 +123,7 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage)
 	svpwm_normalize(eangle, vbus, ud, q_axis_voltage, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
 
-	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
+	inverter_set_voltage(inverter, duty[0], duty[1], duty[2]);
 }
 
 /**
@@ -137,8 +138,9 @@ void currment_debug(struct motor *motor, float tar)
 	if (!motor) {
 		return;
 	}
-
-	struct feedback *feedback = motor->feedback;
+	struct currsmp *currsmp = &motor->currsmp;
+	struct inverter *inverter = &motor->inverter;
+	struct feedback *feedback = &motor->feedback;
 	float eangle = feedback_get_elec_angle(feedback);
 	float ud, uq;
 	float ualpha, ubeta;
@@ -146,7 +148,7 @@ void currment_debug(struct motor *motor, float tar)
 
 	struct foc *foc = &motor->foc;
 	struct currsmp_output out;
-	currsmp_get_output(motor->currsmp, &out);
+	currsmp_get_output(currsmp, &out);
 
 	float vbus = out.v_bus;
 	struct foc_measurement *meas = &foc->meas;
@@ -163,5 +165,5 @@ void currment_debug(struct motor *motor, float tar)
 	svpwm_normalize(eangle, vbus, ud_limit, uq, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
 
-	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
+	inverter_set_voltage(inverter, duty[0], duty[1], duty[2]);
 }

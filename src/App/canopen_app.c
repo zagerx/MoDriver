@@ -143,12 +143,7 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 
 			if (app->sys_reset_ops) {
 				app->sys_reset_ops();
-			} else {
-				// 没有定义系统复位操作，执行软件复位
-				// NVIC_SystemReset();
 			}
-			// HAL_NVIC_SystemReset();
-			// app->sys_reset_ops();
 			break;
 
 		case CO_RESET_NOT:
@@ -245,8 +240,6 @@ static int canopen_app_resetCommunication(canopen_app_t *app)
 		app->last_err = err;
 		return -3;
 	}
-
-	/* 注意：定时器由应用层启动，这里不控制定时器 */
 
 	/* 启动 CAN */
 	CO_CANsetNormalMode(app->co->CANmodule);

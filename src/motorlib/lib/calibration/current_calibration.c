@@ -41,8 +41,9 @@ void current_calib_init(struct motor *motor, uint16_t samples)
 	curr->target_samples = (samples > 0) ? samples : CURRENT_CALIB_DEFAULT_SAMPLES;
 
 	/* 禁用逆变器 */
-	if (motor->inverter) {
-		inverter_disable(motor->inverter);
+	struct inverter *inverter = &motor->inverter;
+	if (inverter) {
+		inverter_disable(inverter);
 	}
 }
 
@@ -60,14 +61,15 @@ bool current_calib_run(struct motor *motor)
 {
 	struct current_calib *curr;
 	struct currsmp_input input;
+	struct currsmp *currsmp = &motor->currsmp;
 
-	if (!motor || !motor->currsmp) {
+	if (!motor || !currsmp) {
 		return true;
 	}
 
 	curr = &motor->calib.current;
 
-	currsmp_get_raw(motor->currsmp, &input);
+	currsmp_get_raw(currsmp, &input);
 
 	curr->sum_a += input.i_a_raw;
 	curr->sum_b += input.i_b_raw;
@@ -89,15 +91,14 @@ bool current_calib_run(struct motor *motor)
 void current_calib_apply(struct motor *motor)
 {
 	struct current_calib *curr;
-	struct currsmp *currsmp;
+	struct currsmp *currsmp = &motor->currsmp;
 	uint16_t offsets[3];
 
-	if (!motor || !motor->currsmp || !motor->currsmp) {
+	if (!motor || !currsmp) {
 		return;
 	}
 
 	curr = &motor->calib.current;
-	currsmp = motor->currsmp;
 
 	if (curr->sample_cnt == 0) {
 		return;

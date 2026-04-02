@@ -41,9 +41,9 @@ bool check_stall(struct motor *motor, uint32_t *fault_bit)
 void enter_stall_fault(struct motor *motor, uint32_t fault_bit)
 {
 	(void)fault_bit;
-
+	struct inverter *inverter = &motor->inverter;
 	// 堵转保护：立即关闭逆变器（后续可增加降流、报警等策略）
-	inverter_disable(motor->inverter);
+	inverter_disable(inverter);
 
 	// 切换到故障状态
 	// TRAN_STATE(motor->state_machine, motor_falut_state);

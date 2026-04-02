@@ -75,11 +75,6 @@ struct foc_control {
  * @details 整合FOC控制所需的所有数据和控制器，包括反馈、采样、参数、测量值、参考值和控制器
  */
 struct foc {
-	// /** 反馈数据指针 */
-	// struct feedback *feedback;
-
-	// /** 电流采样数据指针 */
-	// struct currsmp *currsmp;
 
 	/** FOC参数指针 */
 	struct foc_param *parm;

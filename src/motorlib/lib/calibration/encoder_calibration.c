@@ -87,9 +87,10 @@ void encoder_calib_init(struct motor *motor)
 	enc->init_enc_val = 0;
 	enc->calib_start_eangle = 0.0f;
 
+	struct inverter *inverter = &motor->inverter;
 	/* 禁用逆变器准备开始 */
-	if (motor->inverter) {
-		inverter_disable(motor->inverter);
+	if (inverter) {
+		inverter_disable(inverter);
 	}
 }
 
@@ -102,19 +103,18 @@ void encoder_calib_init(struct motor *motor)
 bool encoder_calib_run(struct motor *motor)
 {
 	struct encoder_calib *enc;
-	struct feedback *feedback;
-	struct inverter *inverter;
+	struct feedback *feedback = &motor->feedback;
+	struct currsmp *currsmp = &motor->currsmp;
+	struct inverter *inverter = &motor->inverter;
 	uint16_t current_raw;
 	int32_t delta;
 	float current_eangle;
 
-	if (!motor || !motor->feedback || !motor->inverter || !motor->currsmp) {
+	if (!motor || !feedback || !inverter || !currsmp) {
 		return true;
 	}
 
 	enc = &motor->calib.encoder;
-	feedback = motor->feedback;
-	inverter = motor->inverter;
 
 	switch (enc->state) {
 	case ENC_CALIB_ALIGN_START:

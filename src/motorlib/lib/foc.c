@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: GPL-2.0
-
 /**
  * @file foc.c
  * @brief FOC（磁场定向控制）模块实现
@@ -53,14 +51,10 @@ void foc_update_idiq(struct foc *foc)
 	}
 
 	struct foc_measurement *meas = &foc->meas;
-	// struct currsmp_output out;
-
-	// currsmp_get_output(foc->currsmp, &out);
 
 	float i_a = meas->cs_out->i_a;
 	float i_b = meas->cs_out->i_b;
 
-	// float eangle = feedback_get_elec_angle(foc->feedback);
 	float eangle = meas->fd_out->eangle_rad;
 	arm_clarke_f32(i_a, i_b, &meas->i_alpha, &meas->i_beta);
 

@@ -20,9 +20,12 @@
 #include "motor_protection.h"
 
 struct motor_param_ext;
-struct inverter;
-struct feedback;
-struct currsmp;
+#include "inverter.h"
+#include "feedback.h"
+#include "currsmp.h"
+// struct inverter;
+// struct feedback;
+// struct currsmp;
 
 /**
  * @brief 调试数据开关，默认开启
@@ -61,9 +64,9 @@ struct motor_data {
  */
 struct motor {
 	struct motor_param_ext *param_ext;  /**< @brief 扩展参数 */
-	struct inverter *inverter;          /**< @brief 逆变器实例 */
-	struct feedback *feedback;          /**< @brief 反馈实例 */
-	struct currsmp *currsmp;            /**< @brief 电流采样实例 */
+	struct inverter inverter;           /**< @brief 逆变器实例 */
+	struct feedback feedback;           /**< @brief 反馈实例 */
+	struct currsmp currsmp;             /**< @brief 电流采样实例 */
 	struct statemachine sm;             /**< @brief 状态机实例 */
 	struct statemachine sm_mode;        /**< @brief 模式状态机实例 */
 	struct motor_data data;             /**< @brief 数据 */

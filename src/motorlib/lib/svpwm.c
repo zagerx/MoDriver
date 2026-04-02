@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: GPL-2.0
-
 /**
  * @file svpwm.c
  * @brief 空间矢量脉宽调制（SVPWM）实现
@@ -26,23 +24,23 @@
  */
 static inline float clamp_0_1(float x)
 {
-    const float EPS = 1e-7f;
+	const float EPS = 1e-7f;
 
-    if (x < 0.0f) {
-        if (x > -EPS) {
-            return 0.0f;
-        }
-        return 0.0f;
-    }
+	if (x < 0.0f) {
+		if (x > -EPS) {
+			return 0.0f;
+		}
+		return 0.0f;
+	}
 
-    if (x > 1.0f) {
-        if (x < 1.0f + EPS) {
-            return 1.0f;
-        }
-        return 1.0f;
-    }
+	if (x > 1.0f) {
+		if (x < 1.0f + EPS) {
+			return 1.0f;
+		}
+		return 1.0f;
+	}
 
-    return x;
+	return x;
 }
 
 /**
@@ -55,11 +53,11 @@ static inline float clamp_0_1(float x)
  */
 static inline float safe_sqrtf(float x)
 {
-    if (x <= 0.0f) {
-        return 0.0f;
-    }
+	if (x <= 0.0f) {
+		return 0.0f;
+	}
 
-    return sqrtf(x);
+	return sqrtf(x);
 }
 
 /**
@@ -77,36 +75,36 @@ static inline float safe_sqrtf(float x)
  */
 void svpwm_limit_voltage(float vbus, float *ud, float *uq)
 {
-    // 1. 母线电压异常检查
-    if (vbus <= 0.001f) {
-        *ud = 0.0f;
-        *uq = 0.0f;
-        return;
-    }
+	// 1. 母线电压异常检查
+	if (vbus <= 0.001f) {
+		*ud = 0.0f;
+		*uq = 0.0f;
+		return;
+	}
 
-    // 2. 计算线性调制区极限
-    float u_limit = vbus * ONE_OVER_SQRT3; // Vbus / sqrt(3)
-    float u_limit_sq = u_limit * u_limit;
+	// 2. 计算线性调制区极限
+	float u_limit = vbus * ONE_OVER_SQRT3; // Vbus / sqrt(3)
+	float u_limit_sq = u_limit * u_limit;
 
-    // 3. 计算当前矢量模长的平方
-    float u_sq = (*ud) * (*ud) + (*uq) * (*uq);
+	// 3. 计算当前矢量模长的平方
+	float u_sq = (*ud) * (*ud) + (*uq) * (*uq);
 
-    // 4. 仅当超出极限时才进行缩放
-    if (u_sq > u_limit_sq) {
-        // 使用安全开方，避免数值误差
-        float u_mag = safe_sqrtf(u_sq);
+	// 4. 仅当超出极限时才进行缩放
+	if (u_sq > u_limit_sq) {
+		// 使用安全开方，避免数值误差
+		float u_mag = safe_sqrtf(u_sq);
 
-        // 5. 计算缩放系数并等比例缩放
-        float factor = u_limit / u_mag;
-        *ud *= factor;
-        *uq *= factor;
-    }
+		// 5. 计算缩放系数并等比例缩放
+		float factor = u_limit / u_mag;
+		*ud *= factor;
+		*uq *= factor;
+	}
 
-    // 6. 边界：如果输入已经是零，确保输出也是零
-    if (fabsf(*ud) < FLT_EPSILON && fabsf(*uq) < FLT_EPSILON) {
-        *ud = 0.0f;
-        *uq = 0.0f;
-    }
+	// 6. 边界：如果输入已经是零，确保输出也是零
+	if (fabsf(*ud) < FLT_EPSILON && fabsf(*uq) < FLT_EPSILON) {
+		*ud = 0.0f;
+		*uq = 0.0f;
+	}
 }
 
 /**
@@ -129,44 +127,44 @@ void svpwm_limit_voltage(float vbus, float *ud, float *uq)
  */
 void svpwm_normalize(float eangle, float vbus, float ud, float uq, float *ualpha, float *ubeta)
 {
-    float sin_val, cos_val;
-    float alpha, beta;
+	float sin_val, cos_val;
+	float alpha, beta;
 
-    // 1. 逆Park变换（dq -> αβ）
-    arm_sin_cos_f32(eangle * MOTORLIB_RAD_TO_DEG, &sin_val, &cos_val);
-    arm_inv_park_f32(ud, uq, &alpha, &beta, sin_val, cos_val);
+	// 1. 逆Park变换（dq -> αβ）
+	arm_sin_cos_f32(eangle * MOTORLIB_RAD_TO_DEG, &sin_val, &cos_val);
+	arm_inv_park_f32(ud, uq, &alpha, &beta, sin_val, cos_val);
 
-    // 2. 电压归一化到线性调制区
-    if (vbus > 0.001f) {
-        // 归一化因子：1.0 / (Vbus / sqrt(3)) = sqrt(3) / Vbus
-        float inv_vbase = SQRT3 / vbus;
-        alpha *= inv_vbase;
-        beta *= inv_vbase;
+	// 2. 电压归一化到线性调制区
+	if (vbus > 0.001f) {
+		// 归一化因子：1.0 / (Vbus / sqrt(3)) = sqrt(3) / Vbus
+		float inv_vbase = SQRT3 / vbus;
+		alpha *= inv_vbase;
+		beta *= inv_vbase;
 
-        // 3. 验证归一化后模长≤1.0（应通过前置限幅保证）
-        float v_sq = alpha * alpha + beta * beta;
-        if (v_sq > 1.0001f) { // 允许1%的浮点误差容限
-            // 如果超出，说明前置限幅有问题，强制限幅
-            float v_mag = safe_sqrtf(v_sq);
-            float factor = 1.0f / v_mag;
-            alpha *= factor;
-            beta *= factor;
-        }
-    } else {
-        // 母线电压异常，输出零矢量
-        alpha = 0.0f;
-        beta = 0.0f;
-    }
+		// 3. 验证归一化后模长≤1.0（应通过前置限幅保证）
+		float v_sq = alpha * alpha + beta * beta;
+		if (v_sq > 1.0001f) { // 允许1%的浮点误差容限
+			// 如果超出，说明前置限幅有问题，强制限幅
+			float v_mag = safe_sqrtf(v_sq);
+			float factor = 1.0f / v_mag;
+			alpha *= factor;
+			beta *= factor;
+		}
+	} else {
+		// 母线电压异常，输出零矢量
+		alpha = 0.0f;
+		beta = 0.0f;
+	}
 
-    // 4. 返回归一化的αβ电压
-    *ualpha = alpha;
-    *ubeta = beta;
+	// 4. 返回归一化的αβ电压
+	*ualpha = alpha;
+	*ubeta = beta;
 
-    // 5. 处理零矢量边界条件
-    if (fabsf(alpha) < 1e-6f && fabsf(beta) < 1e-6f) {
-        *ualpha = 0.0f;
-        *ubeta = 0.0f;
-    }
+	// 5. 处理零矢量边界条件
+	if (fabsf(alpha) < 1e-6f && fabsf(beta) < 1e-6f) {
+		*ualpha = 0.0f;
+		*ubeta = 0.0f;
+	}
 }
 
 /**
@@ -185,62 +183,62 @@ void svpwm_normalize(float eangle, float vbus, float ud, float uq, float *ualpha
  */
 void svpwm_calc_duty(float valpha, float vbeta, float *dabc)
 {
-    // ----------- 1. 零矢量奇点处理 -----------
-    const float ZERO_THRESH = 1e-7f;
+	// ----------- 1. 零矢量奇点处理 -----------
+	const float ZERO_THRESH = 1e-7f;
 
-    if (fabsf(valpha) < ZERO_THRESH && fabsf(vbeta) < ZERO_THRESH) {
-        dabc[0] = 0.5f;
-        dabc[1] = 0.5f;
-        dabc[2] = 0.5f;
-        return;
-    }
+	if (fabsf(valpha) < ZERO_THRESH && fabsf(vbeta) < ZERO_THRESH) {
+		dabc[0] = 0.5f;
+		dabc[1] = 0.5f;
+		dabc[2] = 0.5f;
+		return;
+	}
 
-    // ----------- 3. αβ → abc 投影 -----------
-    // 假设α轴对齐A相，β轴超前α轴90°
-    float va = valpha;                                // A相
-    float vb = -0.5f * valpha + SQRT3_OVER_2 * vbeta; // B相
-    float vc = -0.5f * valpha - SQRT3_OVER_2 * vbeta; // C相
+	// ----------- 3. αβ → abc 投影 -----------
+	// 假设α轴对齐A相，β轴超前α轴90°
+	float va = valpha;                                // A相
+	float vb = -0.5f * valpha + SQRT3_OVER_2 * vbeta; // B相
+	float vc = -0.5f * valpha - SQRT3_OVER_2 * vbeta; // C相
 
-    // ----------- 4. 寻找三相极值 -----------
-    float vmax = va;
-    float vmin = va;
+	// ----------- 4. 寻找三相极值 -----------
+	float vmax = va;
+	float vmin = va;
 
-    if (vb > vmax) {
-        vmax = vb;
-    }
-    if (vb < vmin) {
-        vmin = vb;
-    }
+	if (vb > vmax) {
+		vmax = vb;
+	}
+	if (vb < vmin) {
+		vmin = vb;
+	}
 
-    if (vc > vmax) {
-        vmax = vc;
-    }
-    if (vc < vmin) {
-        vmin = vc;
-    }
+	if (vc > vmax) {
+		vmax = vc;
+	}
+	if (vc < vmin) {
+		vmin = vc;
+	}
 
-    // ----------- 5. 七段式SVPWM核心计算 -----------
-    // 计算有效矢量作用时间（归一化到PWM周期）
-    // 对于归一化输入：T1+T2 = (vmax - vmin) * (2/3)
-    float T1_plus_T2 = (vmax - vmin) * TWO_OVER_3;
+	// ----------- 5. 七段式SVPWM核心计算 -----------
+	// 计算有效矢量作用时间（归一化到PWM周期）
+	// 对于归一化输入：T1+T2 = (vmax - vmin) * (2/3)
+	float T1_plus_T2 = (vmax - vmin) * TWO_OVER_3;
 
-    // 钳制在[0,1]内，防止浮点误差
-    T1_plus_T2 = clamp_0_1(T1_plus_T2);
+	// 钳制在[0,1]内，防止浮点误差
+	T1_plus_T2 = clamp_0_1(T1_plus_T2);
 
-    // 零矢量时间
-    float T0 = 1.0f - T1_plus_T2;
-    T0 = clamp_0_1(T0);
+	// 零矢量时间
+	float T0 = 1.0f - T1_plus_T2;
+	T0 = clamp_0_1(T0);
 
-    // 对称零矢量分布
-    float offset = 0.5f * T0;
+	// 对称零矢量分布
+	float offset = 0.5f * T0;
 
-    // ----------- 6. 计算各相占空比 -----------
-    // 七段式投影公式：duty_x = (vx - vmin) * (2/3) + T0/2
-    float da = (va - vmin) * TWO_OVER_3 + offset;
-    float db = (vb - vmin) * TWO_OVER_3 + offset;
-    float dc = (vc - vmin) * TWO_OVER_3 + offset;
+	// ----------- 6. 计算各相占空比 -----------
+	// 七段式投影公式：duty_x = (vx - vmin) * (2/3) + T0/2
+	float da = (va - vmin) * TWO_OVER_3 + offset;
+	float db = (vb - vmin) * TWO_OVER_3 + offset;
+	float dc = (vc - vmin) * TWO_OVER_3 + offset;
 
-    dabc[0] = clamp_0_1(da);
-    dabc[1] = clamp_0_1(db);
-    dabc[2] = clamp_0_1(dc);
+	dabc[0] = clamp_0_1(da);
+	dabc[1] = clamp_0_1(db);
+	dabc[2] = clamp_0_1(dc);
 }

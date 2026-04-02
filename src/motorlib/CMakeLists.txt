@@ -11,7 +11,6 @@ target_sources(motor PRIVATE
         lib/protection/prot_overvoltage.c
         lib/protection/prot_undervoltage.c
         lib/protection/prot_stall.c
-        lib/protection/prot_temp.c
         lib/calibration/calibration.c
         lib/calibration/current_calibration.c
         lib/calibration/encoder_calibration.c
