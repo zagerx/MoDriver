@@ -28,7 +28,7 @@ void motor_position_loop(struct motor *motor, float dt)
 	struct foc_pid *position_pi = &foc->ctrl.position;
 	struct foc_measurement *meas = &foc->meas;
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
-	
+
 	/* 获取轨迹规划的位置和速度（单位转换：mm -> m） */
 	float plan_position = trajectory_planner_get_pos(traj_plan);
 	float plan_velocity = trajectory_planner_get_vel(traj_plan) / (17.5f / 1000.0f);
@@ -40,7 +40,7 @@ void motor_position_loop(struct motor *motor, float dt)
 	motor->data.debug.test_real_pos = current_pos * 1000.0f;
 	motor->data.debug.test_plann_vel = plan_velocity * 1000.0f;
 #endif
-	
+
 	/* 位置环PID计算，输出作为速度环的目标输入 */
 	float temp = foc_pid_run(position_pi, plan_position, current_pos, dt);
 	foc->ref.velocity = temp + plan_velocity; /* 速度前馈：轨迹规划的速度 */
@@ -59,12 +59,12 @@ void motor_position_loop_reset(struct motor *motor)
 	struct foc_pid *velocity_pi = &foc->ctrl.velocity;
 	struct foc_pid *current_d_pi = &foc->ctrl.d_axis;
 	struct foc_pid *current_q_pi = &foc->ctrl.q_axis;
-	
+
 	/* 清零参考值 */
 	foc->ref.velocity = 0.0f;
 	foc->ref.i_q = 0.0f;
 	foc->ref.i_d = 0.0f;
-	
+
 	/* 复位各环PID控制器 */
 	foc_pid_reset(position_pi);
 	foc_pid_reset(velocity_pi);
@@ -106,11 +106,11 @@ void motor_velocity_loop_reset(struct motor *motor)
 	struct foc_pid *velocity_pi = &foc->ctrl.velocity;
 	struct foc_pid *current_d_pi = &foc->ctrl.d_axis;
 	struct foc_pid *current_q_pi = &foc->ctrl.q_axis;
-	
+
 	/* 清零电流参考值 */
 	foc->ref.i_q = 0.0f;
 	foc->ref.i_d = 0.0f;
-	
+
 	/* 复位速度环和电流环PID控制器 */
 	foc_pid_reset(velocity_pi);
 	foc_pid_reset(current_d_pi);
@@ -125,7 +125,7 @@ void motor_velocity_loop_reset(struct motor *motor)
  *          2. 电压限幅（根据母线电压计算最大输出电压）
  *          3. 坐标变换后通过SVPWM计算三相占空比
  *          4. 输出到逆变器
- * @note 电流环是三环控制的最内环，执行频率最高（通常10kHz）
+ * @note 电流环是三环控制的最内环，执行频率最高
  */
 void motor_currment_loop(struct motor *motor)
 {
@@ -134,15 +134,15 @@ void motor_currment_loop(struct motor *motor)
 	struct foc_control *ctrl = &foc->ctrl;
 	struct foc_pid *d_axis_pid = &ctrl->d_axis;
 	struct foc_pid *q_axis_pid = &ctrl->q_axis;
-	
+
 	float ud, uq;
 	float ualpha, ubeta;
 	float duty[3];
-	
+
 	/* d/q轴电流环PID计算，输出电压指令 */
 	ud = foc_currentloop_pid_run(d_axis_pid, foc->ref.i_d, meas->i_d, CONTROL_PERIOD_DT);
 	uq = foc_currentloop_pid_run(q_axis_pid, foc->ref.i_q, meas->i_q, CONTROL_PERIOD_DT);
-	
+
 	/* 记录原始电压值用于限幅计算 */
 	float ud_limit = ud;
 	float uq_limit = uq;
@@ -150,20 +150,20 @@ void motor_currment_loop(struct motor *motor)
 	/* 获取母线电压和电角度 */
 	float vbus = meas->cs_out->v_bus;
 	float eangle = meas->fd_out->eangle_rad;
-	
+
 	/* 电压限幅（考虑SVPWM最大调制比） */
 	svpwm_limit_voltage(vbus, &ud_limit, &uq_limit);
-	
+
 	/* 更新PID积分限幅（抗积分饱和） */
 	foc_currentpid_saturation(&foc->ctrl.d_axis, ud_limit, ud);
 	foc_currentpid_saturation(&foc->ctrl.q_axis, uq_limit, uq);
-	
+
 	/* SVPWM归一化计算 */
 	svpwm_normalize(eangle, vbus, ud_limit, uq_limit, &ualpha, &ubeta);
-	
+
 	/* 计算三相占空比 */
 	svpwm_calc_duty(ualpha, ubeta, duty);
-	
+
 	/* 输出到逆变器 */
 	inverter_set_voltage(motor->inverter, duty[0], duty[1], duty[2]);
 }
@@ -179,11 +179,11 @@ void motor_current_loop_reset(struct motor *motor)
 	struct foc *foc = &motor->foc;
 	struct foc_pid *d_axis_pid = &foc->ctrl.d_axis;
 	struct foc_pid *q_axis_pid = &foc->ctrl.q_axis;
-	
+
 	/* 清零电流参考值 */
 	foc->ref.i_q = 0.0f;
 	foc->ref.i_d = 0.0f;
-	
+
 	/* 复位d/q轴电流环PID控制器 */
 	foc_pid_reset(d_axis_pid);
 	foc_pid_reset(q_axis_pid);

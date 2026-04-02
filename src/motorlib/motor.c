@@ -3,8 +3,8 @@
  * @file motor.c
  * @brief 电机控制模块主文件
  * @author zager
- * @date 2026-03-18
- * @version v0.0.9
+ * @date 2026-04-02
+ * @version v0.1.0
  *
  * 本文件实现电机控制的核心功能，包括硬件绑定、参数绑定、初始化和高频控制任务。
  * 模块采用状态机设计，支持校准、空闲、运行等多种工作状态。
@@ -152,7 +152,7 @@ void motor_init(struct motor *motor)
  * @param[in] motor 电机实例指针
  * @param[in] adc_raw ADC原始数据数组指针
  * @return 无
- * @note 应在定时器中断中周期性调用（默认10kHz）
+ * @note 应在定时器中断中周期性调用
  * @details 执行电流采样原始数据更新、反馈原始数据更新和状态机调度。
  *          在非校准状态下，执行完整的反馈更新和FOC电流计算。
  *          在校准状态下，仅更新母线相关数据。

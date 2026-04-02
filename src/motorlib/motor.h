@@ -47,7 +47,7 @@ void motor_init(struct motor *motor);
  * @param[in] motor 电机实例
  * @param[in] adc_raw ADC原始数据数组
  * @return 无
- * @note 应在定时器中断中周期性调用（默认10kHz），执行反馈更新和状态机调度
+ * @note 应在定时器中断中周期性调用，执行反馈更新和状态机调度
  */
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw);
 

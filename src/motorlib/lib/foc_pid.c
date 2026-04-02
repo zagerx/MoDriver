@@ -126,7 +126,7 @@ void foc_pid_saturation_feedback(struct foc_pid *pid, float output_real, float o
  * @param pid PID 控制器结构体指针
  * @param target 目标值
  * @param meas 测量值
- * @param dt 采样周期 (例如 10kHz 就是 0.0001f)
+ * @param dt 采样周期
  * @return PID 控制器输出值
  */
 float foc_currentloop_pid_run(struct foc_pid *pid, float target, float meas, float dt)
