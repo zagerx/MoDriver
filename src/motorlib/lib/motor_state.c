@@ -224,6 +224,31 @@ void motor_openloop_encoder_state(struct statemachine *sm)
 }
 
 /**
+ * @brief 获取电机当前主状态
+ * @param[in] motor 电机实例指针
+ * @return enum motor_status 当前主状态
+ * @details 通过状态机 current_state 反查枚举值
+ */
+enum motor_status motor_get_status(const struct motor *motor)
+{
+	if (!motor) {
+		return MOTOR_STATUS_INIT;
+	}
+
+	sm_state_t state = motor->sm.current_state;
+	if (state == motor_runing_state) {
+		return MOTOR_STATUS_RUNING;
+	}
+	if (state == motor_idle_state) {
+		return MOTOR_STATUS_IDLE;
+	}
+	if (state == motor_carib_state) {
+		return MOTOR_STATUS_CALIB;
+	}
+	return MOTOR_STATUS_INIT;
+}
+
+/**
  * @brief 切换电机主状态
  * @param[in] motor 电机实例指针
  * @param[in] new_state 新的电机状态

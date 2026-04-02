@@ -157,6 +157,31 @@ void motor_mode_HOMING(struct statemachine *sm)
 }
 
 /**
+ * @brief 获取电机当前操作模式
+ * @param[in] motor 电机实例指针
+ * @return enum motor_mode 当前操作模式
+ * @details 通过模式状态机 current_state 反查枚举值
+ */
+enum motor_mode motor_get_mode(const struct motor *motor)
+{
+	if (!motor) {
+		return MODE_NONE;
+	}
+
+	sm_state_t state = motor->sm_mode.current_state;
+	if (state == motor_mode_PP) {
+		return MODE_PP;
+	}
+	if (state == motor_mode_PV) {
+		return MODE_PV;
+	}
+	if (state == motor_mode_HOMING) {
+		return MODE_HM;
+	}
+	return MODE_NONE;
+}
+
+/**
  * @brief 切换电机操作模式
  * @param[in] motor 电机实例指针
  * @param[in] new_mode 新的操作模式

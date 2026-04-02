@@ -83,6 +83,14 @@ uint32_t motor_get_errorcode(const struct motor *motor);
  */
 int motor_is_error_set(const struct motor *motor, enum motor_errorcode_bits bit);
 /**
+ * @brief 获取电机当前操作模式
+ * @param[in] motor 电机实例
+ * @return enum motor_mode 当前操作模式
+ * @note 通过模式状态机 current_state 反查枚举值
+ */
+enum motor_mode motor_get_mode(const struct motor *motor);
+
+/**
  * @brief 切换电机操作模式
  * @param[in] motor 电机实例
  * @param[in] new_mode 新的操作模式
@@ -90,6 +98,14 @@ int motor_is_error_set(const struct motor *motor, enum motor_errorcode_bits bit)
  * @details 内部函数，用于状态机切换操作模式
  */
 void motor_tran_mode(struct motor *motor, enum motor_mode new_mode);
+
+/**
+ * @brief 获取电机当前主状态
+ * @param[in] motor 电机实例
+ * @return enum motor_status 当前主状态
+ * @note 通过状态机 current_state 反查枚举值
+ */
+enum motor_status motor_get_status(const struct motor *motor);
 
 /**
  * @brief 切换电机主状态
