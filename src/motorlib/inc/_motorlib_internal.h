@@ -9,14 +9,17 @@
 #ifndef _MOTOR_INTERNAL_H
 #define _MOTOR_INTERNAL_H
 
-#include "motor_interface.h"
+#include <stdint.h>
+#include "motor_interface_flag.h"
+#include "motor_interface_mode.h"
+#include "motor_bits.h"
 #include "foc.h"
 #include "calibration.h"
-#include "motor_interface_flag.h"
 #include "trajectory_plan.h"
 #include "statemachine.h"
 #include "motor_protection.h"
-#include "motor_bits.h"
+
+struct motor_param_ext;
 struct inverter;
 struct feedback;
 struct currsmp;
