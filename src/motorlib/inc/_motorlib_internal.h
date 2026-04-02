@@ -57,13 +57,6 @@ struct motor_data {
 };
 
 /**
- * @brief 电机配置结构体
- */
-struct motor_config {
-	uint16_t pairs; /**< @brief 极对数 */
-};
-
-/**
  * @brief 电机实例结构体
  */
 struct motor {
@@ -74,7 +67,6 @@ struct motor {
 	struct statemachine sm;             /**< @brief 状态机实例 */
 	struct statemachine sm_mode;        /**< @brief 模式状态机实例 */
 	struct motor_data data;             /**< @brief 数据 */
-	struct motor_config config;         /**< @brief 配置 */
 	struct calibration calib;           /**< @brief 校准实例 */
 	struct trajectory_plan traj_plan;   /**< @brief 轨迹规划实例 */
 	struct foc foc;                     /**< @brief FOC相关数据 */

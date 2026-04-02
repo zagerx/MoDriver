@@ -61,9 +61,6 @@ struct foc_param {
 	struct foc_pid_param q_axis; /**< @brief q轴电流环PID参数 */
 	struct foc_pid_param vel;    /**< @brief 速度环PID参数 */
 	struct foc_pid_param pos;    /**< @brief 位置环PID参数 */
-	int32_t *target_pos;         /**< @brief 位置模式目标位置 */
-	int32_t *target_vel;         /**< @brief 速度模式目标速度 */
-	int32_t *target_torque;      /**< @brief 力矩模式目标转矩 */
 };
 /**
  * @brief 电机扩展参数结构体

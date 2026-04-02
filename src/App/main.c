@@ -64,10 +64,7 @@ struct motor_param_ext m1_param_ext = {
 				.kd = 0.0f,
 				.limit = SPEED_LOOP_LIMIT},
 			.pos = {.kp = 4000.0f, .ki = 8000.0f, .kd = 0.0f, .limit = 300.0f},
-			.target_pos = NULL,
-			.target_vel =
-				&OD_RAM.x60FF_targetVelocity, /* OD中有0x60FF Target Velocity */
-			.target_torque = NULL,
+
 		},
 };
 
