@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "feedback.h"
+#include "motorlib_constants.h"
 
 /** @brief 低通滤波系数（0~1，越大响应越快） */
 #define VELOCITY_LPF_ALPHA 0.08f
@@ -21,9 +22,9 @@
  */
 static float normalize_angle(float angle)
 {
-	angle = fmodf(angle, 2.0f * M_PI);
+	angle = fmodf(angle, MOTORLIB_TWOPI);
 	if (angle < 0.0f) {
-		angle += 2.0f * M_PI;
+		angle += MOTORLIB_TWOPI;
 	}
 	return angle;
 }
@@ -111,7 +112,7 @@ static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t
 	struct feedback_param *param = feedback->param;
 	struct feedback_data *data = &feedback->data;
 
-	const float two_pi = 2.0f * M_PI;
+	const float two_pi = MOTORLIB_TWOPI;
 	const int32_t cpr = (int32_t)param->encoder_resolution;
 
 	/* 计算原始差值（使用原始值，偏移在差分中抵消） */
@@ -169,10 +170,10 @@ static float feedback_calc_velocity(struct feedback *feedback, float dt, float c
 
 	/* 计算角度差（处理跨越 2π 边界） */
 	float dtheta = cur_mangle - data->prev_mangle_rad;
-	if (dtheta > M_PI) {
-		dtheta -= 2.0f * M_PI;
-	} else if (dtheta < -M_PI) {
-		dtheta += 2.0f * M_PI;
+	if (dtheta > MOTORLIB_PI) {
+		dtheta -= MOTORLIB_TWOPI;
+	} else if (dtheta < -MOTORLIB_PI) {
+		dtheta += MOTORLIB_TWOPI;
 	}
 
 	/* 原始速度计算 */
@@ -237,7 +238,7 @@ void feedback_update(struct feedback *feedback, float dt)
 	/* 6. 应用小数偏移到电角度输出	小数偏移用于子计数精度的相位对齐 */
 	if (param->encoder_offset_frac != 0.0f) {
 		/* 将小数偏移转换为电角度弧度 */
-		float frac_eangle_offset = param->encoder_offset_frac * M_TWOPI /
+		float frac_eangle_offset = param->encoder_offset_frac * MOTORLIB_TWOPI /
 					   (float)param->encoder_resolution * param->pole_pairs;
 		feedback->output.eangle_rad =
 			normalize_angle(feedback->output.eangle_rad - frac_eangle_offset);

@@ -11,10 +11,6 @@
 #include <stdint.h>
 #include "motor_interface_driver.h"
 #include "motor_interface_params.h"
-#ifndef M_PI
-#define M_PI 3.14159265358979323846f
-#endif
-
 /** @brief 反馈错误码枚举 */
 enum feedback_error_code {
 	FEEDBACK_ERROR_NONE = 0,       /**< @brief 无错误 */

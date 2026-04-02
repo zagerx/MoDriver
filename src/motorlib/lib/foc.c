@@ -14,9 +14,7 @@
 #include "feedback.h"
 #include "currsmp.h"
 #include "arm_math.h"
-
-#undef RAD_TO_DEG
-#define RAD_TO_DEG (180.0f / M_PI)
+#include "motorlib_constants.h"
 
 /**
  * @brief 绑定FOC数据源
@@ -68,6 +66,6 @@ void foc_update_idiq(struct foc *foc)
 
 	float sin_val, cos_val;
 
-	arm_sin_cos_f32(eangle * RAD_TO_DEG, &sin_val, &cos_val);
+	arm_sin_cos_f32(eangle * MOTORLIB_RAD_TO_DEG, &sin_val, &cos_val);
 	arm_park_f32(meas->i_alpha, meas->i_beta, &meas->i_d, &meas->i_q, sin_val, cos_val);
 }

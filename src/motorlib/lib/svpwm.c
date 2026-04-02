@@ -9,18 +9,12 @@
 // #include "foc_data.h"
 #include "arm_math.h"
 #include <float.h>
+#include "motorlib_constants.h"
 
 #define SQRT3_OVER_2   0.8660254037844386f // sqrt(3)/2
 #define ONE_OVER_SQRT3 0.5773502691896258f // 1/sqrt(3)
 #define SQRT3          1.7320508075688772f // sqrt(3)
 #define TWO_OVER_3     0.6666666666666666f // 2/3
-
-#undef M_PI
-#define M_PI 3.14159265358979323846f
-
-#ifndef RAD_TO_DEG
-#define RAD_TO_DEG (180.0f / M_PI)
-#endif
 
 /**
  * @brief 安全的数值限制函数 [0.0, 1.0]
@@ -139,7 +133,7 @@ void svpwm_normalize(float eangle, float vbus, float ud, float uq, float *ualpha
     float alpha, beta;
 
     // 1. 逆Park变换（dq -> αβ）
-    arm_sin_cos_f32(eangle * RAD_TO_DEG, &sin_val, &cos_val);
+    arm_sin_cos_f32(eangle * MOTORLIB_RAD_TO_DEG, &sin_val, &cos_val);
     arm_inv_park_f32(ud, uq, &alpha, &beta, sin_val, cos_val);
 
     // 2. 电压归一化到线性调制区

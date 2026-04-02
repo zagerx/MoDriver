@@ -13,24 +13,16 @@
 #include "open_loop.h"
 #include <math.h>
 #include "motorlib_control_param.h"
-
+#include "motorlib_constants.h"
 #undef ABS
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846f
-#endif
-
-#ifndef M_TWOPI
-#define M_TWOPI (2.0f * M_PI)
-#endif
-
 /* 编码器校准配置参数 */
-#define ENC_CALIB_SCAN_DISTANCE       (14.0f * M_PI) /* 扫描电角度距离，默认16π (8圈电角度) */
-#define ENC_CALIB_SCAN_OMEGA          (2.0f * M_PI)  /* 扫描电角速度，默认8π rad/s (4圈/秒) */
-#define ENC_CALIB_ALIGN_TIME          1.0f           /* 对齐保持时间，秒 */
-#define ENC_CALIB_DIRECTION_THRESHOLD 8              /* 方向检测最小编码器变化计数 */
-#define ENC_CALIB_CPR_TOLERANCE       0.02f          /* CPR校验容差，2% */
+#define ENC_CALIB_SCAN_DISTANCE (14.0f * MOTORLIB_PI) /* 扫描电角度距离，默认16π (8圈电角度) */
+#define ENC_CALIB_SCAN_OMEGA    (MOTORLIB_TWOPI)      /* 扫描电角速度，默认8π rad/s (4圈/秒) */
+#define ENC_CALIB_ALIGN_TIME    1.0f                  /* 对齐保持时间，秒 */
+#define ENC_CALIB_DIRECTION_THRESHOLD 8               /* 方向检测最小编码器变化计数 */
+#define ENC_CALIB_CPR_TOLERANCE       0.02f           /* CPR校验容差，2% */
 
 /* 预计算的tick阈值 */
 #define ENC_CALIB_ALIGN_TICKS ((uint32_t)(ENC_CALIB_ALIGN_TIME / CONTROL_PERIOD_DT))
@@ -63,9 +55,9 @@ static inline int32_t unwrap_delta(uint16_t current, uint16_t *prev)
  */
 static inline float normalize_angle_0_2pi(float angle)
 {
-	angle = fmodf(angle, M_TWOPI);
+	angle = fmodf(angle, MOTORLIB_TWOPI);
 	if (angle < 0.0f) {
-		angle += M_TWOPI;
+		angle += MOTORLIB_TWOPI;
 	}
 	return angle;
 }
@@ -190,7 +182,7 @@ bool encoder_calib_run(struct motor *motor)
 
 			/* 计算极对数 */
 			float mech_rounds = (float)enc_delta / ENCODER_RESOLUTION_F;
-			float elec_rounds = ENC_CALIB_SCAN_DISTANCE / M_TWOPI;
+			float elec_rounds = ENC_CALIB_SCAN_DISTANCE / MOTORLIB_TWOPI;
 			float ratio = fabsf(elec_rounds / mech_rounds);
 			int pole_pairs = (int)roundf(ratio);
 			if (pole_pairs < 1) {
@@ -198,7 +190,7 @@ bool encoder_calib_run(struct motor *motor)
 			}
 
 			/* CPR校验：检查实际编码器变化与期望是否匹配 */
-			float expected_enc_delta = (ENC_CALIB_SCAN_DISTANCE / M_TWOPI) *
+			float expected_enc_delta = (ENC_CALIB_SCAN_DISTANCE / MOTORLIB_TWOPI) *
 						   (ENCODER_RESOLUTION_F / (float)pole_pairs);
 			float actual_enc_delta = fabsf((float)enc_delta);
 			float cpr_error =
