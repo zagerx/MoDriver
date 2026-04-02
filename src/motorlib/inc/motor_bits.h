@@ -10,8 +10,8 @@
 #define MOTOR_BITS_H
 
 /**
- * @note 本头文件依赖 motor_interface_flag.h 中的枚举定义，
- *       包含时请确保前置包含 motor_interface_flag.h
+ * @note 本头文件依赖 motor_interface_flag.h 和 motor_interface_mode.h 中的枚举定义，
+ *       包含时请确保前置包含对应头文件
  */
 
 /**

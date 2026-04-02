@@ -9,4 +9,5 @@
 #include "motor_interface_driver.h"
 #include "motor_interface_params.h"
 #include "motor_interface_flag.h"
+#include "motor_interface_mode.h"
 #endif
