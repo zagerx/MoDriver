@@ -192,20 +192,19 @@ void motor_openloop_encoder_state(struct statemachine *sm)
 
 	struct motor *motor = (struct motor *)(sm->data);
 	struct inverter *inverter = motor->inverter;
-	static float target;
 	// struct feedback *feedback = motor->feedback;
 	// static uint32_t debug_cnt = 0;
 
 	switch (sm->phase) {
 	case ENTER:
 		inverter_enable(inverter);
-		target = 1.0f;
+		motor->data.openloop_target = 1.0f;
 		sm->phase = RUNING;
 		break;
 
 	case RUNING:
-		target = (float)(*motor->param_ext->foc_param.target_pos) / 1000.0f;
-		open_loop_encoder(motor, target);
+		motor->data.openloop_target = (float)(*motor->param_ext->foc_param.target_pos) / 1000.0f;
+		open_loop_encoder(motor, motor->data.openloop_target);
 		// if (++debug_cnt % 500 == 0) {
 		// 	debug_cnt = 0;
 		// 	target = -target;                            // 反转目标位置

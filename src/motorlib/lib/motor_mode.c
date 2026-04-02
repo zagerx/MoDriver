@@ -52,8 +52,6 @@ void motor_mode_PP(struct statemachine *sm)
 	enum {
 		RUNING = USER_STATUS,
 	};
-	static uint16_t test_flag1 = 1;
-	static uint16_t test_flag2 = 1;
 	struct motor *motor = (struct motor *)(sm->data);
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
 	struct foc *foc = &motor->foc;
@@ -64,17 +62,25 @@ void motor_mode_PP(struct statemachine *sm)
 		sm->count = 0;
 		trajectory_planner_init(traj_plan, start_pos, 0.0f, 0.0f, POSITION_PERIOD_DT);
 		motor_position_loop_reset(motor);
+#if MOTORLIB_DEBUG_ENABLED
+		motor->data.debug.test_flag1 = 1;
+		motor->data.debug.test_flag2 = 1;
+#endif
 		break;
 
 	case RUNING:
 		if (sm->count % (uint16_t)POSITION_LOOP_INTERVAL == 0) {
 			trajectory_planner_action(traj_plan, POSITION_PERIOD_DT);
 			motor_position_loop(motor, POSITION_PERIOD_DT);
-			test_flag1 = -test_flag1;
+#if MOTORLIB_DEBUG_ENABLED
+			motor->data.debug.test_flag1 = -motor->data.debug.test_flag1;
+#endif
 		}
 		if (sm->count % (uint16_t)(SPEED_LOOP_INTERVAL) == 0) {
 			motor_velocity_loop(motor, foc->ref.velocity);
-			test_flag2 = -test_flag2;
+#if MOTORLIB_DEBUG_ENABLED
+			motor->data.debug.test_flag2 = -motor->data.debug.test_flag2;
+#endif
 		}
 		motor_currment_loop(motor);
 		sm->count++;
