@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "statemachine.h"
 
+struct motor;
 struct cia402_instance {
 	/* ========== OD 变量指针 (绑定到 OD_RAM) ========== */
 	uint16_t *controlword;      /*!< 0x6040 - 控制字 */
@@ -13,10 +14,10 @@ struct cia402_instance {
 	uint16_t *error_code;       /*!< 0x603F - 错误码 */
 
 	/* 目标值 - RPDO 映射 */
-	int32_t *target_position; /*!< 0x607A - 目标位置 */
-	int32_t *target_velocity; /*!< 0x60FF - 目标速度 */
-	int16_t *target_torque;   /*!< 0x6071 - 目标转矩 */
-
+	int32_t *target_position;  /*!< 0x607A - 目标位置 */
+	int32_t *target_velocity;  /*!< 0x60FF - 目标速度 */
+	int16_t *target_torque;    /*!< 0x6071 - 目标转矩 */
+	int32_t *profile_velocity; /*!< 0x6081 - 轮廓速度 */
 	/* 实际值 - TPDO 映射 */
 	int32_t *actual_position; /*!< 0x6064 - 实际位置 */
 	int32_t *actual_velocity; /*!< 0x606C - 实际速度 */
@@ -43,7 +44,8 @@ void cia402_params_bind(struct cia402_instance *instance, struct motor *motor,
 			uint16_t *controlword, uint16_t *statusword, int8_t *modes_of_operation,
 			int8_t *mode_display, int32_t *target_velocity, int32_t *actual_velocity,
 			uint16_t *error_code, int32_t *target_position, int16_t *target_torque,
-			int32_t *actual_position, int16_t *actual_torque);
+			int32_t *actual_position, int16_t *actual_torque,
+			int32_t *profile_velocity);
 void cia402_init(struct cia402_instance *instance);
 void cia402_update(struct cia402_instance *instance, float dt);
 #endif /* CIA402_H */

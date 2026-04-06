@@ -2,6 +2,7 @@
 #include "cia402_state.h"
 #include "cia402_defs.h"
 #include "motor.h"
+#include "motor_interface_mode.h"
 
 /*============================================================================
  * 辅助函数
@@ -42,6 +43,28 @@ void fault_handler(struct cia402_instance *inst)
 		sm_transition(sm, cia402_pds_fault_reaction_state);
 	}
 	return;
+}
+void mode_handler(struct cia402_instance *inst)
+{
+	struct motor *motor = inst->motor;
+	if (!inst || !motor) {
+		return;
+	}
+	/* 处理模式相关逻辑 */
+	if (inst->cache_mode == *inst->modes_of_operation) {
+		return;
+	}
+
+	switch (*inst->modes_of_operation) {
+	case MODE_PP:
+		motor_tran_mode(inst->motor, MODE_PP);
+		break;
+	case MODE_HM:
+		motor_tran_mode(inst->motor, MODE_HM);
+		break;
+	default:
+		break;
+	}
 }
 
 /**
@@ -336,12 +359,13 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm)
 {
 	enum {
 		RUNING = USER_STATUS,
+		WAIT_COMMAND,
 	};
 
 	struct cia402_instance *inst = (struct cia402_instance *)(sm->data);
-
+	struct motor *motor = inst->motor;
 	/* 前置指针检查：关键指针为空直接退出 */
-	if (!inst || !inst->controlword || !inst->statusword || !inst->motor) {
+	if (!inst || !inst->controlword || !inst->statusword || !motor) {
 		return;
 	}
 
@@ -353,12 +377,20 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm)
 	case ENTER:
 		set_statusword(inst, CIA402_STATE_OPERATION_ENABLED);
 		inst->halt_active = false;
-		/* 缓存初始控制字值，用于检测变化 */
-		inst->cache_controlword = cw;
 		/* TODO: 使能电机输出 */
+		motor_tran_state(motor, MOTOR_STATUS_RUNING);
+		sm->count = 0;
+		sm->phase = WAIT_COMMAND;
+		break;
+	case WAIT_COMMAND: {
+		if (sm->count++ < 10) {
+			break;
+		}
+		motor_tran_mode(motor, *inst->modes_of_operation);
+		sm->count = 0;
 		sm->phase = RUNING;
 		break;
-
+	}
 	case RUNING:
 		/* 检查 Halt 请求 (bit8) */
 		if (is_halt_requested(cw)) {
@@ -372,17 +404,18 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm)
 		/* PP模式：检测 New Set-point (bit4) 上升沿
 		 * 注意：target_position 在 bind 中是可选参数，PP模式需要它
 		 */
-		if (inst->target_position &&
-		    inst->modes_of_operation &&
+		if (inst->target_position && inst->modes_of_operation &&
 		    *inst->modes_of_operation == CIA402_MODE_PROFILE_POSITION) {
 			/* 检测 bit4 的上升沿 (0->1) */
 			bool new_set_point_now = (cw & CIA402_CW_NEW_SET_POINT_MASK) != 0;
-			bool new_set_point_prev = (inst->cache_controlword & CIA402_CW_NEW_SET_POINT_MASK) != 0;
+			bool new_set_point_prev =
+				(inst->cache_controlword & CIA402_CW_NEW_SET_POINT_MASK) != 0;
 
 			if (new_set_point_now && !new_set_point_prev) {
 				/* 新的目标点触发，读取目标位置和速度 */
-				float target_pos = (float)(*inst->target_position);
-				float target_vel = (float)(*inst->target_velocity);
+				float target_pos = (float)(*inst->target_position / 1000.0f);
+				float target_vel =
+					(float)(*inst->profile_velocity / 1000.0f); /* 轮廓速度 */
 
 				/* 调用 motor 接口设置目标点 */
 				motor_set_target_pos(inst->motor, target_pos, target_vel);
@@ -396,9 +429,6 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm)
 				*inst->statusword &= ~(1U << 12);
 			}
 		}
-
-		/* 更新缓存的控制字值 */
-		inst->cache_controlword = cw;
 
 		switch (cmd) {
 		case CMD_SWITCH_ON_REQ:
@@ -430,6 +460,8 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm)
 		break;
 
 	case EXIT:
+
+		motor_tran_state(motor, MOTOR_STATUS_IDLE);
 		inst->halt_active = false;
 		/* TODO: 禁用电机输出 */
 		break;

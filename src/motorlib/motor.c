@@ -201,3 +201,18 @@ void motor_set_target_pos(struct motor *motor, float target_pos, float target_ve
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
 	trajectory_planner_update_target(traj_plan, target_pos, target_vel);
 }
+
+void motor_get_all_data(const struct motor *motor, struct motor_all_state *state)
+{
+	if (!motor || !state) {
+		return;
+	}
+	struct foc *foc = (struct foc *)&motor->foc;
+
+	state->actual_pos = foc->meas.fd_out->odometer;
+	state->actual_vel = foc->meas.fd_out->velocity_rad_s;
+
+	state->errorcode = motor->data.errorcode;
+	state->flags = motor->data.flags;
+	state->mode = motor_get_mode(motor);
+}

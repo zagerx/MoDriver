@@ -110,6 +110,7 @@ void cia402_pds_fault_reaction_state(struct statemachine *sm);
  */
 void cia402_pds_fault_state(struct statemachine *sm);
 void fault_handler(struct cia402_instance *inst);
+void mode_handler(struct cia402_instance *inst);
 
 /*================== 控制字命令枚举 ==================*/
 

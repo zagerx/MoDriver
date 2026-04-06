@@ -113,7 +113,6 @@ int main(void)
 		uint32_t dt_ms = current_tick - last_tick;
 		last_tick = current_tick;
 		canopen_app_process(&canopen_app, dt_ms);
-		cia402_update(&canopen_app.cia402_inst, dt_ms / 1000.0f);
 	}
 }
 

@@ -206,8 +206,9 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
     .x6071_targetTorque = 0,
     .x6077_torque = 0,
     .x607A_targetPosition = 0,
+    .x6081_profileVelocity = 0,
     .x60FF_targetVelocity = 0,
-    .x6502_supportedDriveModes = 0x00000025
+    .x6502_supportedDriveModes = 0x00000065
 };
 
 
@@ -259,6 +260,7 @@ typedef struct {
     OD_obj_var_t o_6071_targetTorque;
     OD_obj_var_t o_6077_torque;
     OD_obj_var_t o_607A_targetPosition;
+    OD_obj_var_t o_6081_profileVelocity;
     OD_obj_var_t o_60FF_targetVelocity;
     OD_obj_var_t o_6502_supportedDriveModes;
 } ODObjs_t;
@@ -1142,6 +1144,11 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .attribute = ODA_SDO_RW | ODA_RPDO | ODA_MB,
         .dataLength = 4
     },
+    .o_6081_profileVelocity = {
+        .dataOrig = &OD_RAM.x6081_profileVelocity,
+        .attribute = ODA_SDO_RW | ODA_RPDO | ODA_MB,
+        .dataLength = 4
+    },
     .o_60FF_targetVelocity = {
         .dataOrig = &OD_RAM.x60FF_targetVelocity,
         .attribute = ODA_SDO_RW | ODA_RPDO | ODA_MB,
@@ -1202,6 +1209,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x6071, 0x01, ODT_VAR, &ODObjs.o_6071_targetTorque, NULL},
     {0x6077, 0x01, ODT_VAR, &ODObjs.o_6077_torque, NULL},
     {0x607A, 0x01, ODT_VAR, &ODObjs.o_607A_targetPosition, NULL},
+    {0x6081, 0x01, ODT_VAR, &ODObjs.o_6081_profileVelocity, NULL},
     {0x60FF, 0x01, ODT_VAR, &ODObjs.o_60FF_targetVelocity, NULL},
     {0x6502, 0x01, ODT_VAR, &ODObjs.o_6502_supportedDriveModes, NULL},
     {0x0000, 0x00, 0, NULL, NULL}

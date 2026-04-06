@@ -11,12 +11,12 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: DS301_profile.xpd
+        Project File: DS301_profile.xdd
         File Version: 1
 
         Created:      2020/11/23 19:00:00
         Created By:   
-        Modified:     2026/3/30 21:46:17
+        Modified:     2026/4/6 22:38:34
         Modified By:  
 
     Device Info:
@@ -246,6 +246,7 @@ typedef struct {
     int16_t x6071_targetTorque;
     int16_t x6077_torque;
     int32_t x607A_targetPosition;
+    int32_t x6081_profileVelocity;
     int32_t x60FF_targetVelocity;
     uint32_t x6502_supportedDriveModes;
 } OD_RAM_t;
@@ -312,8 +313,9 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6071 &OD->list[40]
 #define OD_ENTRY_H6077 &OD->list[41]
 #define OD_ENTRY_H607A &OD->list[42]
-#define OD_ENTRY_H60FF &OD->list[43]
-#define OD_ENTRY_H6502 &OD->list[44]
+#define OD_ENTRY_H6081 &OD->list[43]
+#define OD_ENTRY_H60FF &OD->list[44]
+#define OD_ENTRY_H6502 &OD->list[45]
 
 
 /*******************************************************************************
@@ -362,8 +364,9 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6071_targetTorque &OD->list[40]
 #define OD_ENTRY_H6077_torque &OD->list[41]
 #define OD_ENTRY_H607A_targetPosition &OD->list[42]
-#define OD_ENTRY_H60FF_targetVelocity &OD->list[43]
-#define OD_ENTRY_H6502_supportedDriveModes &OD->list[44]
+#define OD_ENTRY_H6081_profileVelocity &OD->list[43]
+#define OD_ENTRY_H60FF_targetVelocity &OD->list[44]
+#define OD_ENTRY_H6502_supportedDriveModes &OD->list[45]
 
 
 /*******************************************************************************

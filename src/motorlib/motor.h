@@ -126,4 +126,5 @@ void motor_tran_state(struct motor *motor, enum motor_status new_state);
  */
 void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel);
 
+void motor_get_all_data(const struct motor *motor, struct motor_all_state *state);
 #endif /* MOTOR_H */
