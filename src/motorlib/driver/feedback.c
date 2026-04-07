@@ -91,7 +91,7 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
 	data->mech_omega_rad_s = 0.0f;
 
 	feedback->output.eangle_rad = 0.0f;
-	feedback->output.velocity_rad_s = 0.0f;
+	// feedback->output.velocity_rad_s = 0.0f;
 	feedback->output.odometer = 0.0f;
 
 	return FEEDBACK_ERROR_NONE;
@@ -233,8 +233,9 @@ void feedback_update(struct feedback *feedback, float dt)
 	feedback->output.eangle_rad = feedback_calc_elec_angle(feedback, cur_mangle);
 
 	/* 5. 差分法计算机械角速度 */
-	feedback->output.velocity_rad_s = feedback_calc_velocity(feedback, dt, cur_mangle);
-
+	// feedback->output.velocity_rad_s = feedback_calc_velocity(feedback, dt, cur_mangle);
+	feedback->output.line_velocity = feedback_calc_velocity(feedback, dt, cur_mangle) *
+					 param->wheel_radius / param->gear_ratio;
 	/* 6. 应用小数偏移到电角度输出	小数偏移用于子计数精度的相位对齐 */
 	if (param->encoder_offset_frac != 0.0f) {
 		/* 将小数偏移转换为电角度弧度 */

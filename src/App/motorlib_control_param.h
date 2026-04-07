@@ -18,11 +18,13 @@
 #define BUS_CURRENT_GAIN     0.00f      /* 母线电流增益 */
 #define ENCODER_RESOLUTION   16384      /* 编码器分辨率 */
 #define ENCODER_RESOLUTION_F (16384.0f) /* 编码器分辨率 */
+#define ENCODER_WHEEL_RADIO  (17.5f)    /* 轮子半径，单位mm */
+#define ENCODER_GEAR_RATIO   (1.0f)     /* 减速比 */
 
 /*控制相关     */
 #define CONTROL_LOOP_FREQ 20000.0f                   /* 控制循环频率 20kHz */
 #define CONTROL_PERIOD_DT (1.0f / CONTROL_LOOP_FREQ) /* 控制周期 50us */
-#define SPEED_LOOP_FREQ   1000.0f                    /* 速度环频率 1kHz */
+#define SPEED_LOOP_FREQ   4000.0f                    /* 速度环频率 1kHz */
 #define SPEED_PERIOD_DT   (1.0f / SPEED_LOOP_FREQ)   /* 速度环周期 1ms */
 #define SPEED_LOOP_INTERVAL                                                                        \
 	(SPEED_PERIOD_DT / CONTROL_PERIOD_DT) /* 速度环执行间隔，单位为控制周期数 */
@@ -49,7 +51,7 @@
 #define CURRMENT_LOOP_KI    (800.0f) /* 电流环I增益 */
 #define CURRMENT_LOOP_LIMIT (13.0f)  /* 电流调试输出间隔，单位为控制周期数 */
 
-#define SPEED_LOOP_KP    (0.05f)
-#define SPEED_LOOP_KI    (6.0f)
-#define SPEED_LOOP_LIMIT (7.0f)
+#define SPEED_LOOP_KP    (0.002f)
+#define SPEED_LOOP_KI    (0.2f)
+#define SPEED_LOOP_LIMIT (10.0f)
 #endif /* MOTORLIB_CONTROL_PARAM_H */

@@ -40,9 +40,10 @@ struct feedback_data {
  * @brief 反馈输出数据结构体
  */
 struct feedback_output {
-	float eangle_rad;     /**< @brief 电角度，单位：rad */
-	float velocity_rad_s; /**< @brief 机械角速度，单位：rad/s */
-	float odometer;       /**< @brief 里程（累积线位移），单位：m */
+	float eangle_rad; /**< @brief 电角度，单位：rad */
+	// float velocity_rad_s; /**< @brief 机械角速度，单位：rad/s */
+	float odometer;      /**< @brief 里程（累积线位移），单位：m */
+	float line_velocity; /**< @brief 线速度，单位：mm/s */
 };
 
 /**
@@ -123,10 +124,10 @@ static inline float feedback_get_elec_angle(struct feedback *fb)
  * @param[in] fb 反馈实例
  * @return float 机械角速度，单位：rad/s
  */
-static inline float feedback_get_velocity(struct feedback *fb)
-{
-	return fb->output.velocity_rad_s;
-}
+// static inline float feedback_get_velocity(struct feedback *fb)
+// {
+// 	return fb->output.velocity_rad_s;
+// }
 
 /**
  * @brief 获取线速度
@@ -135,7 +136,8 @@ static inline float feedback_get_velocity(struct feedback *fb)
  */
 static inline float feedback_get_line_velocity(struct feedback *fb)
 {
-	return fb->output.velocity_rad_s * fb->param->wheel_radius / fb->param->gear_ratio;
+	// return fb->output.velocity_rad_s * fb->param->wheel_radius / fb->param->gear_ratio;
+	return fb->output.line_velocity;
 }
 
 /* 以下函数为内部参数更新函数，以 _ 开头 */

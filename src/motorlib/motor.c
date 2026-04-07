@@ -210,7 +210,7 @@ void motor_get_all_data(const struct motor *motor, struct motor_all_state *state
 	struct foc *foc = (struct foc *)&motor->foc;
 
 	state->actual_pos = foc->meas.fd_out->odometer;
-	state->actual_vel = foc->meas.fd_out->velocity_rad_s;
+	state->actual_vel = foc->meas.fd_out->line_velocity;
 
 	state->errorcode = motor->data.errorcode;
 	state->flags = motor->data.flags;

@@ -35,8 +35,8 @@ static const struct motor_hw_ops m1_hw_ops = {
 struct motor_param_ext m1_param_ext = {
 	.feedback_param =
 		{
-			.gear_ratio = 1.0f,
-			.wheel_radius = 17.5f / 1000.0f, // 17.5mm 轮子半径
+			.gear_ratio = ENCODER_GEAR_RATIO,
+			.wheel_radius = ENCODER_WHEEL_RADIO, // 17.5mm 轮子半径
 		},
 	.currsmp_param =
 		{
@@ -46,8 +46,8 @@ struct motor_param_ext m1_param_ext = {
 		},
 	.traj_param =
 		{
-			.acc_max = 10.0f, /* 最大加速度 10 m/s^2 */
-			.vmax = 5.0f,     /* 最大速度 5 m/s */
+			.acc_max = 10.0f * 1000.0f, /* 最大加速度 10 m/s^2 */
+			.vmax = 5.0f * 1000.0f,     /* 最大速度 5 m/s */
 		},
 	.foc_param =
 		{

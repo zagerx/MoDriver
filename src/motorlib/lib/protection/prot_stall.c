@@ -21,7 +21,7 @@ bool check_stall(struct motor *motor, uint32_t *fault_bit)
 
 	// 获取Q轴电流和速度
 	float current = motor->foc.meas.i_q; // 使用FOC测量的q轴电流作为堵转判定的电流值
-	float vel = motor->foc.meas.fd_out->velocity_rad_s;
+	float vel = motor->foc.meas.fd_out->line_velocity;
 
 	// 堵转判定：电流大且速度低
 	if (fabsf(current) > cfg->current_threshold && fabsf(vel) < cfg->vel_threshold) {
