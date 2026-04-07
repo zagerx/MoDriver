@@ -4,15 +4,13 @@
 
 #include <stddef.h>
 #include <stdint.h>
-// #include <cstddef>
 
 #include "hardware.h"
 #include "motor.h"
-#include "stm32g4xx_hal.h"
+// #include "stm32g4xx_hal.h"
 #include "motorlib_control_param.h"
 #include "canopen_app.h"
 
-#include "OD.h"
 /*============================================================================
  * 电机 1 硬件接口配置
  *===========================================================================*/
@@ -46,8 +44,8 @@ struct motor_param_ext m1_param_ext = {
 		},
 	.traj_param =
 		{
-			.acc_max = 10.0f * 1000.0f, /* 最大加速度 10 m/s^2 */
-			.vmax = 5.0f * 1000.0f,     /* 最大速度 5 m/s */
+			.acc_max = TRAJAC_MAX_ACC,
+			.vmax = TRAJAC_MAX_VEL,
 		},
 	.foc_param =
 		{
@@ -63,7 +61,10 @@ struct motor_param_ext m1_param_ext = {
 				.ki = SPEED_LOOP_KI,
 				.kd = 0.0f,
 				.limit = SPEED_LOOP_LIMIT},
-			.pos = {.kp = 4000.0f, .ki = 8000.0f, .kd = 0.0f, .limit = 300.0f},
+			.pos = {.kp = POSITION_LOOP_KP,
+				.ki = POSITION_LOOP_KI,
+				.kd = 0.0f,
+				.limit = POSITION_LOOP_LIMIT},
 
 		},
 };
@@ -77,9 +78,6 @@ int main(void)
 {
 	/* 初始化硬件层（时钟、GPIO、外设等） */
 	hardware_init();
-
-	/* 启动 1ms 定时器中断（一旦开启，永不关闭） */
-	HAL_TIM_Base_Start_IT(&htim6);
 
 	/* 初始化 CANopen 应用（节点 ID = 21） */
 	if (canopen_app_init(&canopen_app, motor_1) != 0) {
@@ -101,10 +99,7 @@ int main(void)
 	/* 初始化电机 */
 	motor_init(motor_1);
 
-	/* 开启中断 */
-	adc_start();
-	tim1_set_adc();
-
+	hardware_start_irq();
 	/* 主循环 */
 	uint32_t last_tick = HAL_GetTick();
 	while (1) {
@@ -126,7 +121,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 	if (hadc->Instance == ADC1) {
 		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
 		raw_uvw[1] = (uint32_t)(hadc->Instance->JDR2);
-		raw_uvw[2] = (uint32_t)(hadc2.Instance->JDR1);
+		// raw_uvw[2] = (uint32_t)(hadc2.Instance->JDR1);
 		raw_uvw[4] = (uint32_t)(hadc->Instance->DR);
 		raw_uvw[3] = 0;
 		motor_highfreq_task(motor_1, (uint16_t *)raw_uvw);

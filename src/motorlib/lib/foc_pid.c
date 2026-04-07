@@ -31,6 +31,7 @@ void foc_pid_init(struct foc_pid *pid, float kp, float ki, float limit)
 	pid->params->limit = limit;
 	pid->integral = 0.0f;
 	pid->err_prev = 0.0f;
+	pid->debug_out = 0.0f;
 }
 
 /**
@@ -41,6 +42,7 @@ void foc_pid_reset(struct foc_pid *pid)
 {
 	pid->integral = 0.0f;
 	pid->err_prev = 0.0f;
+	pid->debug_out = 0.0f;
 }
 
 /**
@@ -99,7 +101,7 @@ float foc_pid_run(struct foc_pid *pid, float target, float meas, float dt)
 
 	// 更新真正的积分器
 	pid->integral = i_term_predict;
-
+	pid->debug_out = output;
 	return output;
 }
 

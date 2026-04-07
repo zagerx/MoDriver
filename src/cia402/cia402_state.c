@@ -413,9 +413,8 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm)
 
 			if (new_set_point_now && !new_set_point_prev) {
 				/* 新的目标点触发，读取目标位置和速度 */
-				float target_pos = (float)(*inst->target_position / 1000.0f);
-				float target_vel =
-					(float)(*inst->profile_velocity / 1000.0f); /* 轮廓速度 */
+				float target_pos = (float)(*inst->target_position);
+				float target_vel = (float)(*inst->profile_velocity); /* 轮廓速度 */
 
 				/* 调用 motor 接口设置目标点 */
 				motor_set_target_pos(inst->motor, target_pos, target_vel);

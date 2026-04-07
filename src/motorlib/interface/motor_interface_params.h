@@ -20,7 +20,7 @@ struct feedback_param {
 	uint16_t encoder_resolution; /**< @brief 编码器分辨率（CPR） */
 	uint16_t encoder_offset;     /**< @brief 编码器零位偏移（整数部分） */
 	float encoder_offset_frac;   /**< @brief 编码器零位小数偏移（0~1），用于精确对齐电角度 */
-};
+} __attribute__((packed));
 
 /**
  * @brief 电流采样参数配置结构体
@@ -33,7 +33,7 @@ struct currsmp_param {
 	float gain_phase; /**< @brief 相电流增益 */
 	float gain_i_bus; /**< @brief 母线电流增益 */
 	float gain_v_bus; /**< @brief 母线电压增益 */
-};
+} __attribute__((packed));
 
 /**
  * @brief 轨迹规划参数结构体
@@ -41,7 +41,7 @@ struct currsmp_param {
 typedef struct trajectory_param {
 	float acc_max; /**< @brief 最大加速度 */
 	float vmax;    /**< @brief 最大速度 */
-} trajectory_param_t;
+} __attribute__((packed)) trajectory_param_t;
 
 /**
  * @brief FOC PID参数结构体
@@ -51,7 +51,7 @@ struct foc_pid_param {
 	float ki;    /**< @brief 积分增益 */
 	float kd;    /**< @brief 微分增益 */
 	float limit; /**< @brief 输出限幅 */
-};
+} __attribute__((packed));
 
 /**
  * @brief FOC参数结构体
@@ -61,7 +61,7 @@ struct foc_param {
 	struct foc_pid_param q_axis; /**< @brief q轴电流环PID参数 */
 	struct foc_pid_param vel;    /**< @brief 速度环PID参数 */
 	struct foc_pid_param pos;    /**< @brief 位置环PID参数 */
-};
+} __attribute__((packed));
 /**
  * @brief 电机扩展参数结构体
  */
@@ -71,6 +71,6 @@ struct motor_param_ext {
 	struct trajectory_param traj_param;   /**< @brief 轨迹规划参数 */
 	struct foc_param foc_param;           /**< @brief FOC参数 */
 	uint16_t crc_16;                      /**< @brief 参数完整性校验 */
-};
+} __attribute__((packed));
 
 #endif /* MOTOR_INTERFACE_PARAMS_H */

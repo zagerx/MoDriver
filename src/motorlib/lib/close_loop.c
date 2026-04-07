@@ -61,6 +61,7 @@ void motor_position_loop_reset(struct motor *motor)
 	struct foc_pid *current_q_pi = &foc->ctrl.q_axis;
 
 	/* 清零参考值 */
+
 	foc->ref.velocity = 0.0f;
 	foc->ref.i_q = 0.0f;
 	foc->ref.i_d = 0.0f;

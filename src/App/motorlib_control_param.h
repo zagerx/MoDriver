@@ -47,6 +47,9 @@
 	((uint32_t)(ROTATE_TIMEOUT / (CONTROL_PERIOD_DT * 1000.0f))) /* 5000ms / 0.05ms = 100000   \
 								      */
 
+#define TRAJAC_MAX_ACC (9.8f * 1000.0f) /* 轨迹最大加速度 10 mm/s^2 */
+#define TRAJAC_MAX_VEL (5.0f * 1000.0f) /* 轨迹最大速度 5 mm/s */
+
 #define CURRMENT_LOOP_KP    (0.1f)   /* 电流环P增益 */
 #define CURRMENT_LOOP_KI    (800.0f) /* 电流环I增益 */
 #define CURRMENT_LOOP_LIMIT (13.0f)  /* 电流调试输出间隔，单位为控制周期数 */
@@ -54,4 +57,8 @@
 #define SPEED_LOOP_KP    (0.002f)
 #define SPEED_LOOP_KI    (0.2f)
 #define SPEED_LOOP_LIMIT (10.0f)
+
+#define POSITION_LOOP_KP    (400.0f)
+#define POSITION_LOOP_KI    (4000.0f)
+#define POSITION_LOOP_LIMIT (TRAJAC_MAX_VEL)
 #endif /* MOTORLIB_CONTROL_PARAM_H */

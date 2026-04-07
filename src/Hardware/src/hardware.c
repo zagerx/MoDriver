@@ -23,6 +23,12 @@ void hardware_init(void)
 	MX_USART1_UART_Init();
 	MX_SPI1_Init();
 }
+void hardware_start_irq(void)
+{
+	HAL_TIM_Base_Start_IT(&htim6);
+	adc_start();
+	tim1_set_adc();
+}
 
 static void Error_Handler(void)
 {

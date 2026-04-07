@@ -6,5 +6,6 @@
 #include "tim.h"
 #include "adc.h"
 void hardware_init(void);
+void hardware_start_irq(void);
 
 #endif

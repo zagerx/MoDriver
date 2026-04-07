@@ -119,7 +119,7 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
 #cmake --build build/ --target jlink_down
 # ==================================================
 # MCU 型号（用于 JLink 下载）
-set(CHIP "STM32G431CB")
+set(CHIP "STM32G473RC")
 
 # ==================================================
 # 必须指定 chip 型号，否则 JLink 下载无法工作

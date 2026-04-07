@@ -44,6 +44,9 @@ int trajectory_planner_init(struct trajectory_plan *trajectory, float start_pos,
 	(void)start_vel;  // 当前实现未使用起始速度参数
 	(void)start_pos;  // 当前实现未使用起始位置参数
 	(void)trajectory; // 避免未使用警告
+	trajectory->data.exec_data.pos = start_pos;
+	trajectory->data.exec_data.vel = start_vel;
+	trajectory->data.exec_data.acc = start_acc;
 	return 0;
 }
 
