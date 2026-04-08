@@ -202,6 +202,40 @@ void motor_set_target_pos(struct motor *motor, float target_pos, float target_ve
 	trajectory_planner_update_target(traj_plan, target_pos, target_vel);
 }
 
+/**
+ * @brief 紧急停止电机
+ * @param[in] motor 电机实例指针
+ * @return 无
+ * @details 停止轨迹规划器，进入安全状态
+ */
+void motor_stop(struct motor *motor)
+{
+	if (!motor) {
+		return;
+	}
+	struct trajectory_plan *traj_plan = &motor->traj_plan;
+	trajectory_planner_stop(traj_plan);
+}
+
+void motor_enable(struct motor *motor)
+{
+	if (!motor) {
+		return;
+	}
+	struct inverter *inverter = &motor->inverter;
+	inverter_enable(inverter);
+	inverter_set_voltage(inverter, 0.0f, 0.0f, 0.0f);
+}
+void motor_disable(struct motor *motor)
+{
+	if (!motor) {
+		return;
+	}
+	struct inverter *inverter = &motor->inverter;
+	inverter_set_voltage(inverter, 0.0f, 0.0f, 0.0f);
+	inverter_disable(inverter);
+}
+
 void motor_get_all_data(const struct motor *motor, struct motor_all_state *state)
 {
 	if (!motor || !state) {
@@ -210,7 +244,7 @@ void motor_get_all_data(const struct motor *motor, struct motor_all_state *state
 	struct foc *foc = (struct foc *)&motor->foc;
 
 	state->actual_pos = foc->meas.fd_out->odometer;
-	state->actual_vel = foc->meas.fd_out->line_velocity;
+	state->actual_vel = foc->meas.fd_out->line_velocity_mm_s;
 
 	state->errorcode = motor->data.errorcode;
 	state->flags = motor->data.flags;

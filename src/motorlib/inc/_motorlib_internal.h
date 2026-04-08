@@ -10,9 +10,8 @@
 #define _MOTOR_INTERNAL_H
 
 #include <stdint.h>
-#include "motor_interface_flag.h"
+#include "motor_interface_bits.h"
 #include "motor_interface_mode.h"
-#include "motor_bits.h"
 #include "foc.h"
 #include "calibration.h"
 #include "trajectory_plan.h"
@@ -53,6 +52,7 @@ struct motor_debug {
 struct motor_data {
 	uint32_t flags;        /**< @brief 状态标志位组合值（位掩码） */
 	uint32_t errorcode;    /**< @brief 错误码位组合值（位掩码） */
+	uint32_t command;      /**< @brief 命令位组合值（位掩码） */
 	float openloop_target; /**< @brief 开环编码器目标值 */
 #if MOTORLIB_DEBUG_ENABLED
 	struct motor_debug debug; /**< @brief 调试数据 */

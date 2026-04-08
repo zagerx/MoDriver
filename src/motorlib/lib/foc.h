@@ -8,14 +8,12 @@
 #ifndef FOC_H
 #define FOC_H
 
-#include "currsmp.h"
-#include "feedback.h"
-struct motor;
-
-#include "foc_pid.h"
-
+struct feedback;
+struct currsmp;
 struct currsmp_output;
 struct feedback_output;
+
+#include "foc_pid.h"
 /**
  * @brief FOC测量数据结构体
  * @details 存储经过Clarke变换后的α、β轴电流和Park变换后的d、q轴电流

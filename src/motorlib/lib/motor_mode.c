@@ -11,6 +11,11 @@
 #include "motorlib_control_param.h"
 #include "_motorlib_internal.h"
 #include <stdint.h>
+
+#include <math.h>
+extern int motor_is_command_set(const struct motor *motor, enum motor_command_bits bit);
+extern int motor_clear_command(struct motor *motor, enum motor_command_bits bit);
+
 /**
  * @brief 电机无模式状态处理函数
  * @param[in] sm 状态机实例指针
@@ -56,37 +61,43 @@ void motor_mode_PP(struct statemachine *sm)
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
 	struct foc *foc = &motor->foc;
 	float start_pos = foc->meas.fd_out->odometer; /* 当前位置作为起始位置 */
+	float plan_target, actual_pos;
 	switch (sm->phase) {
 	case ENTER:
 		sm->phase = RUNING;
 		sm->count = 0;
 		trajectory_planner_init(traj_plan, start_pos, 0.0f, 0.0f, POSITION_PERIOD_DT);
 		motor_position_loop_reset(motor);
-#if MOTORLIB_DEBUG_ENABLED
-		motor->data.debug.test_flag1 = 1;
-		motor->data.debug.test_flag2 = 1;
-#endif
 		break;
 
 	case RUNING:
+#define TARGET_REACHED_POS_TOL 0.1f // 位置容差：0.1 mm
+#define TARGET_REACHED_VEL_TOL 5.0f // 速度容差：1 mm/s
+
+		/* 判断目标到达 */
+		// traj_exec_data_t *exec = &traj_plan->data.exec_data;
+		plan_target = trajectory_planner_read_plantarget(traj_plan); // 目标位置
+		actual_pos = foc->meas.fd_out->odometer;                     // 实际位置
+
+		if (fabsf(actual_pos - plan_target) < TARGET_REACHED_POS_TOL) {
+			motor_set_flag(motor, MOTOR_FLAGS_TARGET_REACHED);
+		} else {
+			motor_clear_flag(motor, MOTOR_FLAGS_TARGET_REACHED);
+		}
+
 		if (sm->count % (uint16_t)POSITION_LOOP_INTERVAL == 0) {
 			trajectory_planner_action(traj_plan, POSITION_PERIOD_DT);
 			motor_position_loop(motor, POSITION_PERIOD_DT);
-#if MOTORLIB_DEBUG_ENABLED
-			motor->data.debug.test_flag1 = -motor->data.debug.test_flag1;
-#endif
 		}
 		if (sm->count % (uint16_t)(SPEED_LOOP_INTERVAL) == 0) {
 			motor_velocity_loop(motor, foc->ref.velocity);
-#if MOTORLIB_DEBUG_ENABLED
-			motor->data.debug.test_flag2 = -motor->data.debug.test_flag2;
-#endif
 		}
 		motor_currment_loop(motor);
 		sm->count++;
 		break;
 
 	case EXIT:
+		motor_position_loop_reset(motor);
 		break;
 
 	default:
@@ -141,17 +152,52 @@ void motor_mode_HOMING(struct statemachine *sm)
 {
 	enum {
 		RUNING = USER_STATUS,
+		WAIT_COMMAND,
+		IDLE,
 	};
+#define CAPTURE_THRESHOLD 0.001f // 约0.57度
 
 	struct motor *motor = (struct motor *)(sm->data);
+	struct foc *foc = &motor->foc;
+	float elec_angle;
 	(void)motor;
 
 	switch (sm->phase) {
 	case ENTER:
-		sm->phase = RUNING;
+		motor_velocity_loop_reset(motor);
+		motor_clear_command(motor, MOTOR_CMD_HOMING);
+		sm->count = 0;
+		sm->phase = WAIT_COMMAND;
+		break;
+
+	case WAIT_COMMAND:
+
+		/* 等待外部命令触发原点回归动作 */
+		if (motor_is_command_set(motor, MOTOR_CMD_HOMING)) {
+			motor_clear_command(motor, MOTOR_CMD_HOMING);
+			sm->phase = RUNING;
+		}
+
 		break;
 
 	case RUNING:
+		elec_angle = foc->meas.fd_out->eangle_rad;
+		if (fabsf(elec_angle) < CAPTURE_THRESHOLD ||
+		    fabsf(elec_angle - (3.141592653f * 2.0f)) < CAPTURE_THRESHOLD) {
+			motor_set_flag(motor, MOTOR_FLAGS_HOMING_DONE);
+			sm->count = 0;
+			motor_velocity_loop_reset(motor);
+			inverter_set_voltage(&motor->inverter, 0.0f, 0.0f, 0.0f); // 锁定位置
+			feedback_reset_odometer(&motor->feedback); // 将当前位置设为零点
+			sm->phase = WAIT_COMMAND;
+			break;
+		}
+
+		if (sm->count++ > SPEED_LOOP_INTERVAL) {
+			sm->count = 0;
+			motor_velocity_loop(motor, 5.0f);
+		}
+		motor_currment_loop(motor);
 		break;
 
 	case EXIT:

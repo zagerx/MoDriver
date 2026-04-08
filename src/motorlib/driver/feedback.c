@@ -89,9 +89,10 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
 	data->accumulated_mangle_rad = 0.0f;
 	data->prev_mangle_rad = 0.0f;
 	data->mech_omega_rad_s = 0.0f;
+	data->odometer_offset_mangle = 0.0f; /* 初始无偏移 */
 
 	feedback->output.eangle_rad = 0.0f;
-	// feedback->output.velocity_rad_s = 0.0f;
+	feedback->output.velocity_rad_s = 0.0f;
 	feedback->output.odometer = 0.0f;
 
 	return FEEDBACK_ERROR_NONE;
@@ -233,9 +234,9 @@ void feedback_update(struct feedback *feedback, float dt)
 	feedback->output.eangle_rad = feedback_calc_elec_angle(feedback, cur_mangle);
 
 	/* 5. 差分法计算机械角速度 */
-	// feedback->output.velocity_rad_s = feedback_calc_velocity(feedback, dt, cur_mangle);
-	feedback->output.line_velocity = feedback_calc_velocity(feedback, dt, cur_mangle) *
-					 param->wheel_radius / param->gear_ratio;
+	feedback->output.velocity_rad_s = feedback_calc_velocity(feedback, dt, cur_mangle);
+	feedback->output.line_velocity_mm_s =
+		feedback->output.velocity_rad_s * param->wheel_radius / param->gear_ratio;
 	/* 6. 应用小数偏移到电角度输出	小数偏移用于子计数精度的相位对齐 */
 	if (param->encoder_offset_frac != 0.0f) {
 		/* 将小数偏移转换为电角度弧度 */
@@ -245,6 +246,8 @@ void feedback_update(struct feedback *feedback, float dt)
 			normalize_angle(feedback->output.eangle_rad - frac_eangle_offset);
 	}
 
-	/* 7. 更新里程（可选） */
-	feedback->output.odometer = cur_mangle * param->wheel_radius / param->gear_ratio;
+	/* 7. 更新里程（应用偏移，实现相对零点） */
+	/* 使用相对角度计算里程，支持Home模式下动态重置而不破坏角度连续性 */
+	float relative_mangle = data->accumulated_mangle_rad - data->odometer_offset_mangle;
+	feedback->output.odometer = relative_mangle * param->wheel_radius / param->gear_ratio;
 }

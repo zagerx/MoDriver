@@ -25,8 +25,6 @@ struct foc_pid {
 
 	/** 积分累加器 */
 	float integral;
-
-	float debug_out;
 };
 
 /**

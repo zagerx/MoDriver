@@ -7,7 +7,6 @@
 
 #include "hardware.h"
 #include "motor.h"
-// #include "stm32g4xx_hal.h"
 #include "motorlib_control_param.h"
 #include "canopen_app.h"
 
@@ -33,8 +32,8 @@ static const struct motor_hw_ops m1_hw_ops = {
 struct motor_param_ext m1_param_ext = {
 	.feedback_param =
 		{
-			.gear_ratio = ENCODER_GEAR_RATIO,
-			.wheel_radius = ENCODER_WHEEL_RADIO, // 17.5mm 轮子半径
+			.gear_ratio = FEEDBACK_GEAR_RATIO,
+			.wheel_radius = FEEDBACK_WHEEL_RADIO, // 17.5mm 轮子半径
 		},
 	.currsmp_param =
 		{
@@ -122,7 +121,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
 		raw_uvw[1] = (uint32_t)(hadc->Instance->JDR2);
 		// raw_uvw[2] = (uint32_t)(hadc2.Instance->JDR1);
-		raw_uvw[4] = (uint32_t)(hadc->Instance->DR);
+		raw_uvw[4] = (uint32_t)(hadc->Instance->DR) + 300; // 硬件补偿，临时方案
 		raw_uvw[3] = 0;
 		motor_highfreq_task(motor_1, (uint16_t *)raw_uvw);
 	}

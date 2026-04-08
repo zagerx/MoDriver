@@ -18,13 +18,21 @@
 #define BUS_CURRENT_GAIN     0.00f      /* 母线电流增益 */
 #define ENCODER_RESOLUTION   16384      /* 编码器分辨率 */
 #define ENCODER_RESOLUTION_F (16384.0f) /* 编码器分辨率 */
-#define ENCODER_WHEEL_RADIO  (17.5f)    /* 轮子半径，单位mm */
-#define ENCODER_GEAR_RATIO   (1.0f)     /* 减速比 */
+#define FEEDBACK_WHEEL_RADIO (17.5f)    /* 轮半径mm */
+#define FEEDBACK_GEAR_RATIO  (1.0f)     /* 减速比 */
+
+/* 电压保护阈值 */
+#define OVERVOLTAGE_THRESHOLD  (28.0f) /* 过压阈值 28V */
+#define UNDERVOLTAGE_THRESHOLD (20.0f) /* 欠压阈值 20V */
+
+/* 堵转保护阈值 */
+#define STALL_CURRENT_THRESHOLD  (10.0f) /* 堵转电流阈值 A */
+#define STALL_VELOCITY_THRESHOLD (5.0f)  /* 堵转速度阈值 10mm/s */
 
 /*控制相关     */
 #define CONTROL_LOOP_FREQ 20000.0f                   /* 控制循环频率 20kHz */
 #define CONTROL_PERIOD_DT (1.0f / CONTROL_LOOP_FREQ) /* 控制周期 50us */
-#define SPEED_LOOP_FREQ   4000.0f                    /* 速度环频率 1kHz */
+#define SPEED_LOOP_FREQ   4000.0f                    /* 速度环频率 4kHz */
 #define SPEED_PERIOD_DT   (1.0f / SPEED_LOOP_FREQ)   /* 速度环周期 1ms */
 #define SPEED_LOOP_INTERVAL                                                                        \
 	(SPEED_PERIOD_DT / CONTROL_PERIOD_DT) /* 速度环执行间隔，单位为控制周期数 */
@@ -52,7 +60,7 @@
 
 #define CURRMENT_LOOP_KP    (0.1f)   /* 电流环P增益 */
 #define CURRMENT_LOOP_KI    (800.0f) /* 电流环I增益 */
-#define CURRMENT_LOOP_LIMIT (13.0f)  /* 电流调试输出间隔，单位为控制周期数 */
+#define CURRMENT_LOOP_LIMIT (13.0f)  /*  */
 
 #define SPEED_LOOP_KP    (0.002f)
 #define SPEED_LOOP_KI    (0.2f)

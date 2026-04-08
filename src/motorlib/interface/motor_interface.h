@@ -1,6 +1,5 @@
 #ifndef MOTOR_INTERFACE_H
 #define MOTOR_INTERFACE_H
-#include <stdint.h>
 #pragma once
 /**
  * @file motor_interface.h
@@ -9,14 +8,15 @@
  */
 #include "motor_interface_driver.h"
 #include "motor_interface_params.h"
-#include "motor_interface_flag.h"
+#include "motor_interface_bits.h"
 #include "motor_interface_mode.h"
-struct motor_all_state {
-	uint32_t flags;
-	uint32_t errorcode;
-	enum motor_mode mode;
-	float actual_pos;
-	float actual_vel;
-	float actual_torque;
+struct motor_all_state
+{
+        uint32_t flags;
+        uint32_t errorcode;
+        enum motor_mode mode;
+        float actual_pos;
+        float actual_vel;
+        float actual_torque;
 };
 #endif

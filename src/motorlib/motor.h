@@ -51,37 +51,16 @@ void motor_init(struct motor *motor);
  */
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw);
 
-/**
- * @brief 获取电机当前状态标志位
- * @param[in] motor 电机实例
- * @return uint32_t 状态标志位组合值
- * @note 对应 motor_data.status_flag，外部只读获取
+/*
+ * 以下位标志相关API在 motor_interface_bits.h 中定义：
+ * - motor_get_flag / motor_set_flag / motor_clear_flag / motor_clear_all_flags
+ * - motor_is_flag_set
+ * - motor_get_errorcode / motor_set_error / motor_clear_error / motor_clear_all_errors
+ * - motor_is_error_set
+ * - motor_set_command / motor_clear_command / motor_clear_all_commands
+ * - motor_is_command_set
  */
-uint32_t motor_get_flag(const struct motor *motor);
 
-/**
- * @brief 检查指定状态标志位是否置位
- * @param[in] motor 电机实例
- * @param[in] bit 状态标志位枚举值
- * @return int 1 表示置位，0 表示未置位或实例为空
- */
-int motor_is_flag_set(const struct motor *motor, enum motor_flag_bits bit);
-
-/**
- * @brief 获取电机当前错误码位组合值
- * @param[in] motor 电机实例
- * @return uint32_t 错误码位组合值
- * @note 对应 motor_data.errorcode，外部只读获取
- */
-uint32_t motor_get_errorcode(const struct motor *motor);
-
-/**
- * @brief 检查指定错误码位是否置位
- * @param[in] motor 电机实例
- * @param[in] bit 错误码位枚举值
- * @return int 1 表示置位，0 表示未置位或实例为空
- */
-int motor_is_error_set(const struct motor *motor, enum motor_errorcode_bits bit);
 /**
  * @brief 获取电机当前操作模式
  * @param[in] motor 电机实例
@@ -126,5 +105,12 @@ void motor_tran_state(struct motor *motor, enum motor_status new_state);
  */
 void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel);
 
+void motor_stop(struct motor *motor);
+void motor_enable(struct motor *motor);
+void motor_disable(struct motor *motor);
 void motor_get_all_data(const struct motor *motor, struct motor_all_state *state);
+
+#include "stdbool.h"
+extern bool motor_protection_has_fault(struct motor *motor);
+
 #endif /* MOTOR_H */

@@ -22,7 +22,8 @@
  */
 void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eangle)
 {
-	if (!motor) {
+	if (!motor)
+	{
 		return;
 	}
 	struct currsmp *currsmp = &motor->currsmp;
@@ -56,7 +57,8 @@ void open_loop_force_align(struct motor *motor, float d_axis_voltage, float eang
  */
 void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, float omega)
 {
-	if (!motor) {
+	if (!motor)
+	{
 		return;
 	}
 	struct currsmp *currsmp = &motor->currsmp;
@@ -87,7 +89,8 @@ void open_loop_force_drag(struct motor *motor, float dt, float d_axis_voltage, f
  */
 float open_loop_get_force_angle(struct motor *motor)
 {
-	if (!motor) {
+	if (!motor)
+	{
 		return 0.0f;
 	}
 
@@ -103,7 +106,8 @@ float open_loop_get_force_angle(struct motor *motor)
  */
 void open_loop_encoder(struct motor *motor, float q_axis_voltage)
 {
-	if (!motor) {
+	if (!motor)
+	{
 		return;
 	}
 	struct currsmp *currsmp = &motor->currsmp;
@@ -135,23 +139,20 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage)
  */
 void currment_debug(struct motor *motor, float tar)
 {
-	if (!motor) {
+	if (!motor)
+	{
 		return;
 	}
-	struct currsmp *currsmp = &motor->currsmp;
 	struct inverter *inverter = &motor->inverter;
-	struct feedback *feedback = &motor->feedback;
-	float eangle = feedback_get_elec_angle(feedback);
+	struct foc *foc = &motor->foc;
+	struct foc_measurement *meas = &foc->meas;
+
+	float eangle = meas->fd_out->eangle_rad;
 	float ud, uq;
 	float ualpha, ubeta;
 	float duty[3];
 
-	struct foc *foc = &motor->foc;
-	struct currsmp_output out;
-	currsmp_get_output(currsmp, &out);
-
-	float vbus = out.v_bus;
-	struct foc_measurement *meas = &foc->meas;
+	float vbus = meas->cs_out->v_bus; // out.v_bus;
 
 	ud = foc_currentloop_pid_run(&foc->ctrl.d_axis, tar, meas->i_d, CONTROL_PERIOD_DT);
 	uq = 0.0f;
@@ -162,7 +163,7 @@ void currment_debug(struct motor *motor, float tar)
 	svpwm_limit_voltage(vbus, &ud_limit, &uq_limit);
 	foc_currentpid_saturation(&foc->ctrl.d_axis, ud_limit, ud);
 
-	svpwm_normalize(eangle, vbus, ud_limit, uq, &ualpha, &ubeta);
+	svpwm_normalize(eangle, vbus, ud_limit, uq_limit, &ualpha, &ubeta);
 	svpwm_calc_duty(ualpha, ubeta, duty);
 
 	inverter_set_voltage(inverter, duty[0], duty[1], duty[2]);

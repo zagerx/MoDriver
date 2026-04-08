@@ -28,7 +28,8 @@ void motor_openloop_encoder_state(struct statemachine *sm);
  */
 void motor_carib_state(struct statemachine *sm)
 {
-	enum {
+	enum
+	{
 		CALIBRATING = USER_STATUS,
 	};
 
@@ -36,7 +37,8 @@ void motor_carib_state(struct statemachine *sm)
 	struct inverter *inverter = &motor->inverter;
 	enum calibration_status calib_status;
 
-	switch (sm->phase) {
+	switch (sm->phase)
+	{
 	case ENTER:
 		/* 进入校准状态 */
 		calibration_init(motor);
@@ -48,9 +50,12 @@ void motor_carib_state(struct statemachine *sm)
 		calib_status = calibration_task(motor);
 
 		/* 根据校准结果迁移状态 */
-		if (calib_status == CALIBRATION_STATUS_SUCCESS) {
-			TRAN_STATE(sm, motor_runing_state);
-		} else if (calib_status == CALIBRATION_STATUS_FAILED) {
+		if (calib_status == CALIBRATION_STATUS_SUCCESS)
+		{
+			TRAN_STATE(sm, motor_idle_state);
+		}
+		else if (calib_status == CALIBRATION_STATUS_FAILED)
+		{
 			/* 校准失败 */
 			TRAN_STATE(sm, motor_init_state);
 		}
@@ -59,7 +64,8 @@ void motor_carib_state(struct statemachine *sm)
 	case EXIT:
 		/* 退出校准状态，确保逆变器禁用（安全考虑） */
 		/* 注：即使校准模块内部已禁用，这里再禁一次确保万无一失 */
-		if (inverter) {
+		if (inverter)
+		{
 			inverter_disable(inverter);
 		}
 		break;
@@ -78,14 +84,16 @@ void motor_carib_state(struct statemachine *sm)
  */
 void motor_init_state(struct statemachine *sm)
 {
-	enum {
+	enum
+	{
 		RUNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
 	(void)motor;
 
-	switch (sm->phase) {
+	switch (sm->phase)
+	{
 	case ENTER:
 		sm->phase = RUNING;
 		break;
@@ -110,14 +118,16 @@ void motor_init_state(struct statemachine *sm)
  */
 void motor_idle_state(struct statemachine *sm)
 {
-	enum {
+	enum
+	{
 		RUNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
 	(void)motor;
 
-	switch (sm->phase) {
+	switch (sm->phase)
+	{
 	case ENTER:
 		sm->phase = RUNING;
 		break;
@@ -142,19 +152,22 @@ void motor_idle_state(struct statemachine *sm)
  */
 void motor_runing_state(struct statemachine *sm)
 {
-	enum {
+	enum
+	{
 		RUNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
 	struct inverter *inverter = &motor->inverter;
 	struct statemachine *sm_mode = &motor->sm_mode;
-	switch (sm->phase) {
+	switch (sm->phase)
+	{
 	case ENTER:
 		inverter_set_voltage(inverter, 0.0f, 0.0f, 0.0f);
 		inverter_enable(inverter);
 
-		if (sm_mode->current_state != motor_mode_none) {
+		if (sm_mode->current_state != motor_mode_none)
+		{
 			TRAN_STATE(sm_mode, motor_mode_none);
 		}
 		sm->phase = RUNING;
@@ -166,7 +179,8 @@ void motor_runing_state(struct statemachine *sm)
 		break;
 
 	case EXIT:
-		if (sm_mode->current_state != motor_mode_none) {
+		if (sm_mode->current_state != motor_mode_none)
+		{
 			TRAN_STATE(sm_mode, motor_mode_none);
 		}
 		break;
@@ -183,31 +197,58 @@ void motor_runing_state(struct statemachine *sm)
  *
  * 电机开环编码器测试状态。
  */
+#include "motorlib_control_param.h"
 void motor_openloop_encoder_state(struct statemachine *sm)
 {
-	enum {
+	enum
+	{
 		RUNING = USER_STATUS,
+		ALIGN,
+		RUNING2,
+		IDLE,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
 	struct inverter *inverter = &motor->inverter;
-
-	switch (sm->phase) {
+	static float target = 0.0f;
+	static uint32_t test_flag = 1;
+	switch (sm->phase)
+	{
 	case ENTER:
 		inverter_enable(inverter);
-		motor->data.openloop_target = 1.0f;
+		sm->count = 0;
 		sm->phase = RUNING;
 		break;
 
+	case ALIGN:
+		open_loop_encoder(motor, ALIGN_VOLTAGE);
+		if (++sm->count > 30000) // 1秒后切换到运行状态
+		{
+			sm->count = 0;
+			sm->phase = IDLE;
+		}
+		break;
+
 	case RUNING:
-		motor->data.openloop_target = 0.8f; // 固定目标位置
-		open_loop_encoder(motor, motor->data.openloop_target);
-		// if (++debug_cnt % 500 == 0) {
-		// 	debug_cnt = 0;
-		// 	target = -target;                            // 反转目标位置
-		// 	foc_pid_reset(&motor->foc.data.ctrl.d_axis); // 重置PID控制器状态
-		// }
-		// currment_debug(motor, target);
+
+		if (++sm->count > 500)
+		{
+			test_flag = -test_flag; // 反转目标位置
+			sm->count = 0;
+
+			if (test_flag == 1)
+			{
+				target = 4.0f; // 正转目标位置
+			}
+			else
+			{
+				target = 0.0f; // 反转目标位置
+			}
+			// 反转目标位置
+			foc_pid_reset(&motor->foc.ctrl.d_axis); // 重置PID控制器状态
+			break;
+		}
+		currment_debug(motor, target);
 		break;
 
 	case EXIT:
@@ -227,18 +268,22 @@ void motor_openloop_encoder_state(struct statemachine *sm)
  */
 enum motor_status motor_get_status(const struct motor *motor)
 {
-	if (!motor) {
+	if (!motor)
+	{
 		return MOTOR_STATUS_INIT;
 	}
 
 	sm_state_t state = motor->sm.current_state;
-	if (state == motor_runing_state) {
+	if (state == motor_runing_state)
+	{
 		return MOTOR_STATUS_RUNING;
 	}
-	if (state == motor_idle_state) {
+	if (state == motor_idle_state)
+	{
 		return MOTOR_STATUS_IDLE;
 	}
-	if (state == motor_carib_state) {
+	if (state == motor_carib_state)
+	{
 		return MOTOR_STATUS_CALIB;
 	}
 	return MOTOR_STATUS_INIT;
@@ -254,29 +299,35 @@ void motor_tran_state(struct motor *motor, enum motor_status new_state)
 {
 
 	struct statemachine *sm = &motor->sm;
-	if (!motor || !sm) {
+	if (!motor || !sm)
+	{
 		return;
 	}
 
-	switch (new_state) {
+	switch (new_state)
+	{
 	case MOTOR_STATUS_INIT:
-		if (sm->current_state != motor_init_state) {
+		if (sm->current_state != motor_init_state)
+		{
 			TRAN_STATE(sm, motor_init_state);
 		}
 		break;
 
 	case MOTOR_STATUS_CALIB:
-		if (sm->current_state != motor_carib_state) {
+		if (sm->current_state != motor_carib_state)
+		{
 			TRAN_STATE(sm, motor_carib_state);
 		}
 		break;
 	case MOTOR_STATUS_IDLE:
-		if (sm->current_state != motor_idle_state) {
+		if (sm->current_state != motor_idle_state)
+		{
 			TRAN_STATE(sm, motor_idle_state);
 		}
 		break;
 	case MOTOR_STATUS_RUNING:
-		if (sm->current_state != motor_runing_state) {
+		if (sm->current_state != motor_runing_state)
+		{
 			TRAN_STATE(sm, motor_runing_state);
 		}
 		break;

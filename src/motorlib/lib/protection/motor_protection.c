@@ -4,6 +4,7 @@
  */
 #include "_motorlib_internal.h"
 #include "motor_protection.h"
+#include "motorlib_control_param.h"
 #include <string.h>
 
 // ========== 外部保护函数声明 ==========
@@ -135,11 +136,11 @@ void motor_protection_init(struct motor *motor)
 	// t_desc->recover_fn = recover_temp_fault;
 
 	// 初始化配置
-	mgr->overvoltage_cfg.threshold = 28.0f;  // 过压阈值52V
-	mgr->undervoltage_cfg.threshold = 20.0f; // 欠压阈值12V
+	mgr->overvoltage_cfg.threshold = OVERVOLTAGE_THRESHOLD;   // 过压阈值52V
+	mgr->undervoltage_cfg.threshold = UNDERVOLTAGE_THRESHOLD; // 欠压阈值12V
 
-	mgr->stall_cfg.current_threshold = 8000.0f; // A
-	mgr->stall_cfg.vel_threshold = 30000.0f;    // 30mm/s
+	mgr->stall_cfg.current_threshold = STALL_CURRENT_THRESHOLD; // A
+	mgr->stall_cfg.vel_threshold = STALL_VELOCITY_THRESHOLD;    // 30mm/s
 
 	// mgr->temp_cfg.overtemp = 85.0f; // 默认85°C过温
 	// mgr->temp_cfg.lowtemp = -20.0f; // 默认-20°C低温
