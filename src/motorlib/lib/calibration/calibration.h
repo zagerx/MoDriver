@@ -11,12 +11,14 @@
 
 #include <stdint.h>
 #include "current_calibration.h"
+#include "rl_calibration.h"
 #include "encoder_calibration.h"
 
 /** 校准状态枚举 */
 enum calibration_status {
 	CALIBRATION_STATUS_IDLE = 0, /**< 空闲状态 */
 	CALIBRATION_STATUS_CURRENT,  /**< 电流校准阶段 */
+	CALIBRATION_STATUS_RL,       /**< RL校准阶段 */
 	CALIBRATION_STATUS_ENCODER,  /**< 编码器校准阶段 */
 	CALIBRATION_STATUS_SUCCESS,  /**< 校准成功 */
 	CALIBRATION_STATUS_FAILED    /**< 校准失败 */
@@ -37,6 +39,7 @@ struct calibration {
 
 	/** 子校准对象 */
 	struct current_calib current; /**< 电流校准数据 */
+	struct rl_calib rl;           /**< RL校准数据 */
 	struct encoder_calib encoder; /**< 编码器校准数据 */
 };
 

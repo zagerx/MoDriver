@@ -13,6 +13,7 @@ target_sources(motor PRIVATE
         lib/protection/prot_stall.c
         lib/calibration/calibration.c
         lib/calibration/current_calibration.c
+        lib/calibration/rl_calibration.c
         lib/calibration/encoder_calibration.c
         # lib/trajectory_plan_bridgemode.c
         lib/trajectory_plan.c

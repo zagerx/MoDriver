@@ -85,8 +85,8 @@ void motor_velocity_loop(struct motor *motor, float target_vel)
 	struct foc *foc = &motor->foc;
 	struct foc_pid *velocity_pi = &foc->ctrl.velocity;
 	struct foc_measurement *meas = &foc->meas;
-	// struct feedback *fb = &motor->feedback;
-	/* 获取实际速度（单位：rad/s） */
+
+	/* 获取实际速度（单位：mm/s） */
 	float vel = meas->fd_out->line_velocity_mm_s;
 
 	/* 速度环PI计算，输出q轴电流参考值 */

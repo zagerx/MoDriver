@@ -7,6 +7,7 @@
 
 #include "calibration.h"
 #include "current_calibration.h"
+#include "rl_calibration.h"
 #include "encoder_calibration.h"
 #include "_motorlib_internal.h"
 #include <stdint.h>
@@ -70,6 +71,43 @@ static int16_t current_phase_handle(struct motor *motor)
 	}
 
 	return ret;
+}
+
+/**
+ * @brief RL校准阶段处理
+ * @param[in] motor 电机实例
+ * @return 校准状态
+ * @retval 0 校准成功
+ * @retval -1 校准失败
+ * @retval 1 校准进行中
+ */
+static int16_t rl_phase_handle(struct motor *motor)
+{
+	struct calibration *calib = &motor->calib;
+
+	switch (calib->rl.state) {
+	case RL_CALIB_STATE_IDLE:
+		rl_calib_init(motor);
+		return 1;
+
+	case RL_CALIB_STATE_RESISTANCE:
+	case RL_CALIB_STATE_INDUCTANCE:
+		if (rl_calib_run(motor)) {
+			if (calib->rl.state == RL_CALIB_STATE_FINISH) {
+				rl_calib_apply(motor);
+				return 0;
+			} else {
+				return -1; /* 错误状态 */
+			}
+		}
+		return 1;
+
+	case RL_CALIB_STATE_FINISH:
+		return 0;
+
+	default:
+		return -1; /* 错误状态 */
+	}
 }
 
 /**
@@ -147,8 +185,17 @@ enum calibration_status calibration_task(struct motor *motor)
 	case CALIBRATION_STATUS_CURRENT: {
 		int16_t curr_ret = current_phase_handle(motor);
 		if (curr_ret == 0) {
-			calib->status = CALIBRATION_STATUS_ENCODER;
+			calib->status = CALIBRATION_STATUS_RL;
 		} else if (curr_ret < 0) {
+			calib->status = CALIBRATION_STATUS_FAILED;
+		}
+	} break;
+
+	case CALIBRATION_STATUS_RL: {
+		int16_t rl_ret = rl_phase_handle(motor);
+		if (rl_ret == 0) {
+			calib->status = CALIBRATION_STATUS_ENCODER;
+		} else if (rl_ret < 0) {
 			calib->status = CALIBRATION_STATUS_FAILED;
 		}
 	} break;
