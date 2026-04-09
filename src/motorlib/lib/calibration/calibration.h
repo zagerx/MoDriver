@@ -1,61 +1,226 @@
 
-
 /**
  * @file calibration.h
  * @brief 电机校准模块头文件
- * @details 实现电机参数自动校准功能，包括电流采样校准和编码器校准
+ * @details 实现电机参数自动校准功能，包括电流采样校准、RL校准和编码器校准
+ * 架构说明：
+ * - 统一状态机在 calibration.c 中管理
+ * - 子模块仅提供具体步骤实现，不维护状态
+ * - 使用统一错误码便于调试
  */
 
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 
 #include <stdint.h>
-#include "current_calibration.h"
-#include "rl_calibration.h"
-#include "encoder_calibration.h"
-
-/** 校准状态枚举 */
-enum calibration_status {
-	CALIBRATION_STATUS_IDLE = 0, /**< 空闲状态 */
-	CALIBRATION_STATUS_CURRENT,  /**< 电流校准阶段 */
-	CALIBRATION_STATUS_RL,       /**< RL校准阶段 */
-	CALIBRATION_STATUS_ENCODER,  /**< 编码器校准阶段 */
-	CALIBRATION_STATUS_SUCCESS,  /**< 校准成功 */
-	CALIBRATION_STATUS_FAILED    /**< 校准失败 */
-};
-
-/** 编码器校准阶段枚举 */
-enum encoder_calib_phase {
-	ENCODER_PHASE_INIT = 0, /**< 初始化阶段 */
-	ENCODER_PHASE_RUNNING,  /**< 运行阶段 */
-	ENCODER_PHASE_FINISH    /**< 完成阶段 */
-};
-
-/** 总校准对象（嵌入在 motor 中） */
-struct calibration {
-	enum calibration_status status;      /**< 当前校准状态 */
-	enum current_calib_state curr_state; /**< 电流校准阶段状态 */
-	enum encoder_calib_phase enc_phase;  /**< 编码器校准阶段 */
-
-	/** 子校准对象 */
-	struct current_calib current; /**< 电流校准数据 */
-	struct rl_calib rl;           /**< RL校准数据 */
-	struct encoder_calib encoder; /**< 编码器校准数据 */
-};
+#include <stdbool.h>
 
 struct motor;
 
-/** 初始化校准模块
- *
- * @param motor 电机对象指针
+/** ========== 统一校准状态（扁平化） ========== */
+enum calibration_state {
+	CAL_STATE_IDLE = 0,          /**< 空闲状态 */
+	CAL_STATE_SUCCESS,           /**< 校准成功 */
+	CAL_STATE_FAILED,            /**< 校准失败 */
+
+	/* 电流校准子状态 */
+	CAL_STATE_CURRENT_INIT,      /**< 电流校准初始化 */
+	CAL_STATE_CURRENT_SAMPLING,  /**< 电流采样中 */
+
+	/* RL校准子状态 */
+	CAL_STATE_RL_INIT,           /**< RL校准初始化 */
+	CAL_STATE_RL_RESISTANCE,     /**< 电阻测量 */
+	CAL_STATE_RL_INDUCTANCE,     /**< 电感测量 */
+
+	/* 编码器校准子状态 */
+	CAL_STATE_ENC_ALIGN,         /**< 编码器对齐 */
+	CAL_STATE_ENC_SCAN_FORWARD,  /**< 正向扫描 */
+	CAL_STATE_ENC_CHECK,         /**< 检查响应和方向 */
+	CAL_STATE_ENC_SCAN_BACKWARD, /**< 反向扫描 */
+	CAL_STATE_ENC_CALC_OFFSET,   /**< 计算零点偏移 */
+};
+
+/** ========== 调试用错误码 ========== */
+enum calib_error {
+	CAL_ERR_NONE = 0,            /**< 无错误 */
+	CAL_ERR_RES_RANGE,           /**< 电阻超出有效范围 */
+	CAL_ERR_IND_RANGE,           /**< 电感超出有效范围 */
+	CAL_ERR_UNBALANCED,          /**< 相不平衡 */
+	CAL_ERR_ENC_NO_RESPONSE,     /**< 编码器无响应 */
+	CAL_ERR_ENC_CPR_MISMATCH,    /**< CPR不匹配 */
+};
+
+/** ========== 电流校准数据 ========== */
+struct current_calib_data {
+	uint32_t sample_cnt;         /**< 采样计数 */
+	uint32_t target_samples;     /**< 目标采样数 */
+	uint32_t sum_a;              /**< a轴累加和 */
+	uint32_t sum_b;              /**< b轴累加和 */
+	uint32_t sum_c;              /**< c轴累加和 */
+};
+
+/** ========== RL校准数据 ========== */
+struct rl_calib_data {
+	uint32_t sample_cnt;         /**< 采样计数 */
+	uint32_t target_samples;     /**< 目标采样数 */
+	float current_setpoint;      /**< 目标电流 [A] */
+	float voltage_limit;         /**< 最大测试电压 [V] */
+	float voltage_accumulator;   /**< 电压积分器 [V] */
+	float I_beta_accumulator;    /**< 用于相平衡检测 */
+	float test_voltage;          /**< 测试电压 [V] */
+	float last_I_alpha;          /**< 上次I_alpha */
+	float delta_I_sum;           /**< 电流变化累加 */
+	bool voltage_polarity;       /**< 电压极性 */
+	float measured_resistance;   /**< 测量电阻 [Ohm] */
+	float measured_inductance;   /**< 测量电感 [H] */
+};
+
+/** ========== 编码器校准数据 ========== */
+struct encoder_calib_data {
+	uint32_t tick_cnt;           /**< 滴答计数 */
+	uint16_t raw_prev;           /**< 上次编码器原始值 */
+	int32_t raw_delta_acc;       /**< 编码器累计变化量 */
+	uint32_t align_tick_cnt;     /**< 对齐阶段计数 */
+	int32_t init_enc_val;        /**< 初始编码器值 */
+	int64_t encvaluesum;         /**< 编码器值累加和 */
+	uint32_t num_steps;          /**< 采样步数 */
+	float calib_start_eangle;    /**< 校准起始电角度 */
+	int32_t scan_delta;          /**< 正向扫描累计值 */
+};
+
+/** ========== 主校准对象 ========== */
+struct calibration {
+	enum calibration_state state; /**< 当前校准状态 */
+	enum calib_error error_code;  /**< 错误码（调试用） */
+
+	/** 子模块数据 */
+	struct current_calib_data curr;
+	struct rl_calib_data rl;
+	struct encoder_calib_data enc;
+};
+
+/** ========== 子模块接口 ========== */
+
+/**
+ * @brief 电流校准准备
+ * @param[in] motor 电机实例
+ */
+void curr_calib_prepare(struct motor *motor);
+
+/**
+ * @brief 电流校准单步执行
+ * @param[in] motor 电机实例
+ * @return 0=继续, 1=完成
+ */
+int curr_calib_step(struct motor *motor);
+
+/**
+ * @brief 应用电流校准结果
+ * @param[in] motor 电机实例
+ */
+void curr_calib_apply(struct motor *motor);
+
+/**
+ * @brief RL校准准备
+ * @param[in] motor 电机实例
+ */
+void rl_calib_prepare(struct motor *motor);
+
+/**
+ * @brief 电感测量准备（电阻完成后调用）
+ * @param[in] motor 电机实例
+ */
+void rl_inductance_prepare(struct motor *motor);
+
+/**
+ * @brief 电阻测量单步执行
+ * @param[in] motor 电机实例
+ * @return 0=继续, 1=完成, -1=错误
+ */
+int rl_resistance_step(struct motor *motor);
+
+/**
+ * @brief 电感测量单步执行
+ * @param[in] motor 电机实例
+ * @return 0=继续, 1=完成, -1=错误
+ */
+int rl_inductance_step(struct motor *motor);
+
+/**
+ * @brief 应用RL校准结果
+ * @param[in] motor 电机实例
+ */
+void rl_calib_apply(struct motor *motor);
+
+/**
+ * @brief 编码器校准准备
+ * @param[in] motor 电机实例
+ */
+void enc_calib_prepare(struct motor *motor);
+
+/**
+ * @brief 编码器对齐单步执行
+ * @param[in] motor 电机实例
+ * @return 0=继续, 1=完成
+ */
+int enc_align_step(struct motor *motor);
+
+/**
+ * @brief 编码器正向扫描单步执行
+ * @param[in] motor 电机实例
+ * @return 0=继续, 1=完成
+ */
+int enc_scan_forward_step(struct motor *motor);
+
+/**
+ * @brief 检查编码器响应和计算极对数/方向
+ * @param[in] motor 电机实例
+ * @param[out] out_delta 输出扫描累计值
+ * @return true=成功, false=失败（无响应）
+ */
+bool enc_check_response(struct motor *motor, int32_t *out_delta);
+
+/**
+ * @brief 编码器反向扫描单步执行
+ * @param[in] motor 电机实例
+ * @return 0=继续, 1=完成
+ */
+int enc_scan_backward_step(struct motor *motor);
+
+/**
+ * @brief 计算编码器零点偏移
+ * @param[in] motor 电机实例
+ * @param[in] scan_delta 正向扫描累计值
+ */
+void enc_calc_offset(struct motor *motor, int32_t scan_delta);
+
+/**
+ * @brief 应用编码器校准结果
+ * @param[in] motor 电机实例
+ */
+void enc_calib_apply(struct motor *motor);
+
+/** ========== 主接口 ========== */
+
+/**
+ * @brief 初始化校准模块
+ * @param[in] motor 电机实例
  */
 void calibration_init(struct motor *motor);
 
-/** 校准任务主入口
- *
- * @param motor 电机对象指针
- * @return 校准状态
+/**
+ * @brief 校准任务主入口
+ * @param[in] motor 电机实例
+ * @return true=校准完成（成功或失败）, false=进行中
+ * @note 应在主循环中周期性调用
  */
-enum calibration_status calibration_task(struct motor *motor);
+bool calibration_task(struct motor *motor);
+
+/**
+ * @brief 获取校准错误码（调试用）
+ * @param[in] motor 电机实例
+ * @return 错误码
+ */
+enum calib_error calibration_get_error(struct motor *motor);
 
 #endif /* CALIBRATION_H */

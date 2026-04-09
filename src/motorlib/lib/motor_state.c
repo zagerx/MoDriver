@@ -35,7 +35,7 @@ void motor_carib_state(struct statemachine *sm)
 
 	struct motor *motor = (struct motor *)(sm->data);
 	struct inverter *inverter = &motor->inverter;
-	enum calibration_status calib_status;
+	bool calib_done;
 
 	switch (sm->phase)
 	{
@@ -47,17 +47,16 @@ void motor_carib_state(struct statemachine *sm)
 
 	case CALIBRATING:
 		/* 调用校准任务，由校准模块自主控制逆变器等硬件 */
-		calib_status = calibration_task(motor);
+		calib_done = calibration_task(motor);
 
 		/* 根据校准结果迁移状态 */
-		if (calib_status == CALIBRATION_STATUS_SUCCESS)
-		{
-			TRAN_STATE(sm, motor_idle_state);
-		}
-		else if (calib_status == CALIBRATION_STATUS_FAILED)
-		{
-			/* 校准失败 */
-			TRAN_STATE(sm, motor_init_state);
+		if (calib_done) {
+			if (motor->calib.state == CAL_STATE_SUCCESS) {
+				TRAN_STATE(sm, motor_idle_state);
+			} else {
+				/* 校准失败 */
+				TRAN_STATE(sm, motor_init_state);
+			}
 		}
 		break;
 

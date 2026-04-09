@@ -3,11 +3,11 @@
  * @file current_calibration.c
  * @brief 电流校准实现
  * @details 实现电流采样偏移量的自动采集、累加平均及应用
+ * 纯逻辑实现，不维护状态，由 calibration.c 统一状态管理
  */
 
-#include "current_calibration.h"
-#include "_motorlib_internal.h"
 #include "calibration.h"
+#include "_motorlib_internal.h"
 #include "currsmp.h"
 #include "inverter.h"
 
@@ -15,30 +15,23 @@
 
 /**
  * @brief 初始化电流校准
- *
- * @param[in] motor   电机实例
- * @param[in] samples 目标采样数（0表示使用默认值）
- *
- * @return 无
- *
- * @details 禁用逆变器，清零累加器，准备电流采样
+ * @param[in] motor 电机实例
  */
-void current_calib_init(struct motor *motor, uint16_t samples)
+void curr_calib_prepare(struct motor *motor)
 {
-	struct current_calib *curr;
+	struct current_calib_data *curr;
 
 	if (!motor) {
 		return;
 	}
 
-	/* 通过 motor 获取电流校准对象 */
-	curr = &motor->calib.current;
+	curr = &motor->calib.curr;
 
 	curr->sample_cnt = 0;
 	curr->sum_a = 0;
 	curr->sum_b = 0;
 	curr->sum_c = 0;
-	curr->target_samples = (samples > 0) ? samples : CURRENT_CALIB_DEFAULT_SAMPLES;
+	curr->target_samples = CURRENT_CALIB_DEFAULT_SAMPLES;
 
 	/* 禁用逆变器 */
 	struct inverter *inverter = &motor->inverter;
@@ -49,25 +42,26 @@ void current_calib_init(struct motor *motor, uint16_t samples)
 
 /**
  * @brief 执行一次电流采样
- *
  * @param[in] motor 电机实例
- *
- * @return true  校准完成
- * @return false 需要继续采样
- *
+ * @return 0=继续, 1=完成
  * @note 应在高频任务中周期性调用
  */
-bool current_calib_run(struct motor *motor)
+int curr_calib_step(struct motor *motor)
 {
-	struct current_calib *curr;
+	struct current_calib_data *curr;
 	struct currsmp_input input;
-	struct currsmp *currsmp = &motor->currsmp;
+	struct currsmp *currsmp;
 
-	if (!motor || !currsmp) {
-		return true;
+	if (!motor) {
+		return 1;
 	}
 
-	curr = &motor->calib.current;
+	currsmp = &motor->currsmp;
+	if (!currsmp) {
+		return 1;
+	}
+
+	curr = &motor->calib.curr;
 
 	currsmp_get_raw(currsmp, &input);
 
@@ -76,29 +70,33 @@ bool current_calib_run(struct motor *motor)
 	curr->sum_c += input.i_c_raw;
 	curr->sample_cnt++;
 
-	return (curr->sample_cnt >= curr->target_samples);
+	if (curr->sample_cnt >= curr->target_samples) {
+		return 1;  /* 完成 */
+	}
+	return 0;  /* 继续 */
 }
 
 /**
  * @brief 应用电流校准结果
- *
  * @param[in] motor 电机实例
- *
- * @return 无
- *
  * @details 计算平均ADC值并设置为电流采样偏移量
  */
-void current_calib_apply(struct motor *motor)
+void curr_calib_apply(struct motor *motor)
 {
-	struct current_calib *curr;
-	struct currsmp *currsmp = &motor->currsmp;
+	struct current_calib_data *curr;
+	struct currsmp *currsmp;
 	uint16_t offsets[3];
 
-	if (!motor || !currsmp) {
+	if (!motor) {
 		return;
 	}
 
-	curr = &motor->calib.current;
+	currsmp = &motor->currsmp;
+	if (!currsmp) {
+		return;
+	}
+
+	curr = &motor->calib.curr;
 
 	if (curr->sample_cnt == 0) {
 		return;
