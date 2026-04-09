@@ -33,7 +33,7 @@
 #define CONTROL_LOOP_FREQ 20000.0f                   /* 控制循环频率 20kHz */
 #define CONTROL_PERIOD_DT (1.0f / CONTROL_LOOP_FREQ) /* 控制周期 50us */
 #define SPEED_LOOP_FREQ   4000.0f                    /* 速度环频率 4kHz */
-#define SPEED_PERIOD_DT   (1.0f / SPEED_LOOP_FREQ)   /* 速度环周期 1ms */
+#define SPEED_PERIOD_DT   (1.0f / SPEED_LOOP_FREQ)   /* 速度环周期 250us */
 #define SPEED_LOOP_INTERVAL                                                                        \
 	(SPEED_PERIOD_DT / CONTROL_PERIOD_DT) /* 速度环执行间隔，单位为控制周期数 */
 

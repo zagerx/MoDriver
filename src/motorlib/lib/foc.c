@@ -17,12 +17,12 @@
 /**
  * @brief 绑定FOC数据源
  * @param[in] foc FOC实例
- * @param[in] feeback 反馈输出数据
+ * @param[in] feedback 反馈输出数据
  * @param[in] currsmp_out 电流采样输出数据
  * @param[in] foc_param FOC参数
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp *currsmp,
+void foc_bind(struct foc *foc, struct feedback *feedback, struct currsmp *currsmp,
 	      struct foc_param *foc_param)
 {
 	if (!foc) {
@@ -30,7 +30,7 @@ void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp *currsmp
 	}
 
 	foc->meas.cs_out = &currsmp->output;
-	foc->meas.fd_out = &feeback->output;
+	foc->meas.fd_out = &feedback->output;
 	foc->ctrl.d_axis.params = &foc_param->d_axis;
 	foc->ctrl.q_axis.params = &foc_param->q_axis;
 	foc->ctrl.velocity.params = &foc_param->vel;

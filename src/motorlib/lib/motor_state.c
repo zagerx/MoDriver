@@ -26,7 +26,7 @@ void motor_openloop_encoder_state(struct statemachine *sm);
  * 电机参数异常时进入的校准状态。
  * 调用 calibration_task 执行校准，校准模块内部直接操作逆变器。
  */
-void motor_carib_state(struct statemachine *sm)
+void motor_calib_state(struct statemachine *sm)
 {
 	enum
 	{
@@ -281,7 +281,7 @@ enum motor_status motor_get_status(const struct motor *motor)
 	{
 		return MOTOR_STATUS_IDLE;
 	}
-	if (state == motor_carib_state)
+	if (state == motor_calib_state)
 	{
 		return MOTOR_STATUS_CALIB;
 	}
@@ -313,9 +313,9 @@ void motor_tran_state(struct motor *motor, enum motor_status new_state)
 		break;
 
 	case MOTOR_STATUS_CALIB:
-		if (sm->current_state != motor_carib_state)
+		if (sm->current_state != motor_calib_state)
 		{
-			TRAN_STATE(sm, motor_carib_state);
+			TRAN_STATE(sm, motor_calib_state);
 		}
 		break;
 	case MOTOR_STATUS_IDLE:

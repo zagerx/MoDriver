@@ -250,7 +250,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *tim_baseHandle)
 void tim1_set_adc(void)
 {
 	HAL_TIM_Base_Start_IT(&htim1);
-	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, M_TIM_ARR - 30);
+	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 30);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 }
 /* USER CODE END 1 */

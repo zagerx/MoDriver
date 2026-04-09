@@ -105,12 +105,47 @@ void motor_tran_state(struct motor *motor, enum motor_status new_state);
  */
 void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel);
 
+/**
+ * @brief 紧急停止电机
+ * @param[in] motor 电机实例
+ * @return 无
+ * @details 停止轨迹规划器，进入安全状态
+ */
 void motor_stop(struct motor *motor);
+
+/**
+ * @brief 使能电机驱动
+ * @param[in] motor 电机实例
+ * @return 无
+ * @details 使能逆变器输出，并将三相电压置零
+ */
 void motor_enable(struct motor *motor);
+
+/**
+ * @brief 禁用电机驱动
+ * @param[in] motor 电机实例
+ * @return 无
+ * @details 将三相电压置零后禁用逆变器输出
+ */
 void motor_disable(struct motor *motor);
-void motor_get_all_data(const struct motor *motor, struct motor_all_state *state);
+
+/**
+ * @brief 获取电机当前状态信息
+ * @param[in] motor 电机实例
+ * @param[out] state 电机信息结构体指针，用于接收查询结果
+ * @return 无
+ * @details 获取电机的实际位置、实际速度、错误码、标志位和当前操作模式
+ */
+void motor_get_info(const struct motor *motor, struct motor_info *state);
 
 #include "stdbool.h"
+
+/**
+ * @brief 检查电机是否存在故障
+ * @param[in] motor 电机实例
+ * @return true 存在故障，false 无故障
+ * @details 检查电机错误码是否为非零值
+ */
 extern bool motor_protection_has_fault(struct motor *motor);
 
 #endif /* MOTOR_H */

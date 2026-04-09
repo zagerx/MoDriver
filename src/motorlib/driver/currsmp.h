@@ -9,7 +9,6 @@
 #define CURRSMP_H
 
 #include <stdint.h>
-#include "motor_interface_driver.h"
 #include "motor_interface_params.h"
 /**
  * @brief 电流采样输入数据结构体

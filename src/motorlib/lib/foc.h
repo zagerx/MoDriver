@@ -93,12 +93,12 @@ struct foc {
 /**
  * @brief 绑定FOC数据源
  * @param[in] foc FOC实例指针
- * @param[in] feeback 反馈输出数据指针
+ * @param[in] feedback 反馈输出数据指针
  * @param[in] currsmp 电流采样输出数据指针
  * @param[in] foc_param FOC参数指针
  * @return 无
  */
-void foc_bind(struct foc *foc, struct feedback *feeback, struct currsmp *currsmp,
+void foc_bind(struct foc *foc, struct feedback *feedback, struct currsmp *currsmp,
 	      struct foc_param *foc_param);
 
 /**

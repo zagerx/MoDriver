@@ -132,7 +132,7 @@ void motor_init(struct motor *motor)
 	}
 
 	if (motor_param_check(motor)) {
-		statemachine_init(sm, motor, motor_carib_state, NULL, 0);
+		statemachine_init(sm, motor, motor_calib_state, NULL, 0);
 	} else {
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
 	}
@@ -173,7 +173,7 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 	feedback_update_raw(feedback);
 
 	/* 仅在非校准状态下执行完整的反馈更新和状态机调度，校准状态下可能需要特殊处理 */
-	if (sm->current_state != motor_carib_state) {
+	if (sm->current_state != motor_calib_state) {
 		currsmp_update(currsmp);
 		feedback_update(feedback, CONTROL_PERIOD_DT);
 		foc_update_idiq(&motor->foc);
@@ -217,6 +217,12 @@ void motor_stop(struct motor *motor)
 	trajectory_planner_stop(traj_plan);
 }
 
+/**
+ * @brief 使能电机驱动
+ * @param[in] motor 电机实例指针
+ * @return 无
+ * @details 使能逆变器输出，并将三相电压置零，准备进入运行状态
+ */
 void motor_enable(struct motor *motor)
 {
 	if (!motor) {
@@ -226,6 +232,13 @@ void motor_enable(struct motor *motor)
 	inverter_enable(inverter);
 	inverter_set_voltage(inverter, 0.0f, 0.0f, 0.0f);
 }
+
+/**
+ * @brief 禁用电机驱动
+ * @param[in] motor 电机实例指针
+ * @return 无
+ * @details 先将三相电压置零，再禁用逆变器输出，确保安全停机
+ */
 void motor_disable(struct motor *motor)
 {
 	if (!motor) {
@@ -236,7 +249,14 @@ void motor_disable(struct motor *motor)
 	inverter_disable(inverter);
 }
 
-void motor_get_all_data(const struct motor *motor, struct motor_all_state *state)
+/**
+ * @brief 获取电机当前状态信息
+ * @param[in] motor 电机实例指针
+ * @param[out] state 电机信息结构体指针，用于接收查询结果
+ * @return 无
+ * @details 获取电机的实际位置、实际速度、错误码、标志位和当前操作模式
+ */
+void motor_get_info(const struct motor *motor, struct motor_info *state)
 {
 	if (!motor || !state) {
 		return;
@@ -249,4 +269,5 @@ void motor_get_all_data(const struct motor *motor, struct motor_all_state *state
 	state->errorcode = motor->data.errorcode;
 	state->flags = motor->data.flags;
 	state->mode = motor_get_mode(motor);
+	state->status = motor_get_status(motor);
 }

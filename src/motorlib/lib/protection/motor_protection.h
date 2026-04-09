@@ -100,7 +100,15 @@ void motor_protection_init(struct motor *motor);
 void motor_protection_update(struct motor *motor, float dt);
 void motor_protection_clear_fault(struct motor *motor, enum protection_type type);
 void motor_protection_clear_all_faults(struct motor *motor);
+
+/**
+ * @brief 检查电机是否存在活跃故障
+ * @param[in] motor 电机实例
+ * @return true 存在故障，false 无故障
+ * @details 通过检查电机错误码是否为非零值来判断是否存在故障
+ */
 bool motor_protection_has_fault(struct motor *motor);
+
 uint32_t motor_protection_get_faults(struct motor *motor);
 
 #endif

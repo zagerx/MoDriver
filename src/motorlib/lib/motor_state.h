@@ -23,7 +23,7 @@ void motor_init_state(struct statemachine *sm);
  * @param[in] sm 状态机实例
  * @return 无
  */
-void motor_carib_state(struct statemachine *sm);
+void motor_calib_state(struct statemachine *sm);
 
 /**
  * @brief 电机空闲状态
@@ -32,11 +32,6 @@ void motor_carib_state(struct statemachine *sm);
  */
 void motor_idle_state(struct statemachine *sm);
 
-/**
- * @brief 电机运行状态
- * @param[in] sm 状态机实例
- * @return 无
- */
 /**
  * @brief 电机运行状态处理函数
  * @param[in] sm 状态机实例指针

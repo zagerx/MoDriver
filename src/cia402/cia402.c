@@ -75,8 +75,8 @@ void cia402_update(struct cia402_instance *instance, float dt)
 	instance->cache_mode = (uint8_t)(*instance->modes_of_operation);
 
 	struct motor *motor = instance->motor;
-	struct motor_all_state state;
-	motor_get_all_data(motor, &state);
+	struct motor_info state;
+	motor_get_info(motor, &state);
 
 	instance->fault_code = state.errorcode;
 	// instance->actual_position = state.actual_pos;
