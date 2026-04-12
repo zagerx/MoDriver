@@ -7,6 +7,7 @@ add_library(hardware_driver STATIC)
 
 # 添加源文件
 target_sources(hardware_driver PRIVATE
+    src/g473_flash.c
     src/hardware.c
     src/as5047.c
     src/stm32_pwm.c
