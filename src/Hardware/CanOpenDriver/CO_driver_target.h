@@ -30,7 +30,6 @@
  * It is included from CO_driver.h, which contains documentation
  * for common definitions below. */
 
-/* 注意：不再包含 stm32g4xx_hal.h，保持跨平台兼容性 */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -125,7 +124,7 @@ typedef struct {
 
 /*============================================================================
  * Critical section protection - Platform abstraction
- * 
+ *
  * These functions are implemented in the platform-specific .c file
  *===========================================================================*/
 

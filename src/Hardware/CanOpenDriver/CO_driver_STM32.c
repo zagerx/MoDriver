@@ -29,11 +29,8 @@
  * Implementation Author:               Tilen Majerle <tilen@majerle.eu>
  */
 #include "301/CO_driver.h"
-
 /* 包含 STM32 特定头文件 - 仅在 .c 文件中 */
-#include "stm32g4xx_hal.h"
-#include "fdcan.h"  /* 访问 hfdcan2 */
-#include "tim.h"    /* 访问 htim6 */
+#include "fdcan.h" /* 访问 hfdcan2 */
 
 /* Local CAN module object */
 static CO_CANmodule_t *CANModule_local = NULL; /* Local instance of global CAN module */
@@ -46,7 +43,7 @@ static CO_CANmodule_t *CANModule_local = NULL; /* Local instance of global CAN m
 void CO_CANsetConfigurationMode(void *CANptr)
 {
 	/* Put CAN module in configuration mode */
-	(void)CANptr;  /* 不使用参数，直接使用 hfdcan2 */
+	(void)CANptr; /* 不使用参数，直接使用 hfdcan2 */
 	HAL_FDCAN_Stop(&hfdcan2);
 }
 
@@ -64,8 +61,8 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 				   uint16_t rxSize, CO_CANtx_t txArray[], uint16_t txSize,
 				   uint16_t CANbitRate)
 {
-	(void)CANptr;      /* 不使用参数，直接使用 hfdcan2 */
-	(void)CANbitRate;  /* 不使用参数，CAN波特率在CubeMX中配置 */
+	(void)CANptr;     /* 不使用参数，直接使用 hfdcan2 */
+	(void)CANbitRate; /* 不使用参数，CAN波特率在CubeMX中配置 */
 
 	/* verify arguments */
 	if (CANmodule == NULL || rxArray == NULL || txArray == NULL) {
@@ -115,9 +112,8 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 	 * Reject non-matching extended ID messages
 	 */
 
-	if (HAL_FDCAN_ConfigGlobalFilter(&hfdcan2, FDCAN_ACCEPT_IN_RX_FIFO0,
-					 FDCAN_REJECT, FDCAN_FILTER_REMOTE,
-					 FDCAN_FILTER_REMOTE) != HAL_OK) {
+	if (HAL_FDCAN_ConfigGlobalFilter(&hfdcan2, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_REJECT,
+					 FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK) {
 		return CO_ERROR_ILLEGAL_ARGUMENT;
 	}
 
@@ -204,7 +200,7 @@ CO_CANtx_t *CO_CANtxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, uint16
  */
 static uint8_t prv_send_can_message(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
 {
-	(void)CANmodule;  /* 不使用参数，直接使用 hfdcan2 */
+	(void)CANmodule; /* 不使用参数，直接使用 hfdcan2 */
 	uint8_t success = 0;
 
 	/* Check if TX FIFO is ready to accept more messages */
@@ -257,8 +253,7 @@ static uint8_t prv_send_can_message(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffe
 		}
 
 		/* Now add message to FIFO. Should not fail */
-		success = HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2,
-							&tx_hdr, buffer->data) == HAL_OK;
+		success = HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &tx_hdr, buffer->data) == HAL_OK;
 	}
 
 	return success;
@@ -342,8 +337,7 @@ void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 	// CANOpen just care about Bus_off, Warning, Passive and Overflow
 	// I didn't find overflow error register in STM32, if you find it please let me know
 
-	err = hfdcan2.Instance->PSR &
-	      (FDCAN_PSR_BO | FDCAN_PSR_EW | FDCAN_PSR_EP);
+	err = hfdcan2.Instance->PSR & (FDCAN_PSR_BO | FDCAN_PSR_EW | FDCAN_PSR_EP);
 
 	if (CANmodule->errOld != err) {
 
@@ -385,7 +379,7 @@ void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 static void prv_read_can_received_msg(FDCAN_HandleTypeDef *hfdcan, uint32_t fifo,
 				      uint32_t fifo_isrs)
 {
-	(void)fifo_isrs;  /* 不使用参数，保留供将来使用 */
+	(void)fifo_isrs; /* 不使用参数，保留供将来使用 */
 
 	CO_CANrxMsg_t rcvMsg;
 	CO_CANrx_t *buffer = NULL; /* receive message buffer from CO_CANmodule_t object. */

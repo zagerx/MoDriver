@@ -56,9 +56,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    # CANopen 相关路径
-    ${CMAKE_SOURCE_DIR}/CANopenNode        # 使 App/OD.c 能找到 301/CO_ODinterface.h
-    ${CMAKE_SOURCE_DIR}/Hardware/CanOpenDriver  # CO_driver_target.h
+
 )
 
 # Add project symbols (macros)
@@ -84,15 +82,16 @@ add_subdirectory(motorlib)
 add_subdirectory(CMSIS-DSP)
 add_subdirectory(statemachine)
 add_subdirectory(CANopenNode)
+add_subdirectory(Hardware/CanOpenDriver)
 add_subdirectory(cia402)
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     App/main.c
     App/it.c
-    App/canopen_app.c
-    App/OD.c
-    Hardware/CanOpenDriver/CO_driver_STM32.c
+    App/canopen_app/canopen_app.c
+    App/canopen_app/OD.c
+    App/canopen_app/CO_storageBlank.c  # 添加这一行
 )
 
 # 工程依赖
@@ -100,6 +99,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     hardware_driver
     motor
     canopennode
+    canopennode_driver
     sm
     cia402
 )

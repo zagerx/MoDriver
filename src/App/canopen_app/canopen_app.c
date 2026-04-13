@@ -7,6 +7,7 @@
 
 #include "canopen_app.h"
 #include "OD.h"
+#include <stdint.h>
 #include <string.h>
 #include "motor.h"
 /*============================================================================
@@ -30,7 +31,24 @@ static int canopen_app_resetCommunication(canopen_app_t *app);
 /*============================================================================
  * API 实现
  *===========================================================================*/
+#include "CO_storageBlank.h"
 
+/* 存储对象（必须持久存在） */
+static CO_storage_t storage;
+extern struct motor_param_ext m1_param_ext;
+
+/* 存储条目数组 */
+static CO_storage_entry_t storage_entries[] = {
+	{
+		.addr = &m1_param_ext,                       // 参数地址
+		.len = sizeof(m1_param_ext),                 // 参数长度
+		.subIndexOD = 3,                             // 对应 OD 0x1010:3（应用参数）
+		.attr = CO_storage_cmd | CO_storage_restore, // 支持命令保存和恢复
+	},
+};
+
+/* 错误码输出 */
+static uint32_t storage_error = 0;
 /**
  * @brief 初始化 CANopen 应用
  */
@@ -78,6 +96,18 @@ int canopen_app_init(canopen_app_t *app, struct motor *motor)
 	}
 
 	app->initialized = true;
+
+#if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+	CO_ReturnError_t err = CO_storageBlank_init(&storage,           // 存储对象
+						    app->co->CANmodule, // CAN 模块
+						    OD_ENTRY_H1010,     // 0x1010 存储参数
+						    OD_ENTRY_H1011,     // 0x1011 恢复默认
+						    storage_entries,    // 条目数组
+						    1,                  // 条目数量
+						    &storage_error      // 错误码输出
+	);
+	(void)err;
+#endif
 
 	/* 绑定 CiA 402 实例参数 */
 	cia402_params_bind(
@@ -133,7 +163,7 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 		/* 处理复位命令 */
 		switch (CO_process(app->co, false, timeDifference_us, NULL)) {
 		case CO_RESET_COMM:
-			/* 通信复位 - 不停止定时器，定时器持续运行 */
+			/* 通信复位 */
 			CO_CANsetConfigurationMode(NULL);
 			CO_delete(app->co);
 			app->co = NULL;

@@ -8,8 +8,7 @@
 #include "hardware.h"
 #include "motor.h"
 #include "motorlib_control_param.h"
-#include "canopen_app.h"
-
+#include "canopen_app/canopen_app.h"
 /*============================================================================
  * 电机 1 硬件接口配置
  *===========================================================================*/
@@ -28,7 +27,6 @@ static const struct motor_hw_ops m1_hw_ops = {
 	.encoder = &m1_encoder_ops,
 	.inverter = &m1_inverter_ops,
 };
-
 struct motor_param_ext m1_param_ext = {
 	.feedback_param =
 		{
@@ -64,7 +62,6 @@ struct motor_param_ext m1_param_ext = {
 				.ki = POSITION_LOOP_KI,
 				.kd = 0.0f,
 				.limit = POSITION_LOOP_LIMIT},
-
 		},
 };
 
@@ -107,22 +104,5 @@ int main(void)
 		uint32_t dt_ms = current_tick - last_tick;
 		last_tick = current_tick;
 		canopen_app_process(&canopen_app, dt_ms);
-	}
-}
-
-/**
- * @brief ADC 注入组转换完成回调
- * @note 20kHz 高频控制任务
- */
-void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
-{
-	volatile uint16_t raw_uvw[5];
-	if (hadc->Instance == ADC1) {
-		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
-		raw_uvw[1] = (uint32_t)(hadc->Instance->JDR2);
-		// raw_uvw[2] = (uint32_t)(hadc2.Instance->JDR1);
-		raw_uvw[4] = (uint32_t)(hadc->Instance->DR) + 300; // 硬件补偿，临时方案
-		raw_uvw[3] = 0;
-		motor_highfreq_task(motor_1, (uint16_t *)raw_uvw);
 	}
 }

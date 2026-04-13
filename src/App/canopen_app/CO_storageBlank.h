@@ -26,8 +26,9 @@
 #define CO_STORAGE_BLANK_H
 
 #include "storage/CO_storage.h"
+#include "CO_driver_target.h"
 
-#if ((CO_CONFIG_STORAGE)&CO_CONFIG_STORAGE_ENABLE) || defined CO_DOXYGEN
+#if ((CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE) || defined CO_DOXYGEN
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,11 +44,11 @@ extern "C" {
  *   CANopenLinux/CO_storageLinux.h files.
  */
 
-CO_ReturnError_t CO_storageBlank_init(CO_storage_t* storage, CO_CANmodule_t* CANmodule,
-                                      OD_entry_t* OD_1010_StoreParameters, OD_entry_t* OD_1011_RestoreDefaultParam,
-                                      CO_storage_entry_t* entries, uint8_t entriesCount, uint32_t* storageInitError);
-
-uint32_t CO_storageBlank_auto_process(CO_storage_t* storage, bool_t closeFiles);
+CO_ReturnError_t CO_storageBlank_init(CO_storage_t *storage, CO_CANmodule_t *CANmodule,
+				      OD_entry_t *OD_1010_StoreParameters,
+				      OD_entry_t *OD_1011_RestoreDefaultParam,
+				      CO_storage_entry_t *entries, uint8_t entriesCount,
+				      uint32_t *storageInitError);
 
 #ifdef __cplusplus
 }

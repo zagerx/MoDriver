@@ -19,7 +19,7 @@
 
 #include "storage/CO_storage.h"
 
-#if ((CO_CONFIG_STORAGE)&CO_CONFIG_STORAGE_ENABLE) != 0
+#if ((CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE) != 0
 
 /*
  * Custom function for writing OD object "Store parameters"
@@ -140,14 +140,12 @@ CO_storage_init(CO_storage_t* storage, CO_CANmodule_t* CANmodule, OD_entry_t* OD
         || (OD_1011_RestoreDefaultParameters == NULL) || (store == NULL) || (restore == NULL) || (entries == NULL)) {
         return CO_ERROR_ILLEGAL_ARGUMENT;
     }
-
     /* Configure object variables */
     storage->CANmodule = CANmodule;
     storage->store = store;
     storage->restore = restore;
     storage->entries = entries;
     storage->entriesCount = entriesCount;
-
     /* configure extensions */
     storage->OD_1010_extension.object = storage;
     storage->OD_1010_extension.read = OD_readOriginal;

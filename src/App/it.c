@@ -162,7 +162,7 @@ void process_data(uint8_t *data, uint16_t len)
  * CANopen 定时中断处理
  *===========================================================================*/
 
-#include "canopen_app.h"
+#include "canopen_app/canopen_app.h"
 
 /* 外部声明 main.c 中定义的 CANopen 应用实例 */
 extern canopen_app_t canopen_app;
@@ -174,5 +174,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim == &htim6) {
 		canopen_app_interrupt(&canopen_app, CANOPEN_TIM_PERIOD_US);
+	}
+}
+/**
+ * @brief ADC 注入组转换完成回调
+ * @note 20kHz 高频控制任务
+ */
+void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	volatile uint16_t raw_uvw[5];
+	if (hadc->Instance == ADC1) {
+		raw_uvw[0] = (uint32_t)(hadc->Instance->JDR1);
+		raw_uvw[1] = (uint32_t)(hadc->Instance->JDR2);
+		// raw_uvw[2] = (uint32_t)(hadc2.Instance->JDR1);
+		raw_uvw[4] = (uint32_t)(hadc->Instance->DR) + 300; // 硬件补偿，临时方案
+		raw_uvw[3] = 0;
+		motor_highfreq_task(motor_1, (uint16_t *)raw_uvw);
 	}
 }
