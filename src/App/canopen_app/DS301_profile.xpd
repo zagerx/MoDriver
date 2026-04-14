@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xpd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModifiedBy="" fileModificationDate="2026-04-14" fileModificationTime="15:53:00.5764743+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xpd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModifiedBy="" fileModificationDate="2026-04-14" fileModificationTime="22:00:54.7543628+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName></q1:vendorName>
         <q1:vendorID></q1:vendorID>
@@ -709,7 +709,10 @@
             <q1:varDeclaration name="ls" uniqueID="UID_RECSUB_200921">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="crc16" uniqueID="UID_RECSUB_200922">
+            <q1:varDeclaration name="is_calibrated" uniqueID="UID_RECSUB_200922">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="crc16" uniqueID="UID_RECSUB_200923">
               <UINT />
             </q1:varDeclaration>
           </q1:struct>
@@ -2346,7 +2349,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_200900">
             <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x22" />
+            <q1:defaultValue value="0x23" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_200901" access="readWrite">
             <label lang="en">wheel_radius</label>
@@ -2513,7 +2516,12 @@ The life time factor multiplied with the guard time gives the life time for the 
             <REAL />
             <q1:defaultValue value="0.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200922" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200922">
+            <label lang="en">is_calibrated</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200923" access="readWrite">
             <label lang="en">crc16</label>
             <UINT />
             <q1:defaultValue value="0" />
@@ -2600,7 +2608,7 @@ The life time factor multiplied with the guard time gives the life time for the 
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xpd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModificationDate="2026-04-14" fileModificationTime="15:53:00.5764743+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xpd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModificationDate="2026-04-14" fileModificationTime="22:00:54.7543628+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -2908,7 +2916,7 @@ The life time factor multiplied with the guard time gives the life time for the 
             <CANopenSubObject subIndex="07" name="Application object 7" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0407" />
             <CANopenSubObject subIndex="08" name="Application object 8" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0408" />
           </CANopenObject>
-          <CANopenObject index="2009" name="motorlib_params" objectType="9" uniqueIDRef="UID_OBJ_2009" subNumber="35">
+          <CANopenObject index="2009" name="motorlib_params" objectType="9" uniqueIDRef="UID_OBJ_2009" subNumber="36">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200900" />
             <CANopenSubObject subIndex="01" name="wheel_radius" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200901" />
             <CANopenSubObject subIndex="02" name="gear_ratio" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200902" />
@@ -2943,7 +2951,8 @@ The life time factor multiplied with the guard time gives the life time for the 
             <CANopenSubObject subIndex="1F" name="pos_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091F" />
             <CANopenSubObject subIndex="20" name="rs" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200920" />
             <CANopenSubObject subIndex="21" name="ls" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200921" />
-            <CANopenSubObject subIndex="22" name="crc16" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200922" />
+            <CANopenSubObject subIndex="22" name="is_calibrated" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200922" />
+            <CANopenSubObject subIndex="23" name="crc16" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200923" />
           </CANopenObject>
           <CANopenObject index="603F" name="ErrorCode" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_603F" />
           <CANopenObject index="6040" name="Controlword" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_OBJ_6040" />

@@ -75,7 +75,8 @@ struct motor_param_ext {
 	struct trajectory_param traj_param;             /**< @brief 轨迹规划参数 */
 	struct foc_param foc_param;                     /**< @brief FOC参数 */
 	struct motor_electrical_param electrical_param; /**< @brief 电机本体参数 */
-	uint16_t crc_16;                                /**< @brief 参数完整性校验 */
+	uint8_t is_calibrated;
+	uint16_t crc_16; /**< @brief 参数完整性校验 */
 };
 
 #endif /* MOTOR_INTERFACE_PARAMS_H */

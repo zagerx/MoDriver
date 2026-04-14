@@ -15,6 +15,7 @@
 #include "inverter.h"
 #include "feedback.h"
 #include "currsmp.h"
+#include "motor_interface_params.h"
 #include "statemachine.h"
 #include "motor_state.h"
 #include "foc.h"
@@ -71,44 +72,6 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
 }
 
 /**
- * @brief 检查电机参数合法性
- * @param[in] motor 电机实例指针
- * @return int16_t 错误码
- * @retval 0 参数合法
- * @retval -1 电机实例为空
- * @retval -2 扩展参数为空
- * @retval -3 反馈参数为空
- * @retval -10 轮子半径无效
- * @retval -11 减速比无效
- * @retval -12 极对数无效
- * @retval -13 方向无效
- * @retval -14 编码器分辨率无效
- * @note 当前版本总是返回-1，强制进入校准状态
- */
-static int16_t motor_param_check(struct motor *motor)
-{
-	if (!motor) {
-		return -1; /* 电机实例为空 */
-	}
-
-	struct motor_param_ext *param_ext = motor->param_ext;
-	if (!param_ext) {
-		return -2; /* 扩展参数为空 */
-	}
-
-	/* CRC 校验伪代码 */
-	/* uint16_t calc_crc = crc16_calculate((uint8_t *)param_ext, sizeof(*param_ext)); */
-	/* if (calc_crc != param_ext->crc_16) { */
-	/*     return -20; */
-	/* } */
-	// if(param_ext->currsmp_param.gain_i_bus)
-	(void)param_ext->crc_16;
-
-	/* 暂时保留默认返回-1，确保进入校准状态 */
-	return 0;
-}
-
-/**
  * @brief 初始化电机
  * @param[in] motor 电机实例指针
  * @return 无
@@ -126,24 +89,20 @@ void motor_init(struct motor *motor)
 	struct statemachine *sm_mode = &motor->sm_mode;
 	struct feedback *fb = &motor->feedback;
 	struct currsmp *currsmp = &motor->currsmp;
-
+	struct motor_param_ext *params = motor->param_ext;
 	if (!sm || !fb || !currsmp) {
 		/* 关键指针为空，无法初始化 */
 		return;
 	}
 
-	if (motor_param_check(motor)) {
-		statemachine_init(sm, motor, motor_calib_state, NULL, 0);
-	} else {
+	if (params->is_calibrated) {
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
+	} else {
+		statemachine_init(sm, motor, motor_calib_state, NULL, 0);
 	}
 
 	statemachine_init(sm_mode, motor, motor_mode_none, NULL, 0);
 	struct foc *foc = &motor->foc;
-	if (!motor->param_ext) {
-		/* 参数未绑定 */
-		return;
-	}
 
 	foc_bind(foc, fb, currsmp, &motor->param_ext->foc_param);
 
@@ -169,20 +128,19 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 	struct feedback *feedback = &motor->feedback;
 	struct currsmp *currsmp = &motor->currsmp;
 	struct statemachine *sm = &motor->sm;
-
+	struct motor_param_ext *params = motor->param_ext;
 	currsmp_update_raw(currsmp, adc_raw);
+	currsmp_update_bus(currsmp);
+
 	feedback_update_raw(feedback);
 
 	/* 仅在非校准状态下执行完整的反馈更新和状态机调度，校准状态下可能需要特殊处理 */
-	if (sm->current_state != motor_calib_state) {
-		currsmp_update(currsmp);
+	if (params->is_calibrated) {
+		currsmp_update_phase_currment(currsmp);
 		feedback_update(feedback, CONTROL_PERIOD_DT);
 		foc_update_idiq(&motor->foc);
-	} else {
-		currsmp_update_bus(currsmp);
+		motor_protection_update(motor, CONTROL_PERIOD_DT);
 	}
-
-	motor_protection_update(motor, CONTROL_PERIOD_DT);
 	sm_dispatch(sm);
 }
 

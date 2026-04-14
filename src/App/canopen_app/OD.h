@@ -16,7 +16,7 @@
 
         Created:      2020/11/23 19:00:00
         Created By:   
-        Modified:     2026/4/14 15:53:00
+        Modified:     2026/4/14 22:00:54
         Modified By:  
 
     Device Info:
@@ -271,6 +271,7 @@ typedef struct {
         float32_t pos_limit;
         float32_t rs;
         float32_t ls;
+        uint8_t is_calibrated;
         uint16_t crc16;
     } x2009_motorlib_params;
     uint16_t x603F_errorCode;

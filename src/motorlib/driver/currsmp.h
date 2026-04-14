@@ -79,7 +79,7 @@ void currsmp_update_raw(struct currsmp *currsmp, uint16_t *adc_raw);
  * @return 无
  * @details 使用原始值和参数计算相电流、母线电流、母线电压
  */
-void currsmp_update(struct currsmp *currsmp);
+void currsmp_update_phase_currment(struct currsmp *currsmp);
 
 /**
  * @brief 获取电流采样输出数据

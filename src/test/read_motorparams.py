@@ -39,7 +39,8 @@ params = [
     (0x2009, 0x1F, "pos_limit", "float"),
     (0x2009, 0x20, "rs", "float"),
     (0x2009, 0x21, "ls", "float"),
-    (0x2009, 0x22, "crc16", "uint16"),
+    (0x2009, 0x22, "is_calibrated", "uint8"),
+    (0x2009, 0x23, "crc16", "uint16"),
 ]
 
 group_map = {
@@ -51,6 +52,7 @@ group_map = {
     "foc_vel": ["vel_kp", "vel_ki", "vel_kd", "vel_limit"],
     "foc_pos": ["pos_kp", "pos_ki", "pos_kd", "pos_limit"],
     "electrical_param": ["rs", "ls"],
+    "calibration": ["is_calibrated"],
     "crc": ["crc16"],
 }
 
@@ -78,8 +80,12 @@ for idx, sub, name, dtype in params:
 
     if dtype == "float":
         value = struct.unpack('<f', resp.data[4:8])[0]
-    else:
+    elif dtype == "uint16":
         value = struct.unpack('<H', resp.data[4:6])[0]
+    elif dtype == "uint8":
+        value = resp.data[4]
+    else:
+        value = resp.data[4:8]
 
     results[name] = value
 

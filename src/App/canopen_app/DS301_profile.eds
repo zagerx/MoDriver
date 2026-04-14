@@ -8,7 +8,7 @@ Description=
 CreationTime=7:00PM
 CreationDate=11-23-2020
 CreatedBy=
-ModificationTime=3:53PM
+ModificationTime=10:00PM
 ModificationDate=04-14-2026
 ModifiedBy=
 
@@ -1840,7 +1840,7 @@ SupportedObjects=1
 ParameterName=motorlib_params
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x23
+SubNumber=0x24
 
 [2009sub0]
 ParameterName=Highest sub-index supported
@@ -1848,7 +1848,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x22
+DefaultValue=0x23
 PDOMapping=0
 
 [2009sub1]
@@ -2149,6 +2149,15 @@ DefaultValue=0.0
 PDOMapping=0
 
 [2009sub22]
+ParameterName=is_calibrated
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[2009sub23]
 ParameterName=crc16
 ObjectType=0x7
 ;StorageLocation=RAM

@@ -197,7 +197,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .COB_IDServerToClientTx = 0x00000580
     },
     .x2009_motorlib_params = {
-        .highestSub_indexSupported = 0x22,
+        .highestSub_indexSupported = 0x23,
         .wheel_radius = 17.5,
         .gear_ratio = 1.0,
         .pole_pairs = 0.0,
@@ -231,6 +231,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .pos_limit = 15000.0,
         .rs = 0.0,
         .ls = 0.0,
+        .is_calibrated = 0x00,
         .crc16 = 0x0000
     },
     .x603F_errorCode = 0x0000,
@@ -287,7 +288,7 @@ typedef struct {
     OD_obj_record_t o_1A01_TPDOMappingParameter[9];
     OD_obj_record_t o_1A02_TPDOMappingParameter[9];
     OD_obj_record_t o_1A03_TPDOMappingParameter[9];
-    OD_obj_record_t o_2009_motorlib_params[35];
+    OD_obj_record_t o_2009_motorlib_params[36];
     OD_obj_var_t o_603F_errorCode;
     OD_obj_var_t o_6040_controlword;
     OD_obj_var_t o_6041_statusword;
@@ -1338,8 +1339,14 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.crc16,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.is_calibrated,
             .subIndex = 34,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.crc16,
+            .subIndex = 35,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         }
@@ -1449,7 +1456,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1A01, 0x09, ODT_REC, &ODObjs.o_1A01_TPDOMappingParameter, NULL},
     {0x1A02, 0x09, ODT_REC, &ODObjs.o_1A02_TPDOMappingParameter, NULL},
     {0x1A03, 0x09, ODT_REC, &ODObjs.o_1A03_TPDOMappingParameter, NULL},
-    {0x2009, 0x23, ODT_REC, &ODObjs.o_2009_motorlib_params, NULL},
+    {0x2009, 0x24, ODT_REC, &ODObjs.o_2009_motorlib_params, NULL},
     {0x603F, 0x01, ODT_VAR, &ODObjs.o_603F_errorCode, NULL},
     {0x6040, 0x01, ODT_VAR, &ODObjs.o_6040_controlword, NULL},
     {0x6041, 0x01, ODT_VAR, &ODObjs.o_6041_statusword, NULL},

@@ -53,7 +53,8 @@ params = [
     (0x2009, 0x1F, "pos_limit", "float", 15000.0),
     (0x2009, 0x20, "rs", "float", 0.0),
     (0x2009, 0x21, "ls", "float", 0.0),
-    (0x2009, 0x22, "crc16", "uint16", 0x0000),
+    (0x2009, 0x22, "is_calibrated", "uint8", 0x00),
+    (0x2009, 0x23, "crc16", "uint16", 0x0000),
 ]
 
 
@@ -65,10 +66,13 @@ def build_sdo_download_request(idx, sub, dtype, value):
     elif dtype == "uint16":
         data = struct.pack('<H', int(value))
         cmd = 0x2B  # 2 bytes write
+    elif dtype == "uint8":
+        data = struct.pack('<B', int(value))
+        cmd = 0x2F  # 1 byte write
     else:
         raise ValueError(f"不支持的数据类型: {dtype}")
 
-    # 补零到 4 字节，避免 uint16 访问 data[2]/data[3] 越界
+    # 补零到 4 字节，避免访问 data[2]/data[3] 越界
     data = data.ljust(4, b'\x00')
 
     return can.Message(
