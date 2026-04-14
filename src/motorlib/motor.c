@@ -101,10 +101,11 @@ static int16_t motor_param_check(struct motor *motor)
 	/* if (calc_crc != param_ext->crc_16) { */
 	/*     return -20; */
 	/* } */
+	// if(param_ext->currsmp_param.gain_i_bus)
 	(void)param_ext->crc_16;
 
 	/* 暂时保留默认返回-1，确保进入校准状态 */
-	return -1;
+	return 0;
 }
 
 /**

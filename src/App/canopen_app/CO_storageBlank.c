@@ -132,10 +132,46 @@ CO_ReturnError_t CO_storageBlank_init(CO_storage_t *storage, CO_CANmodule_t *CAN
 			return CO_ERROR_ILLEGAL_ARGUMENT;
 		}
 
-		/* 注意：启动加载由应用层在 main.c 中显式完成 */
+		/* 从 Flash 启动加载参数 */
+		uint16_t read_len = (uint16_t)(entry->len + SIGNATURE_SIZE);
+		if (read_len > sizeof(storage_buffer)) {
+			*storageInitError |= ((uint32_t)1) << entry->subIndexOD;
+			ret = CO_ERROR_DATA_CORRUPT;
+			continue;
+		}
+
+		hardware_flash_read_params(storage_buffer, &read_len);
+		if (read_len < (entry->len + SIGNATURE_SIZE)) {
+			*storageInitError |= ((uint32_t)1) << entry->subIndexOD;
+			ret = CO_ERROR_DATA_CORRUPT;
+			continue;
+		}
+
+		storage_signature_t *sig = (storage_signature_t *)storage_buffer;
+		bool_t data_corrupt = false;
+		if (sig->magic != STORAGE_MAGIC || sig->len != entry->len) {
+			data_corrupt = true;
+		} else {
+			uint16_t calc_crc =
+				crc16_ccitt(storage_buffer + SIGNATURE_SIZE, sig->len, 0);
+			if (calc_crc != sig->crc) {
+				data_corrupt = true;
+			} else {
+				memcpy(entry->addr, storage_buffer + SIGNATURE_SIZE, entry->len);
+			}
+		}
+
+		if (data_corrupt) {
+			uint32_t error_bit = entry->subIndexOD;
+			if (error_bit > 31U) {
+				error_bit = 31U;
+			}
+			*storageInitError |= ((uint32_t)1) << error_bit;
+			ret = CO_ERROR_DATA_CORRUPT;
+		}
 	}
 
-	return CO_ERROR_NO;
+	return ret;
 }
 
 #endif /* (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE */

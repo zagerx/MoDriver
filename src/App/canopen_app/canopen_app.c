@@ -11,48 +11,26 @@
 #include <string.h>
 #include "motor.h"
 #include "motor_interface_params.h"
-/*============================================================================
- * 默认配置参数
- *===========================================================================*/
+#include "CO_storageBlank.h"
 
 #define DEFAULT_FIRST_HB_TIME        500
 #define DEFAULT_SDO_SRV_TIMEOUT_TIME 1000
 #define DEFAULT_SDO_CLI_TIMEOUT_TIME 500
 #define DEFAULT_SDO_CLI_BLOCK        false
 #define NODE_ID                      (21)
-/* NMT 控制字 */
 #define NMT_CONTROL                  (CO_NMT_ERR_ON_ERR_REG | CO_ERR_REG_GENERIC_ERR | CO_ERR_REG_COMMUNICATION)
 
 /*============================================================================
  * 内部函数声明
  *===========================================================================*/
+static int canopen_app_resetCommunication(struct canopen_app *app);
 
-static int canopen_app_resetCommunication(canopen_app_t *app);
+extern struct motor_param_ext *pmotor1_param;
 
-/*============================================================================
- * API 实现
- *===========================================================================*/
-#include "CO_storageBlank.h"
-
-/* 存储对象（必须持久存在） */
-static CO_storage_t storage;
-extern struct motor_param_ext m1_param_ext;
-
-/* 存储条目数组 */
-static CO_storage_entry_t storage_entries[] = {
-	{
-		.addr = &m1_param_ext,                       // 参数地址
-		.len = sizeof(m1_param_ext),                 // 参数长度
-		.subIndexOD = 3,                             // 对应 OD 0x1010:3（应用参数）
-		.attr = CO_storage_cmd | CO_storage_restore, // 支持命令保存和恢复
-	},
-};
-/* 错误码输出 */
-static uint32_t storage_error = 0;
 /**
  * @brief 初始化 CANopen 应用
  */
-int canopen_app_init(canopen_app_t *app, struct motor *motor)
+int canopen_app_init(struct canopen_app *app, struct motor *motor)
 {
 	/* 参数检查 */
 	if (app == NULL || NODE_ID < 1 || NODE_ID > 127) {
@@ -63,7 +41,7 @@ int canopen_app_init(canopen_app_t *app, struct motor *motor)
 	void (*saved_sys_reset)(void) = app->sys_reset_ops;
 
 	/* 清零结构体 */
-	memset(app, 0, sizeof(canopen_app_t));
+	memset(app, 0, sizeof(struct canopen_app));
 
 	/* 恢复回调函数 */
 	app->sys_reset_ops = saved_sys_reset;
@@ -98,13 +76,18 @@ int canopen_app_init(canopen_app_t *app, struct motor *motor)
 	app->initialized = true;
 
 #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
-	CO_ReturnError_t err = CO_storageBlank_init(&storage,           // 存储对象
-						    app->co->CANmodule, // CAN 模块
-						    OD_ENTRY_H1010,     // 0x1010 存储参数
-						    OD_ENTRY_H1011,     // 0x1011 恢复默认
-						    storage_entries,    // 条目数组
-						    1,                  // 条目数量
-						    &storage_error      // 错误码输出
+	/* 初始化存储条目 */
+	app->storage_entries[0].addr = pmotor1_param;
+	app->storage_entries[0].len = sizeof(struct motor_param_ext);
+	app->storage_entries[0].subIndexOD = 3;
+	app->storage_entries[0].attr = CO_storage_cmd | CO_storage_restore;
+	CO_ReturnError_t err = CO_storageBlank_init(&app->storage,        // 存储对象
+						    app->co->CANmodule,   // CAN 模块
+						    OD_ENTRY_H1010,       // 0x1010 存储参数
+						    OD_ENTRY_H1011,       // 0x1011 恢复默认
+						    app->storage_entries, // 条目数组
+						    1,                    // 条目数量
+						    &app->storage_error   // 错误码输出
 	);
 	(void)err;
 #endif
@@ -126,7 +109,7 @@ int canopen_app_init(canopen_app_t *app, struct motor *motor)
  * @brief 反初始化 CANopen 应用
  * @note 不停止定时器，定时器由应用层统一管理
  */
-void canopen_app_deinit(canopen_app_t *app)
+void canopen_app_deinit(struct canopen_app *app)
 {
 	if (app == NULL || !app->initialized) {
 		return;
@@ -147,7 +130,7 @@ void canopen_app_deinit(canopen_app_t *app)
 /**
  * @brief 主循环处理函数
  */
-void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
+void canopen_app_process(struct canopen_app *app, uint32_t dt_ms)
 {
 	if (app == NULL || !app->initialized || app->co == NULL) {
 		return;
@@ -156,9 +139,6 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 	if (dt_ms > 0) {
 		/* 转换为微秒 */
 		uint32_t timeDifference_us = dt_ms * 1000;
-
-		/* 处理 CANopen */
-		// CO_NMT_reset_cmd_t reset_status = ;
 
 		/* 处理复位命令 */
 		switch (CO_process(app->co, false, timeDifference_us, NULL)) {
@@ -199,7 +179,7 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms)
 /**
  * @brief 中断处理函数
  */
-void canopen_app_interrupt(canopen_app_t *app, uint32_t dt_us)
+void canopen_app_interrupt(struct canopen_app *app, uint32_t dt_us)
 {
 	if (app == NULL || !app->initialized || app->co == NULL) {
 		return;
@@ -237,7 +217,7 @@ void canopen_app_interrupt(canopen_app_t *app, uint32_t dt_us)
 /**
  * @brief 复位通信（内部函数）
  */
-static int canopen_app_resetCommunication(canopen_app_t *app)
+static int canopen_app_resetCommunication(struct canopen_app *app)
 {
 	CO_ReturnError_t err;
 	uint32_t errInfo = 0;

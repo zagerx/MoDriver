@@ -11,14 +11,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "CANopen.h"
+#include "storage/CO_storage.h"
 #include "cia402.h"
-/*============================================================================
- * 前向声明
- *===========================================================================*/
-
-struct canopen_app;
-typedef struct canopen_app canopen_app_t;
-
 /*============================================================================
  * 应用上下文结构体
  *===========================================================================*/
@@ -36,6 +30,10 @@ struct canopen_app {
 	CO_t *co;                           /**< CANopen 协议栈实例 */
 	bool initialized;                   /**< 初始化标志 */
 	CO_ReturnError_t last_err;          /**< 最后一次错误码 */
+
+	CO_storage_t storage;               /**< 存储对象 */
+	CO_storage_entry_t storage_entries[1]; /**< 存储条目数组 */
+	uint32_t storage_error;             /**< 存储错误码 */
 };
 
 /*============================================================================
@@ -54,18 +52,18 @@ extern "C" {
  *
  * @par 示例:
  * @code
- * static canopen_app_t canopen_app;
+ * static struct canopen_app canopen_app;
  * canopen_app_init(&canopen_app, 21);
  * @endcode
  */
-int canopen_app_init(canopen_app_t *app, struct motor *motor);
+int canopen_app_init(struct canopen_app *app, struct motor *motor);
 
 /**
  * @brief 反初始化 CANopen 应用
  * @param[in,out] app 应用实例
  * @note 停止 CAN 通信并释放资源
  */
-void canopen_app_deinit(canopen_app_t *app);
+void canopen_app_deinit(struct canopen_app *app);
 
 /**
  * @brief 主循环处理函数（非中断上下文调用）
@@ -73,7 +71,7 @@ void canopen_app_deinit(canopen_app_t *app);
  * @param[in] dt_ms 时间差（毫秒），从上一次调用到现在的时间间隔
  * @note 应在主循环中周期性调用，处理 NMT、SDO、心跳等协议功能
  */
-void canopen_app_process(canopen_app_t *app, uint32_t dt_ms);
+void canopen_app_process(struct canopen_app *app, uint32_t dt_ms);
 
 /**
  * @brief 中断处理函数（定时器中断中调用）
@@ -82,7 +80,7 @@ void canopen_app_process(canopen_app_t *app, uint32_t dt_ms);
  * @note 在定时器中断中调用，处理 SYNC/RPDO/TPDO
  *       必须保证实时性，不要在中断中执行耗时操作
  */
-void canopen_app_interrupt(canopen_app_t *app, uint32_t dt_us);
+void canopen_app_interrupt(struct canopen_app *app, uint32_t dt_us);
 
 /**
  * @brief 通信复位
@@ -90,14 +88,14 @@ void canopen_app_interrupt(canopen_app_t *app, uint32_t dt_us);
  * @return 0 成功，非 0 失败
  * @note 用于 NMT 复位通信命令后的重新初始化
  */
-int canopen_app_reset_comm(canopen_app_t *app);
+int canopen_app_reset_comm(struct canopen_app *app);
 
 /**
  * @brief 获取当前 NMT 状态
  * @param[in] app 应用实例
  * @return 当前 NMT 状态
  */
-static inline CO_NMT_internalState_t canopen_app_get_nmt_state(const canopen_app_t *app)
+static inline CO_NMT_internalState_t canopen_app_get_nmt_state(const struct canopen_app *app)
 {
 	if (app && app->co && app->co->NMT) {
 		return CO_NMT_getInternalState(app->co->NMT);
@@ -110,7 +108,7 @@ static inline CO_NMT_internalState_t canopen_app_get_nmt_state(const canopen_app
  * @param[in] app 应用实例
  * @return 当前节点 ID
  */
-static inline uint8_t canopen_app_get_node_id(const canopen_app_t *app)
+static inline uint8_t canopen_app_get_node_id(const struct canopen_app *app)
 {
 	return app ? app->node_id : 0;
 }
@@ -120,7 +118,7 @@ static inline uint8_t canopen_app_get_node_id(const canopen_app_t *app)
  * @param[in] app 应用实例
  * @return true 已初始化
  */
-static inline bool canopen_app_is_ready(const canopen_app_t *app)
+static inline bool canopen_app_is_ready(const struct canopen_app *app)
 {
 	return app ? app->initialized : false;
 }
@@ -131,7 +129,7 @@ static inline bool canopen_app_is_ready(const canopen_app_t *app)
  * @return CO_t 指针，可用于直接访问协议栈功能
  * @note 高级用法，谨慎使用
  */
-static inline CO_t *canopen_app_get_co_handle(const canopen_app_t *app)
+static inline CO_t *canopen_app_get_co_handle(const struct canopen_app *app)
 {
 	return app ? app->co : NULL;
 }

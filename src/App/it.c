@@ -4,7 +4,9 @@
 #include <string.h>
 #include <stdlib.h>
 extern uint8_t sg_uartreceive_buff[125];
-extern struct motor_param_ext m1_param_ext;
+// extern struct motor_param_ext m1_param_ext;
+extern struct motor_param_ext *pmotor1_param;
+
 void process_data(uint8_t *data, uint16_t len);
 
 void USER_UART_IRQHandler(UART_HandleTypeDef *huart)
@@ -124,15 +126,14 @@ void process_data(uint8_t *data, uint16_t len)
 					// 	(int32_t)(input[0] * 1000); // 转换为整数速度
 					motor_set_target_pos(motor_1, input[0], input[1]);
 				} else if (cmd_map[i].data_index == INDEX_VP_PI) {
-
-					m1_param_ext.foc_param.d_axis.kp = input[0];
-					m1_param_ext.foc_param.d_axis.ki = input[1];
-					m1_param_ext.foc_param.q_axis.kp = input[2];
-					m1_param_ext.foc_param.q_axis.ki = input[3];
-					m1_param_ext.foc_param.vel.kp = input[4];
-					m1_param_ext.foc_param.vel.ki = input[5];
-					m1_param_ext.foc_param.pos.kp = input[6];
-					m1_param_ext.foc_param.pos.ki = input[7];
+					pmotor1_param->foc_param.d_axis.kp = input[0];
+					pmotor1_param->foc_param.d_axis.ki = input[1];
+					pmotor1_param->foc_param.q_axis.kp = input[2];
+					pmotor1_param->foc_param.q_axis.ki = input[3];
+					pmotor1_param->foc_param.vel.kp = input[4];
+					pmotor1_param->foc_param.vel.ki = input[5];
+					pmotor1_param->foc_param.pos.kp = input[6];
+					pmotor1_param->foc_param.pos.ki = input[7];
 				} else if (cmd_map[i].data_index == INDEX_STATE) {
 					// 处理状态命令
 					if (input[0] == 0) {
@@ -165,7 +166,7 @@ void process_data(uint8_t *data, uint16_t len)
 #include "canopen_app/canopen_app.h"
 
 /* 外部声明 main.c 中定义的 CANopen 应用实例 */
-extern canopen_app_t canopen_app;
+extern struct canopen_app canopen_app;
 
 /* 定时器中断周期（微秒）- 与 TIM6 配置对应 */
 #define CANOPEN_TIM_PERIOD_US 1000 /* 1ms = 1000us */
