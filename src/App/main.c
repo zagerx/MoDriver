@@ -91,7 +91,9 @@ int main(void)
 	/* flash_read(&m1_param_ext, sizeof(m1_param_ext)); */
 
 	/* 绑定电机参数 */
-	motor_bind_param_ext(motor_1, &m1_param_ext);
+	// motor_bind_param_ext(motor_1, &m1_param_ext);
+	motor_bind_param_ext(
+		motor_1, (struct motor_param_ext *)(&OD_RAM.x2009_motorlib_params.wheel_radius));
 
 	/* 初始化电机 */
 	motor_init(motor_1);

@@ -8,7 +8,7 @@ Description=
 CreationTime=7:00PM
 CreationDate=11-23-2020
 CreatedBy=
-ModificationTime=1:24PM
+ModificationTime=3:53PM
 ModificationDate=04-14-2026
 ModifiedBy=
 
@@ -1833,33 +1833,25 @@ DefaultValue=0x65
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=9
-1=0x2000
-2=0x2001
-3=0x2002
-4=0x2003
-5=0x2004
-6=0x2005
-7=0x2006
-8=0x2007
-9=0x2008
+SupportedObjects=1
+1=0x2009
 
-[2000]
-ParameterName=feedback_param
+[2009]
+ParameterName=motorlib_params
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x8
+SubNumber=0x23
 
-[2000sub0]
+[2009sub0]
 ParameterName=Highest sub-index supported
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x07
+DefaultValue=0x22
 PDOMapping=0
 
-[2000sub1]
+[2009sub1]
 ParameterName=wheel_radius
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1868,7 +1860,7 @@ AccessType=rw
 DefaultValue=17.5
 PDOMapping=0
 
-[2000sub2]
+[2009sub2]
 ParameterName=gear_ratio
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1877,25 +1869,25 @@ AccessType=rw
 DefaultValue=1.0
 PDOMapping=0
 
-[2000sub3]
+[2009sub3]
 ParameterName=pole_pairs
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0
+DefaultValue=0.0
 PDOMapping=0
 
-[2000sub4]
+[2009sub4]
 ParameterName=direction
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0
+DefaultValue=0.0
 PDOMapping=0
 
-[2000sub5]
+[2009sub5]
 ParameterName=encoder_resolution
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1904,7 +1896,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2000sub6]
+[2009sub6]
 ParameterName=encoder_offset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1913,31 +1905,16 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2000sub7]
+[2009sub7]
 ParameterName=encoder_offset_frac
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0
+DefaultValue=0.0
 PDOMapping=0
 
-[2001]
-ParameterName=currsmp_param
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x7
-
-[2001sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0x06
-PDOMapping=0
-
-[2001sub1]
+[2009sub8]
 ParameterName=a_chn_offset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1946,7 +1923,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2001sub2]
+[2009sub9]
 ParameterName=b_chn_offset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1955,7 +1932,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2001sub3]
+[2009subA]
 ParameterName=c_chn_offset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1964,7 +1941,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2001sub4]
+[2009subB]
 ParameterName=gain_phase
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1973,16 +1950,16 @@ AccessType=rw
 DefaultValue=0.006855
 PDOMapping=0
 
-[2001sub5]
+[2009subC]
 ParameterName=gain_i_bus
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0
+DefaultValue=0.0
 PDOMapping=0
 
-[2001sub6]
+[2009subD]
 ParameterName=gain_v_bus
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1991,31 +1968,16 @@ AccessType=rw
 DefaultValue=0.01059
 PDOMapping=0
 
-[2002]
-ParameterName=trajectory_param
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x3
-
-[2002sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0x02
-PDOMapping=0
-
-[2002sub1]
+[2009subE]
 ParameterName=acc_max
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=9800.0
+DefaultValue=1800.0
 PDOMapping=0
 
-[2002sub2]
+[2009subF]
 ParameterName=vmax
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2024,23 +1986,8 @@ AccessType=rw
 DefaultValue=15000.0
 PDOMapping=0
 
-[2003]
-ParameterName=foc_pid_param_d
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x5
-
-[2003sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0x04
-PDOMapping=0
-
-[2003sub1]
-ParameterName=kp
+[2009sub10]
+ParameterName=d_kp
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2048,8 +1995,8 @@ AccessType=rw
 DefaultValue=0.1
 PDOMapping=0
 
-[2003sub2]
-ParameterName=ki
+[2009sub11]
+ParameterName=d_ki
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2057,59 +2004,8 @@ AccessType=rw
 DefaultValue=800.0
 PDOMapping=0
 
-[2003sub3]
-ParameterName=kd
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0008
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[2003sub4]
-ParameterName=limit
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0008
-AccessType=rw
-DefaultValue=13.0
-PDOMapping=0
-
-[2004]
-ParameterName=foc_pid_param_q
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x5
-
-[2004sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0x04
-PDOMapping=0
-
-[2004sub1]
-ParameterName=kp
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0008
-AccessType=rw
-DefaultValue=0.1
-PDOMapping=0
-
-[2004sub2]
-ParameterName=ki
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0008
-AccessType=rw
-DefaultValue=800.0
-PDOMapping=0
-
-[2004sub3]
-ParameterName=kd
+[2009sub12]
+ParameterName=d_kd
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2117,8 +2013,8 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2004sub4]
-ParameterName=limit
+[2009sub13]
+ParameterName=d_limit
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2126,23 +2022,44 @@ AccessType=rw
 DefaultValue=13.0
 PDOMapping=0
 
-[2005]
-ParameterName=foc_pid_param_vel
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x5
-
-[2005sub0]
-ParameterName=Highest sub-index supported
+[2009sub14]
+ParameterName=q_kp
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0x04
+DataType=0x0008
+AccessType=rw
+DefaultValue=0.1
 PDOMapping=0
 
-[2005sub1]
-ParameterName=kp
+[2009sub15]
+ParameterName=q_ki
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0008
+AccessType=rw
+DefaultValue=800.0
+PDOMapping=0
+
+[2009sub16]
+ParameterName=q_kd
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0008
+AccessType=rw
+DefaultValue=0.0
+PDOMapping=0
+
+[2009sub17]
+ParameterName=q_limit
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0008
+AccessType=rw
+DefaultValue=13.0
+PDOMapping=0
+
+[2009sub18]
+ParameterName=vel_kp
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2150,8 +2067,8 @@ AccessType=rw
 DefaultValue=0.002
 PDOMapping=0
 
-[2005sub2]
-ParameterName=ki
+[2009sub19]
+ParameterName=vel_ki
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2159,8 +2076,8 @@ AccessType=rw
 DefaultValue=0.2
 PDOMapping=0
 
-[2005sub3]
-ParameterName=kd
+[2009sub1A]
+ParameterName=vel_kd
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2168,8 +2085,8 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2005sub4]
-ParameterName=limit
+[2009sub1B]
+ParameterName=vel_limit
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2177,23 +2094,8 @@ AccessType=rw
 DefaultValue=10.0
 PDOMapping=0
 
-[2006]
-ParameterName=foc_pid_param_pos
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x5
-
-[2006sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0x04
-PDOMapping=0
-
-[2006sub1]
-ParameterName=kp
+[2009sub1C]
+ParameterName=pos_kp
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2201,8 +2103,8 @@ AccessType=rw
 DefaultValue=400.0
 PDOMapping=0
 
-[2006sub2]
-ParameterName=ki
+[2009sub1D]
+ParameterName=pos_ki
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2210,17 +2112,17 @@ AccessType=rw
 DefaultValue=4000.0
 PDOMapping=0
 
-[2006sub3]
-ParameterName=kd
+[2009sub1E]
+ParameterName=pos_kd
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0.0
+DefaultValue=00.0
 PDOMapping=0
 
-[2006sub4]
-ParameterName=limit
+[2009sub1F]
+ParameterName=pos_limit
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
@@ -2228,41 +2130,26 @@ AccessType=rw
 DefaultValue=15000.0
 PDOMapping=0
 
-[2007]
-ParameterName=motor_electrical_param
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x3
-
-[2007sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0x02
-PDOMapping=0
-
-[2007sub1]
+[2009sub20]
 ParameterName=rs
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0
+DefaultValue=0.0
 PDOMapping=0
 
-[2007sub2]
+[2009sub21]
 ParameterName=ls
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0
+DefaultValue=0.0
 PDOMapping=0
 
-[2008]
-ParameterName=crc_16
+[2009sub22]
+ParameterName=crc16
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006

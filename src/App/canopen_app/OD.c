@@ -196,64 +196,43 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .COB_IDClientToServerRx = 0x00000600,
         .COB_IDServerToClientTx = 0x00000580
     },
-    .x2000_feedback_param = {
-        .highestSub_indexSupported = 0x07,
+    .x2009_motorlib_params = {
+        .highestSub_indexSupported = 0x22,
         .wheel_radius = 17.5,
         .gear_ratio = 1.0,
-        .pole_pairs = 0,
-        .direction = 0,
+        .pole_pairs = 0.0,
+        .direction = 0.0,
         .encoder_resolution = 0x0000,
         .encoder_offset = 0x0000,
-        .encoder_offset_frac = 0
-    },
-    .x2001_currsmp_param = {
-        .highestSub_indexSupported = 0x06,
+        .encoder_offset_frac = 0.0,
         .A_chn_offset = 0x0000,
         .B_chn_offset = 0x0000,
         .C_chn_offset = 0x0000,
         .gain_phase = 0.006855,
-        .gain_i_bus = 0,
-        .gain_v_bus = 0.01059
+        .gain_i_bus = 0.0,
+        .gain_v_bus = 0.01059,
+        .acc_max = 1800.0,
+        .vmax = 15000.0,
+        .D_kp = 0.1,
+        .D_ki = 800.0,
+        .D_kd = 0.0,
+        .D_limit = 13.0,
+        .Q_kp = 0.1,
+        .Q_ki = 800.0,
+        .Q_kd = 0.0,
+        .Q_limit = 13.0,
+        .vel_kp = 0.002,
+        .vel_ki = 0.2,
+        .vel_kd = 0.0,
+        .vel_limit = 10.0,
+        .pos_kp = 400.0,
+        .pos_ki = 4000.0,
+        .pos_kd = 00.0,
+        .pos_limit = 15000.0,
+        .rs = 0.0,
+        .ls = 0.0,
+        .crc16 = 0x0000
     },
-    .x2002_trajectory_param = {
-        .highestSub_indexSupported = 0x02,
-        .acc_max = 9800.0,
-        .vmax = 15000.0
-    },
-    .x2003_foc_pid_param_d = {
-        .highestSub_indexSupported = 0x04,
-        .kp = 0.1,
-        .ki = 800.0,
-        .kd = 0,
-        .limit = 13.0
-    },
-    .x2004_foc_pid_param_q = {
-        .highestSub_indexSupported = 0x04,
-        .kp = 0.1,
-        .ki = 800.0,
-        .kd = 0.0,
-        .limit = 13.0
-    },
-    .x2005_foc_pid_param_vel = {
-        .highestSub_indexSupported = 0x04,
-        .kp = 0.002,
-        .ki = 0.2,
-        .kd = 0.0,
-        .limit = 10.0
-    },
-    .x2006_foc_pid_param_pos = {
-        .highestSub_indexSupported = 0x04,
-        .kp = 400.0,
-        .ki = 4000.0,
-        .kd = 0.0,
-        .limit = 15000.0
-    },
-    .x2007_motor_electrical_param = {
-        .highestSub_indexSupported = 0x02,
-        .rs = 0,
-        .ls = 0
-    },
-    .x2008_crc_16 = 0x0000,
     .x603F_errorCode = 0x0000,
     .x6040_controlword = 0x0000,
     .x6041_statusword = 0x0000,
@@ -308,15 +287,7 @@ typedef struct {
     OD_obj_record_t o_1A01_TPDOMappingParameter[9];
     OD_obj_record_t o_1A02_TPDOMappingParameter[9];
     OD_obj_record_t o_1A03_TPDOMappingParameter[9];
-    OD_obj_record_t o_2000_feedback_param[8];
-    OD_obj_record_t o_2001_currsmp_param[7];
-    OD_obj_record_t o_2002_trajectory_param[3];
-    OD_obj_record_t o_2003_foc_pid_param_d[5];
-    OD_obj_record_t o_2004_foc_pid_param_q[5];
-    OD_obj_record_t o_2005_foc_pid_param_vel[5];
-    OD_obj_record_t o_2006_foc_pid_param_pos[5];
-    OD_obj_record_t o_2007_motor_electrical_param[3];
-    OD_obj_var_t o_2008_crc_16;
+    OD_obj_record_t o_2009_motorlib_params[35];
     OD_obj_var_t o_603F_errorCode;
     OD_obj_var_t o_6040_controlword;
     OD_obj_var_t o_6041_statusword;
@@ -1161,272 +1132,217 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 4
         }
     },
-    .o_2000_feedback_param = {
+    .o_2009_motorlib_params = {
         {
-            .dataOrig = &OD_RAM.x2000_feedback_param.highestSub_indexSupported,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.highestSub_indexSupported,
             .subIndex = 0,
             .attribute = ODA_SDO_R,
             .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x2000_feedback_param.wheel_radius,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.wheel_radius,
             .subIndex = 1,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2000_feedback_param.gear_ratio,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.gear_ratio,
             .subIndex = 2,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2000_feedback_param.pole_pairs,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pole_pairs,
             .subIndex = 3,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2000_feedback_param.direction,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.direction,
             .subIndex = 4,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2000_feedback_param.encoder_resolution,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.encoder_resolution,
             .subIndex = 5,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x2000_feedback_param.encoder_offset,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.encoder_offset,
             .subIndex = 6,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x2000_feedback_param.encoder_offset_frac,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.encoder_offset_frac,
             .subIndex = 7,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
-        }
-    },
-    .o_2001_currsmp_param = {
-        {
-            .dataOrig = &OD_RAM.x2001_currsmp_param.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x2001_currsmp_param.A_chn_offset,
-            .subIndex = 1,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.A_chn_offset,
+            .subIndex = 8,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x2001_currsmp_param.B_chn_offset,
-            .subIndex = 2,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.B_chn_offset,
+            .subIndex = 9,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x2001_currsmp_param.C_chn_offset,
-            .subIndex = 3,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.C_chn_offset,
+            .subIndex = 10,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x2001_currsmp_param.gain_phase,
-            .subIndex = 4,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.gain_phase,
+            .subIndex = 11,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2001_currsmp_param.gain_i_bus,
-            .subIndex = 5,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.gain_i_bus,
+            .subIndex = 12,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2001_currsmp_param.gain_v_bus,
-            .subIndex = 6,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.gain_v_bus,
+            .subIndex = 13,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.acc_max,
+            .subIndex = 14,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vmax,
+            .subIndex = 15,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.D_kp,
+            .subIndex = 16,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.D_ki,
+            .subIndex = 17,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.D_kd,
+            .subIndex = 18,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.D_limit,
+            .subIndex = 19,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_kp,
+            .subIndex = 20,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_ki,
+            .subIndex = 21,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_kd,
+            .subIndex = 22,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_limit,
+            .subIndex = 23,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_kp,
+            .subIndex = 24,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_ki,
+            .subIndex = 25,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_kd,
+            .subIndex = 26,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_limit,
+            .subIndex = 27,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_kp,
+            .subIndex = 28,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_ki,
+            .subIndex = 29,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_kd,
+            .subIndex = 30,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_limit,
+            .subIndex = 31,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.rs,
+            .subIndex = 32,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.ls,
+            .subIndex = 33,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.crc16,
+            .subIndex = 34,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 2
         }
-    },
-    .o_2002_trajectory_param = {
-        {
-            .dataOrig = &OD_RAM.x2002_trajectory_param.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x2002_trajectory_param.acc_max,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2002_trajectory_param.vmax,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_2003_foc_pid_param_d = {
-        {
-            .dataOrig = &OD_RAM.x2003_foc_pid_param_d.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x2003_foc_pid_param_d.kp,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2003_foc_pid_param_d.ki,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2003_foc_pid_param_d.kd,
-            .subIndex = 3,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2003_foc_pid_param_d.limit,
-            .subIndex = 4,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_2004_foc_pid_param_q = {
-        {
-            .dataOrig = &OD_RAM.x2004_foc_pid_param_q.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x2004_foc_pid_param_q.kp,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2004_foc_pid_param_q.ki,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2004_foc_pid_param_q.kd,
-            .subIndex = 3,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2004_foc_pid_param_q.limit,
-            .subIndex = 4,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_2005_foc_pid_param_vel = {
-        {
-            .dataOrig = &OD_RAM.x2005_foc_pid_param_vel.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x2005_foc_pid_param_vel.kp,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2005_foc_pid_param_vel.ki,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2005_foc_pid_param_vel.kd,
-            .subIndex = 3,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2005_foc_pid_param_vel.limit,
-            .subIndex = 4,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_2006_foc_pid_param_pos = {
-        {
-            .dataOrig = &OD_RAM.x2006_foc_pid_param_pos.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x2006_foc_pid_param_pos.kp,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2006_foc_pid_param_pos.ki,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2006_foc_pid_param_pos.kd,
-            .subIndex = 3,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2006_foc_pid_param_pos.limit,
-            .subIndex = 4,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_2007_motor_electrical_param = {
-        {
-            .dataOrig = &OD_RAM.x2007_motor_electrical_param.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x2007_motor_electrical_param.rs,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2007_motor_electrical_param.ls,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_2008_crc_16 = {
-        .dataOrig = &OD_RAM.x2008_crc_16,
-        .attribute = ODA_SDO_RW | ODA_MB,
-        .dataLength = 2
     },
     .o_603F_errorCode = {
         .dataOrig = &OD_RAM.x603F_errorCode,
@@ -1533,15 +1449,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1A01, 0x09, ODT_REC, &ODObjs.o_1A01_TPDOMappingParameter, NULL},
     {0x1A02, 0x09, ODT_REC, &ODObjs.o_1A02_TPDOMappingParameter, NULL},
     {0x1A03, 0x09, ODT_REC, &ODObjs.o_1A03_TPDOMappingParameter, NULL},
-    {0x2000, 0x08, ODT_REC, &ODObjs.o_2000_feedback_param, NULL},
-    {0x2001, 0x07, ODT_REC, &ODObjs.o_2001_currsmp_param, NULL},
-    {0x2002, 0x03, ODT_REC, &ODObjs.o_2002_trajectory_param, NULL},
-    {0x2003, 0x05, ODT_REC, &ODObjs.o_2003_foc_pid_param_d, NULL},
-    {0x2004, 0x05, ODT_REC, &ODObjs.o_2004_foc_pid_param_q, NULL},
-    {0x2005, 0x05, ODT_REC, &ODObjs.o_2005_foc_pid_param_vel, NULL},
-    {0x2006, 0x05, ODT_REC, &ODObjs.o_2006_foc_pid_param_pos, NULL},
-    {0x2007, 0x03, ODT_REC, &ODObjs.o_2007_motor_electrical_param, NULL},
-    {0x2008, 0x01, ODT_VAR, &ODObjs.o_2008_crc_16, NULL},
+    {0x2009, 0x23, ODT_REC, &ODObjs.o_2009_motorlib_params, NULL},
     {0x603F, 0x01, ODT_VAR, &ODObjs.o_603F_errorCode, NULL},
     {0x6040, 0x01, ODT_VAR, &ODObjs.o_6040_controlword, NULL},
     {0x6041, 0x01, ODT_VAR, &ODObjs.o_6041_statusword, NULL},
