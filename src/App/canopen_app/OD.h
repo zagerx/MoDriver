@@ -11,12 +11,12 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: DS301_profile.xdd
+        Project File: DS301_profile.xpd
         File Version: 1
 
         Created:      2020/11/23 19:00:00
         Created By:   
-        Modified:     2026/4/6 22:38:34
+        Modified:     2026/4/14 13:24:25
         Modified By:  
 
     Device Info:
@@ -236,6 +236,64 @@ typedef struct {
         uint32_t COB_IDClientToServerRx;
         uint32_t COB_IDServerToClientTx;
     } x1200_SDOServerParameter;
+    struct {
+        uint8_t highestSub_indexSupported;
+        float32_t wheel_radius;
+        float32_t gear_ratio;
+        float32_t pole_pairs;
+        float32_t direction;
+        uint16_t encoder_resolution;
+        uint16_t encoder_offset;
+        float32_t encoder_offset_frac;
+    } x2000_feedback_param;
+    struct {
+        uint8_t highestSub_indexSupported;
+        uint16_t A_chn_offset;
+        uint16_t B_chn_offset;
+        uint16_t C_chn_offset;
+        float32_t gain_phase;
+        float32_t gain_i_bus;
+        float32_t gain_v_bus;
+    } x2001_currsmp_param;
+    struct {
+        uint8_t highestSub_indexSupported;
+        float32_t acc_max;
+        float32_t vmax;
+    } x2002_trajectory_param;
+    struct {
+        uint8_t highestSub_indexSupported;
+        float32_t kp;
+        float32_t ki;
+        float32_t kd;
+        float32_t limit;
+    } x2003_foc_pid_param_d;
+    struct {
+        uint8_t highestSub_indexSupported;
+        float32_t kp;
+        float32_t ki;
+        float32_t kd;
+        float32_t limit;
+    } x2004_foc_pid_param_q;
+    struct {
+        uint8_t highestSub_indexSupported;
+        float32_t kp;
+        float32_t ki;
+        float32_t kd;
+        float32_t limit;
+    } x2005_foc_pid_param_vel;
+    struct {
+        uint8_t highestSub_indexSupported;
+        float32_t kp;
+        float32_t ki;
+        float32_t kd;
+        float32_t limit;
+    } x2006_foc_pid_param_pos;
+    struct {
+        uint8_t highestSub_indexSupported;
+        float32_t rs;
+        float32_t ls;
+    } x2007_motor_electrical_param;
+    uint16_t x2008_crc_16;
     uint16_t x603F_errorCode;
     uint16_t x6040_controlword;
     uint16_t x6041_statusword;
@@ -303,19 +361,28 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01 &OD->list[30]
 #define OD_ENTRY_H1A02 &OD->list[31]
 #define OD_ENTRY_H1A03 &OD->list[32]
-#define OD_ENTRY_H603F &OD->list[33]
-#define OD_ENTRY_H6040 &OD->list[34]
-#define OD_ENTRY_H6041 &OD->list[35]
-#define OD_ENTRY_H6060 &OD->list[36]
-#define OD_ENTRY_H6061 &OD->list[37]
-#define OD_ENTRY_H6064 &OD->list[38]
-#define OD_ENTRY_H606C &OD->list[39]
-#define OD_ENTRY_H6071 &OD->list[40]
-#define OD_ENTRY_H6077 &OD->list[41]
-#define OD_ENTRY_H607A &OD->list[42]
-#define OD_ENTRY_H6081 &OD->list[43]
-#define OD_ENTRY_H60FF &OD->list[44]
-#define OD_ENTRY_H6502 &OD->list[45]
+#define OD_ENTRY_H2000 &OD->list[33]
+#define OD_ENTRY_H2001 &OD->list[34]
+#define OD_ENTRY_H2002 &OD->list[35]
+#define OD_ENTRY_H2003 &OD->list[36]
+#define OD_ENTRY_H2004 &OD->list[37]
+#define OD_ENTRY_H2005 &OD->list[38]
+#define OD_ENTRY_H2006 &OD->list[39]
+#define OD_ENTRY_H2007 &OD->list[40]
+#define OD_ENTRY_H2008 &OD->list[41]
+#define OD_ENTRY_H603F &OD->list[42]
+#define OD_ENTRY_H6040 &OD->list[43]
+#define OD_ENTRY_H6041 &OD->list[44]
+#define OD_ENTRY_H6060 &OD->list[45]
+#define OD_ENTRY_H6061 &OD->list[46]
+#define OD_ENTRY_H6064 &OD->list[47]
+#define OD_ENTRY_H606C &OD->list[48]
+#define OD_ENTRY_H6071 &OD->list[49]
+#define OD_ENTRY_H6077 &OD->list[50]
+#define OD_ENTRY_H607A &OD->list[51]
+#define OD_ENTRY_H6081 &OD->list[52]
+#define OD_ENTRY_H60FF &OD->list[53]
+#define OD_ENTRY_H6502 &OD->list[54]
 
 
 /*******************************************************************************
@@ -354,19 +421,28 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[30]
 #define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[31]
 #define OD_ENTRY_H1A03_TPDOMappingParameter &OD->list[32]
-#define OD_ENTRY_H603F_errorCode &OD->list[33]
-#define OD_ENTRY_H6040_controlword &OD->list[34]
-#define OD_ENTRY_H6041_statusword &OD->list[35]
-#define OD_ENTRY_H6060_modeworld &OD->list[36]
-#define OD_ENTRY_H6061_modeDisplay &OD->list[37]
-#define OD_ENTRY_H6064_position &OD->list[38]
-#define OD_ENTRY_H606C_velocity &OD->list[39]
-#define OD_ENTRY_H6071_targetTorque &OD->list[40]
-#define OD_ENTRY_H6077_torque &OD->list[41]
-#define OD_ENTRY_H607A_targetPosition &OD->list[42]
-#define OD_ENTRY_H6081_profileVelocity &OD->list[43]
-#define OD_ENTRY_H60FF_targetVelocity &OD->list[44]
-#define OD_ENTRY_H6502_supportedDriveModes &OD->list[45]
+#define OD_ENTRY_H2000_feedback_param &OD->list[33]
+#define OD_ENTRY_H2001_currsmp_param &OD->list[34]
+#define OD_ENTRY_H2002_trajectory_param &OD->list[35]
+#define OD_ENTRY_H2003_foc_pid_param_d &OD->list[36]
+#define OD_ENTRY_H2004_foc_pid_param_q &OD->list[37]
+#define OD_ENTRY_H2005_foc_pid_param_vel &OD->list[38]
+#define OD_ENTRY_H2006_foc_pid_param_pos &OD->list[39]
+#define OD_ENTRY_H2007_motor_electrical_param &OD->list[40]
+#define OD_ENTRY_H2008_crc_16 &OD->list[41]
+#define OD_ENTRY_H603F_errorCode &OD->list[42]
+#define OD_ENTRY_H6040_controlword &OD->list[43]
+#define OD_ENTRY_H6041_statusword &OD->list[44]
+#define OD_ENTRY_H6060_modeworld &OD->list[45]
+#define OD_ENTRY_H6061_modeDisplay &OD->list[46]
+#define OD_ENTRY_H6064_position &OD->list[47]
+#define OD_ENTRY_H606C_velocity &OD->list[48]
+#define OD_ENTRY_H6071_targetTorque &OD->list[49]
+#define OD_ENTRY_H6077_torque &OD->list[50]
+#define OD_ENTRY_H607A_targetPosition &OD->list[51]
+#define OD_ENTRY_H6081_profileVelocity &OD->list[52]
+#define OD_ENTRY_H60FF_targetVelocity &OD->list[53]
+#define OD_ENTRY_H6502_supportedDriveModes &OD->list[54]
 
 
 /*******************************************************************************

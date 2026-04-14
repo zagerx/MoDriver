@@ -1,5 +1,5 @@
 /*
- * MoDrive 主程序 - CANopen CiA 402 伺服驱动
+ * MoDrive 主程序
  */
 
 #include <stddef.h>
@@ -9,6 +9,7 @@
 #include "motor.h"
 #include "motorlib_control_param.h"
 #include "canopen_app/canopen_app.h"
+#include "OD.h"
 /*============================================================================
  * 电机 1 硬件接口配置
  *===========================================================================*/

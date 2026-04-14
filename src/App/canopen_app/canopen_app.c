@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "motor.h"
+#include "motor_interface_params.h"
 /*============================================================================
  * 默认配置参数
  *===========================================================================*/
@@ -46,7 +47,6 @@ static CO_storage_entry_t storage_entries[] = {
 		.attr = CO_storage_cmd | CO_storage_restore, // 支持命令保存和恢复
 	},
 };
-
 /* 错误码输出 */
 static uint32_t storage_error = 0;
 /**
