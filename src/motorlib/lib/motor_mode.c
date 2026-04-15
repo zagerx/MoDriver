@@ -5,6 +5,7 @@
  */
 
 #include "foc_pid.h"
+#include "motor_interface_mode.h"
 #include "motor_mode.h"
 #include "statemachine.h"
 #include "close_loop.h"
@@ -13,6 +14,7 @@
 #include <stdint.h>
 
 #include <math.h>
+#include "open_loop.h"
 extern int motor_is_command_set(const struct motor *motor, enum motor_command_bits bit);
 extern int motor_clear_command(struct motor *motor, enum motor_command_bits bit);
 
@@ -209,6 +211,70 @@ void motor_mode_HOMING(struct statemachine *sm)
 }
 
 /**
+ * @brief 电机开环编码器状态
+ *
+ * @param sm 状态机实例
+ *
+ * 电机开环编码器测试状态。
+ */
+#include "motorlib_control_param.h"
+void motor_mode_debug(struct statemachine *sm)
+{
+	enum {
+		RUNING = USER_STATUS,
+		ALIGN,
+		RUNING2,
+		IDLE,
+	};
+
+	struct motor *motor = (struct motor *)(sm->data);
+	struct inverter *inverter = &motor->inverter;
+	static float target = 0.0f;
+	static uint32_t test_flag = 1;
+	switch (sm->phase) {
+	case ENTER:
+		inverter_enable(inverter);
+		sm->count = 0;
+		sm->phase = RUNING;
+		break;
+
+	case ALIGN:
+		open_loop_encoder(motor, ALIGN_VOLTAGE);
+		if (++sm->count > 30000) // 1秒后切换到运行状态
+		{
+			sm->count = 0;
+			sm->phase = IDLE;
+		}
+		break;
+
+	case RUNING:
+
+		if (++sm->count > 500) {
+			test_flag = -test_flag; // 反转目标位置
+			sm->count = 0;
+
+			if (test_flag == 1) {
+				target = 4.0f; // 正转目标位置
+			} else {
+				target = 0.0f; // 反转目标位置
+			}
+			// 反转目标位置
+			foc_pid_reset(&motor->foc.ctrl.d_axis); // 重置PID控制器状态
+			break;
+		}
+		currment_debug(motor, target);
+		break;
+
+	case EXIT:
+		inverter_disable(inverter);
+		break;
+
+	default:
+		break;
+	}
+}
+
+/**
  * @brief 获取电机当前操作模式
  * @param[in] motor 电机实例指针
  * @return enum motor_mode 当前操作模式
@@ -229,6 +295,9 @@ enum motor_mode motor_get_mode(const struct motor *motor)
 	}
 	if (state == motor_mode_HOMING) {
 		return MODE_HM;
+	}
+	if (state == motor_mode_debug) {
+		return MODE_DEBUG;
 	}
 	return MODE_NONE;
 }
@@ -267,7 +336,11 @@ void motor_tran_mode(struct motor *motor, enum motor_mode new_mode)
 			TRAN_STATE(sm_mode, motor_mode_HOMING);
 		}
 		break;
-
+	case MODE_DEBUG: {
+		if (sm_mode->current_state != motor_mode_debug) {
+			TRAN_STATE(sm_mode, motor_mode_debug);
+		}
+	} break;
 	default:
 		break;
 	}
