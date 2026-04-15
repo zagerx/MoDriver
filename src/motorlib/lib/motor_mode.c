@@ -124,6 +124,7 @@ void motor_mode_PV(struct statemachine *sm)
 	switch (sm->phase) {
 	case ENTER:
 		sm->count = 0;
+		motor_velocity_loop_reset(motor);
 		sm->phase = RUNING;
 		break;
 

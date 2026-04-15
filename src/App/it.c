@@ -1,4 +1,5 @@
 #include "motor.h"
+#include "motor_interface_mode.h"
 #include "tim.h"
 #include "usart.h"
 #include <string.h>
@@ -43,7 +44,7 @@ typedef struct {
 // 命令表定义
 static const command_map_t cmd_map[] = {
 	{"tar", 2, INDEX_TAR},
-	{"pid", 6, INDEX_VP_PI},
+	{"pid", 2, INDEX_VP_PI},
 	{"state", 1, INDEX_STATE},
 	{"mode", 1, INDEX_MODE},
 };
@@ -120,20 +121,16 @@ void process_data(uint8_t *data, uint16_t len)
 				}
 
 				if (cmd_map[i].data_index == INDEX_TAR) {
-					// *m1_param_ext.foc_param.target_pos =
-					// 	(int32_t)(input[0] * 1000); // 转换为整数位置
-					// *m1_param_ext.foc_param.target_vel =
-					// 	(int32_t)(input[0] * 1000); // 转换为整数速度
 					motor_set_target_pos(motor_1, input[0], input[1]);
 				} else if (cmd_map[i].data_index == INDEX_VP_PI) {
-					pmotor1_param->foc_param.d_axis.kp = input[0];
-					pmotor1_param->foc_param.d_axis.ki = input[1];
-					pmotor1_param->foc_param.q_axis.kp = input[2];
-					pmotor1_param->foc_param.q_axis.ki = input[3];
-					pmotor1_param->foc_param.vel.kp = input[4];
-					pmotor1_param->foc_param.vel.ki = input[5];
-					pmotor1_param->foc_param.pos.kp = input[6];
-					pmotor1_param->foc_param.pos.ki = input[7];
+					// pmotor1_param->foc_param.d_axis.kp = input[0];
+					// pmotor1_param->foc_param.d_axis.ki = input[1];
+					// pmotor1_param->foc_param.q_axis.kp = input[2];
+					// pmotor1_param->foc_param.q_axis.ki = input[3];
+					pmotor1_param->foc_param.vel.kp = input[0];
+					pmotor1_param->foc_param.vel.ki = input[1];
+					// pmotor1_param->foc_param.pos.kp = input[6];
+					// pmotor1_param->foc_param.pos.ki = input[7];
 				} else if (cmd_map[i].data_index == INDEX_STATE) {
 					// 处理状态命令
 					if (input[0] == 0) {
@@ -151,14 +148,15 @@ void process_data(uint8_t *data, uint16_t len)
 					} else if (input[0] > 2.5f && input[0] < 3.5f) {
 						// 切换到pv模式
 						motor_tran_mode(motor_1, MODE_PV);
+					} else if (input[0] > 8.5f && input[0] < 9.5f) {
+						motor_tran_mode(motor_1, MODE_DEBUG);
 					}
 				}
+				return;
 			}
-			return;
 		}
 	}
 }
-
 /*============================================================================
  * CANopen 定时中断处理
  *===========================================================================*/

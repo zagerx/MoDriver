@@ -23,6 +23,8 @@
 #define RL_IND_TEST_VOLTAGE    (4.0f)    /* 电感测量电压 [V] */
 #define RL_IND_SAMPLES         (1250)    /* 电感测量采样次数 */
 
+#define CURRENT_CONTROL_BANDWIDTH (6283.185f) /* 电流环带宽 1000Hz [rad/s] */
+
 #define RL_RES_MIN_VALID       (0.005f)  /* 最小有效电阻 [Ohm] */
 #define RL_RES_MAX_VALID       (5.0f)    /* 最大有效电阻 [Ohm] */
 #define RL_IND_MIN_VALID       (2e-6f)   /* 最小有效电感 [H] */
@@ -297,6 +299,7 @@ void rl_calib_apply(struct motor *motor)
 {
 	struct rl_calib_data *rl;
 	struct motor_param_ext *param_ext;
+	float kp, ki;
 
 	if (!motor || !motor->param_ext) {
 		return;
@@ -307,4 +310,13 @@ void rl_calib_apply(struct motor *motor)
 
 	param_ext->electrical_param.rs = rl->measured_resistance;
 	param_ext->electrical_param.ls = rl->measured_inductance;
+
+	/* ODrive 风格极点配置：带宽 × 电感 = kp，带宽 × 电阻 = ki */
+	kp = CURRENT_CONTROL_BANDWIDTH * param_ext->electrical_param.ls;
+	ki = CURRENT_CONTROL_BANDWIDTH * param_ext->electrical_param.rs;
+
+	param_ext->foc_param.d_axis.kp = kp;
+	param_ext->foc_param.d_axis.ki = ki;
+	param_ext->foc_param.q_axis.kp = kp;
+	param_ext->foc_param.q_axis.ki = ki;
 }

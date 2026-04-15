@@ -143,6 +143,21 @@ void motor_currment_loop(struct motor *motor)
 	ud = foc_currentloop_pid_run(d_axis_pid, foc->ref.i_d, meas->i_d, CONTROL_PERIOD_DT);
 	uq = foc_currentloop_pid_run(q_axis_pid, foc->ref.i_q, meas->i_q, CONTROL_PERIOD_DT);
 
+	/* 电流环解耦前馈：ωL 交叉耦合 + R 压降补偿  TODO*/
+	struct motor_param_ext *param_ext = motor->param_ext;
+	float ls = param_ext->electrical_param.ls;
+	float rs = param_ext->electrical_param.rs;
+	float pole_pairs = param_ext->feedback_param.pole_pairs;
+
+	float omega_e = meas->fd_out->velocity_rad_s * pole_pairs;
+	/* 交叉耦合项：使用电流设定值进行前馈，避免正反馈 */
+	ud -= omega_e * ls * foc->ref.i_q;
+	uq += omega_e * ls * foc->ref.i_d;
+
+	/* 电阻压降补偿：使用电流设定值进行前馈 */
+	ud += rs * foc->ref.i_d;
+	uq += rs * foc->ref.i_q;
+
 	/* 记录原始电压值用于限幅计算 */
 	float ud_limit = ud;
 	float uq_limit = uq;
