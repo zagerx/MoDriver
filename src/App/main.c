@@ -35,6 +35,7 @@ struct canopen_app canopen_app = {
 
 int main(void)
 {
+	SCB->VTOR = 0x08003000;
 	/* 初始化硬件层（时钟、GPIO、外设等） */
 	hardware_init();
 

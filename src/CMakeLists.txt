@@ -113,6 +113,11 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                                     ${CMAKE_PROJECT_NAME}.hex
     COMMENT "Creating ${CMAKE_PROJECT_NAME}.hex")
 
+##################### 生成srec ##############################
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -I ihex ${CMAKE_PROJECT_NAME}.hex
+                                    -O srec ${CMAKE_PROJECT_NAME}.srec
+    COMMENT "Creating ${CMAKE_PROJECT_NAME}.srec")
 
 # ==================================================
 # 添加 JLink 下载目标（兼容多配置构建）

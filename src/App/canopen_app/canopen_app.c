@@ -26,6 +26,8 @@
 static int canopen_app_resetCommunication(struct canopen_app *app);
 
 extern struct motor_param_ext *pmotor1_param;
+#define BOOTLOADER_MAGIC_KEY 0xDEADBEEF
+volatile uint32_t *bootFlag = (volatile uint32_t *)0x2000FFF0;
 
 /**
  * @brief 初始化 CANopen 应用
@@ -157,6 +159,8 @@ void canopen_app_process(struct canopen_app *app, uint32_t dt_ms)
 
 		case CO_RESET_APP:
 			/* 应用复位 - 系统重启 */
+			*bootFlag = BOOTLOADER_MAGIC_KEY;
+			// __DSB(); // 确保写入完成
 
 			if (app->sys_reset_ops) {
 				app->sys_reset_ops();

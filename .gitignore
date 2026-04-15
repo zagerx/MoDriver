@@ -1,6 +1,10 @@
 .vscode/
+bootload/
 src/build/
 src/.cache/
 src/.vscode/
 src/CanOpenSTM32
+src/ODrive
+src/bldc
+src/canopen
 src/ros2_ws

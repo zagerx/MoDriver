@@ -249,7 +249,7 @@ g_pfnVectors:
 	.word	DMA2_Channel8_IRQHandler
 	.word	CORDIC_IRQHandler
 	.word	FMAC_IRQHandler
-
+	.word	0x55AA11EE
 	.size	g_pfnVectors, .-g_pfnVectors
 
 /*******************************************************************************
