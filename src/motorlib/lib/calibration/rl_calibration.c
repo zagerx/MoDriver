@@ -94,10 +94,6 @@ void rl_calib_prepare(struct motor *motor)
 	rl->measured_resistance = 0.0f;
 	rl->measured_inductance = 0.0f;
 
-	/* 调试标志：RL初始化 */
-	motor->data.debug.test_flag1 = 0x10;
-	motor->data.debug.test_flag2 = 0;
-
 	inverter_enable(&motor->inverter);
 }
 
@@ -124,8 +120,6 @@ void rl_inductance_prepare(struct motor *motor)
 	rl->delta_I_sum = 0.0f;
 
 	/* 调试标志：切换到电感测量 */
-	motor->data.debug.test_flag1 = 0x20;
-	motor->data.debug.test_flag2 = 0;
 
 	inverter_enable(&motor->inverter);
 }
@@ -168,8 +162,6 @@ int rl_resistance_step(struct motor *motor)
 	open_loop_force_align(motor, rl->voltage_accumulator, 0.0f);
 
 	/* 调试标志 */
-	motor->data.debug.test_flag1 = 0x11;
-	motor->data.debug.test_flag2 = rl->sample_cnt;
 
 	rl->sample_cnt++;
 
@@ -184,8 +176,6 @@ int rl_resistance_step(struct motor *motor)
 	/* 计算电阻 R = V/I */
 	if (fabsf(I_alpha) <= 0.1f) {
 		/* 电流太小 */
-		motor->data.debug.test_flag1 = 0xE1;
-		motor->data.debug.test_flag2 = (uint16_t)(fabsf(I_alpha) * 1000.0f);
 		return -1;
 	}
 
@@ -193,22 +183,14 @@ int rl_resistance_step(struct motor *motor)
 
 	/* 检查相不平衡 */
 	if (fabsf(rl->I_beta_accumulator) / rl->current_setpoint > RL_UNBALANCE_THRESHOLD) {
-		motor->data.debug.test_flag1 = 0xE4;
-		motor->data.debug.test_flag2 = (uint16_t)(fabsf(rl->I_beta_accumulator) * 1000.0f);
 		return -1;
 	}
 
 	/* 检查范围 */
 	if (rl->measured_resistance < RL_RES_MIN_VALID ||
 	    rl->measured_resistance > RL_RES_MAX_VALID) {
-		motor->data.debug.test_flag1 = 0xE5;
-		motor->data.debug.test_flag2 = (uint16_t)(rl->measured_resistance * 1000.0f);
 		return -1;
 	}
-
-	/* 调试标志：电阻测量成功 */
-	motor->data.debug.test_flag1 = 0x21;
-	motor->data.debug.test_flag2 = (uint16_t)(rl->measured_resistance * 1000.0f);
 
 	return 1; /* 完成 */
 }
@@ -236,10 +218,6 @@ int rl_inductance_step(struct motor *motor)
 	/* 施加电压 */
 	open_loop_force_align(motor, voltage, 0.0f);
 
-	/* 调试标志 */
-	motor->data.debug.test_flag1 = 0x12;
-	motor->data.debug.test_flag2 = rl->sample_cnt;
-
 	/* 测量电流 */
 	I_alpha = get_I_alpha(motor);
 
@@ -263,8 +241,6 @@ int rl_inductance_step(struct motor *motor)
 	float dt = (float)rl->sample_cnt * CONTROL_PERIOD_DT;
 	if (rl->delta_I_sum <= 0.1f) {
 		/* 电流变化太小 */
-		motor->data.debug.test_flag1 = 0xE2;
-		motor->data.debug.test_flag2 = (uint16_t)(rl->delta_I_sum * 1000.0f);
 		return -1;
 	}
 
@@ -273,14 +249,8 @@ int rl_inductance_step(struct motor *motor)
 	/* 检查范围 */
 	if (rl->measured_inductance < RL_IND_MIN_VALID ||
 	    rl->measured_inductance > RL_IND_MAX_VALID) {
-		motor->data.debug.test_flag1 = 0xE3;
-		motor->data.debug.test_flag2 = (uint16_t)(rl->measured_inductance * 1000000.0f);
 		return -1;
 	}
-
-	/* 调试标志：RL校准全部完成 */
-	motor->data.debug.test_flag1 = 0x30;
-	motor->data.debug.test_flag2 = 0;
 
 	return 1; /* 完成 */
 }

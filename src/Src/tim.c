@@ -55,7 +55,7 @@ void MX_TIM1_Init(void)
 	htim1.Instance = TIM1;
 	htim1.Init.Prescaler = 0;
 	htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED3;
-	htim1.Init.Period = 8399;
+	htim1.Init.Period = 4199;
 	htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV2;
 	htim1.Init.RepetitionCounter = 1;
 	htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -253,4 +253,11 @@ void tim1_set_adc(void)
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 30);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 }
+void dwt_init(void)
+{
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+	DWT->CYCCNT = 0;
+	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
+
 /* USER CODE END 1 */

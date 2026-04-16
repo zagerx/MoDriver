@@ -8,7 +8,7 @@ Description=
 CreationTime=7:00PM
 CreationDate=11-23-2020
 CreatedBy=
-ModificationTime=12:56PM
+ModificationTime=4:36PM
 ModificationDate=04-16-2026
 ModifiedBy=
 
@@ -2073,7 +2073,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0.2
+DefaultValue=1.0
 PDOMapping=0
 
 [2009sub1A]
@@ -2100,7 +2100,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=400.0
+DefaultValue=10.0
 PDOMapping=0
 
 [2009sub1D]
@@ -2109,7 +2109,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=4000.0
+DefaultValue=5.0
 PDOMapping=0
 
 [2009sub1E]

@@ -33,21 +33,11 @@ struct canopen_app canopen_app = {
 	.sys_reset_ops = HAL_NVIC_SystemReset,
 };
 
-static void dwt_init(void)
-{
-	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-	DWT->CYCCNT = 0;
-	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-}
-
 int main(void)
 {
 	// SCB->VTOR = 0x08003000;
 	/* 初始化硬件层（时钟、GPIO、外设等） */
 	hardware_init();
-
-	/* 使能 DWT 周期计数器，用于测量中断执行时间 */
-	dwt_init();
 
 	/* 初始化 CANopen 应用（节点 ID = 21） */
 	if (canopen_app_init(&canopen_app, motor_1) != 0) {

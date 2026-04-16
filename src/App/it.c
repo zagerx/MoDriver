@@ -127,10 +127,10 @@ void process_data(uint8_t *data, uint16_t len)
 					// pmotor1_param->foc_param.d_axis.ki = input[1];
 					// pmotor1_param->foc_param.q_axis.kp = input[2];
 					// pmotor1_param->foc_param.q_axis.ki = input[3];
-					pmotor1_param->foc_param.vel.kp = input[0];
-					pmotor1_param->foc_param.vel.ki = input[1];
-					// pmotor1_param->foc_param.pos.kp = input[6];
-					// pmotor1_param->foc_param.pos.ki = input[7];
+					// pmotor1_param->foc_param.vel.kp = input[0];
+					// pmotor1_param->foc_param.vel.ki = input[1];
+					pmotor1_param->foc_param.pos.kp = input[0];
+					pmotor1_param->foc_param.pos.ki = input[1];
 				} else if (cmd_map[i].data_index == INDEX_STATE) {
 					// 处理状态命令
 					if (input[0] == 0) {
@@ -150,6 +150,8 @@ void process_data(uint8_t *data, uint16_t len)
 						motor_tran_mode(motor_1, MODE_PV);
 					} else if (input[0] > 8.5f && input[0] < 9.5f) {
 						motor_tran_mode(motor_1, MODE_DEBUG);
+					} else {
+						motor_tran_mode(motor_1, MODE_NONE);
 					}
 				}
 				return;

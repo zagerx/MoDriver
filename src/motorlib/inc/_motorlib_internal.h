@@ -43,7 +43,11 @@ struct motor_debug {
 	volatile float test_plann_vel; /**< @brief 调试：规划速度 */
 	volatile float test_tim1;
 	volatile float test_tim2;
+	volatile float test_tim3;
+	volatile float test_tim4;
 
+	uint32_t test_conut1;
+	uint32_t test_conut2;
 	uint16_t test_flag1; /**< @brief 调试：标志1 */
 	uint16_t test_flag2; /**< @brief 调试：标志2 */
 };

@@ -47,6 +47,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN Prototypes */
 void tim1_set_adc(void);
+void dwt_init(void);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

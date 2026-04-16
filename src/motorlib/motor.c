@@ -125,6 +125,8 @@ void motor_init(struct motor *motor)
 
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 {
+	motor->data.debug.test_tim3 = (DWT_CYCCNT - motor->data.debug.test_conut1) / 168.0f;
+	motor->data.debug.test_conut1 = DWT_CYCCNT;
 #if MOTORLIB_DEBUG_ENABLED
 	uint32_t t_raw_start = 0, t_raw_end = 0, t_fb_start = 0, t_fb_end = 0;
 #endif
