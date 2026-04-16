@@ -34,13 +34,6 @@ void motor_position_loop(struct motor *motor, float dt)
 	float plan_velocity = trajectory_planner_get_vel(traj_plan);
 	float current_pos = meas->fd_out->odometer;
 
-#if MOTORLIB_DEBUG_ENABLED
-	/* 调试用变量 */
-	motor->data.debug.test_tar_pos = plan_position;
-	motor->data.debug.test_real_pos = current_pos;
-	motor->data.debug.test_plann_vel = plan_velocity;
-#endif
-
 	/* 位置环PID计算，输出作为速度环的目标输入 */
 	float temp = foc_pid_run(position_pi, plan_position, current_pos, dt);
 	foc->ref.velocity = temp + plan_velocity; /* 速度前馈：轨迹规划的速度 */

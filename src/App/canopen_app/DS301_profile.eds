@@ -8,8 +8,8 @@ Description=
 CreationTime=7:00PM
 CreationDate=11-23-2020
 CreatedBy=
-ModificationTime=4:36PM
-ModificationDate=04-16-2026
+ModificationTime=2:07AM
+ModificationDate=04-17-2026
 ModifiedBy=
 
 [DeviceInfo]
@@ -1983,7 +1983,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=15000.0
+DefaultValue=5000.0
 PDOMapping=0
 
 [2009sub10]
@@ -2127,7 +2127,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=15000.0
+DefaultValue=5000.0
 PDOMapping=0
 
 [2009sub20]

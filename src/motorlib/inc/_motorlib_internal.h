@@ -38,9 +38,7 @@ struct motor_param_ext;
  * @brief 电机调试数据结构体
  */
 struct motor_debug {
-	volatile float test_tar_pos;   /**< @brief 调试：目标位置 */
-	volatile float test_real_pos;  /**< @brief 调试：实际位置 */
-	volatile float test_plann_vel; /**< @brief 调试：规划速度 */
+
 	volatile float test_tim1;
 	volatile float test_tim2;
 	volatile float test_tim3;

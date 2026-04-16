@@ -15,18 +15,15 @@
 #define VELOCITY_LPF_ALPHA 0.08f
 
 /**
- * @brief 角度快速归一化到 [0, 2PI]
+ * @brief 角度归一化到 [0, 2PI]
  * @param[in] angle 输入角度，单位：rad
  * @return float 归一化后的角度，单位：rad
- * @note 用条件减法替代 fmodf，避免通用浮点取模的冗长除法迭代。
- *       电机角度通常只偏离 [0, 2π) 1~2 个周期，实际最多循环 1~2 次。
+ * @note 将任意角度映射到 [0, 2π] 范围内
  */
-static __attribute__((always_inline)) inline float normalize_angle(float angle)
+static float normalize_angle(float angle)
 {
-	while (angle >= MOTORLIB_TWOPI) {
-		angle -= MOTORLIB_TWOPI;
-	}
-	while (angle < 0.0f) {
+	angle = fmodf(angle, MOTORLIB_TWOPI);
+	if (angle < 0.0f) {
 		angle += MOTORLIB_TWOPI;
 	}
 	return angle;
@@ -198,8 +195,6 @@ static float feedback_calc_velocity(struct feedback *feedback, float dt, float c
  * @param[in] feedback 反馈实例
  * @return 无
  */
-#define DWT_CYCCNT (*(volatile uint32_t *)0xE0001004)
-
 void feedback_update_raw(struct feedback *feedback)
 {
 	if (!feedback || feedback->state != FEEDBACK_STATE_OK) {

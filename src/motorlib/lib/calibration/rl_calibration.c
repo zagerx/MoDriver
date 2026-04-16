@@ -20,8 +20,12 @@
 #define RL_RES_KI           (1.0f) /* 电流环积分增益 */
 #define RL_RES_SAMPLES      (3000) /* 电阻测量采样次数 */
 
-#define RL_IND_TEST_VOLTAGE (4.0f) /* 电感测量电压 [V] */
-#define RL_IND_SAMPLES      (1250) /* 电感测量采样次数 */
+#define RL_IND_TEST_VOLTAGE (4.0f)  /* 电感测量电压 [V] */
+#define RL_IND_SAMPLES      (1250)  /* 电感测量采样次数 */
+#define RL_IND_AUDIBLE_FREQ 8000.0f /* 可听方波频率 4kHz */
+#define RL_IND_SWITCH_RATIO                                                                        \
+	((uint32_t)(ceilf(CONTROL_LOOP_FREQ /                                                      \
+			  (2 * RL_IND_AUDIBLE_FREQ)))) /* 极性切换比率，向上取整确保至少为1 */
 
 #define CURRENT_CONTROL_BANDWIDTH (6283.185f) /* 电流环带宽 1000Hz [rad/s] */
 
@@ -211,8 +215,10 @@ int rl_inductance_step(struct motor *motor)
 
 	rl = &motor->calib.rl;
 
-	/* 切换电压极性（方波） */
-	rl->voltage_polarity = !rl->voltage_polarity;
+	/* 切换电压极性（固定可听频率方波） */
+	if (RL_IND_SWITCH_RATIO > 0 && rl->sample_cnt % RL_IND_SWITCH_RATIO == 0) {
+		rl->voltage_polarity = !rl->voltage_polarity;
+	}
 	voltage = rl->voltage_polarity ? rl->test_voltage : -rl->test_voltage;
 
 	/* 施加电压 */
