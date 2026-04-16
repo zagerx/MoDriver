@@ -119,8 +119,16 @@ void motor_init(struct motor *motor)
  *          在非校准状态下，执行完整的反馈更新和FOC电流计算。
  *          在校准状态下，仅更新母线相关数据。
  */
+#if MOTORLIB_DEBUG_ENABLED
+#define DWT_CYCCNT (*(volatile uint32_t *)0xE0001004)
+#endif
+
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 {
+#if MOTORLIB_DEBUG_ENABLED
+	uint32_t t_raw_start = 0, t_raw_end = 0, t_fb_start = 0, t_fb_end = 0;
+#endif
+
 	if (!motor) {
 		return;
 	}
@@ -132,16 +140,35 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 	currsmp_update_raw(currsmp, adc_raw);
 	currsmp_update_bus(currsmp);
 
+#if MOTORLIB_DEBUG_ENABLED
+	t_raw_start = DWT_CYCCNT;
+#endif
 	feedback_update_raw(feedback);
+#if MOTORLIB_DEBUG_ENABLED
+	t_raw_end = DWT_CYCCNT;
+#endif
 
 	/* 仅在非校准状态下执行完整的反馈更新和状态机调度，校准状态下可能需要特殊处理 */
 	if (params->is_calibrated) {
 		currsmp_update_phase_currment(currsmp);
+#if MOTORLIB_DEBUG_ENABLED
+		t_fb_start = DWT_CYCCNT;
+#endif
 		feedback_update(feedback, CONTROL_PERIOD_DT);
+#if MOTORLIB_DEBUG_ENABLED
+		t_fb_end = DWT_CYCCNT;
+#endif
 		foc_update_idiq(&motor->foc);
 		motor_protection_update(motor, CONTROL_PERIOD_DT);
 	}
 	sm_dispatch(sm);
+
+#if MOTORLIB_DEBUG_ENABLED
+	/* feedback_update_raw (含 encoder_getraw) 耗时，单位 us */
+	motor->data.debug.test_tim1 = (float)(t_raw_end - t_raw_start) / 170.0f;
+	/* feedback_update 耗时，单位 us */
+	motor->data.debug.test_tim2 = (float)(t_fb_end - t_fb_start) / 170.0f;
+#endif
 }
 
 /**

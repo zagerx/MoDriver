@@ -142,7 +142,7 @@ void motor_currment_loop(struct motor *motor)
 	/* d/q轴电流环PID计算，输出电压指令 */
 	ud = foc_currentloop_pid_run(d_axis_pid, foc->ref.i_d, meas->i_d, CONTROL_PERIOD_DT);
 	uq = foc_currentloop_pid_run(q_axis_pid, foc->ref.i_q, meas->i_q, CONTROL_PERIOD_DT);
-
+#if 1
 	/* 电流环解耦前馈：ωL 交叉耦合 + R 压降补偿  TODO*/
 	struct motor_param_ext *param_ext = motor->param_ext;
 	float ls = param_ext->electrical_param.ls;
@@ -157,7 +157,7 @@ void motor_currment_loop(struct motor *motor)
 	/* 电阻压降补偿：使用电流设定值进行前馈 */
 	ud += rs * foc->ref.i_d;
 	uq += rs * foc->ref.i_q;
-
+#endif
 	/* 记录原始电压值用于限幅计算 */
 	float ud_limit = ud;
 	float uq_limit = uq;

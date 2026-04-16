@@ -15,21 +15,21 @@
 #include <math.h>
 
 /* ============ 配置参数 ============ */
-#define RL_RES_TEST_CURRENT    (1.0f)    /* 电阻测量目标电流 [A] */
-#define RL_RES_MAX_VOLTAGE     (2.0f)    /* 电阻测量最大电压 [V] */
-#define RL_RES_KI              (1.0f)    /* 电流环积分增益 */
-#define RL_RES_SAMPLES         (3000)    /* 电阻测量采样次数 */
+#define RL_RES_TEST_CURRENT (1.0f) /* 电阻测量目标电流 [A] */
+#define RL_RES_MAX_VOLTAGE  (2.0f) /* 电阻测量最大电压 [V] */
+#define RL_RES_KI           (1.0f) /* 电流环积分增益 */
+#define RL_RES_SAMPLES      (3000) /* 电阻测量采样次数 */
 
-#define RL_IND_TEST_VOLTAGE    (4.0f)    /* 电感测量电压 [V] */
-#define RL_IND_SAMPLES         (1250)    /* 电感测量采样次数 */
+#define RL_IND_TEST_VOLTAGE (4.0f) /* 电感测量电压 [V] */
+#define RL_IND_SAMPLES      (1250) /* 电感测量采样次数 */
 
 #define CURRENT_CONTROL_BANDWIDTH (6283.185f) /* 电流环带宽 1000Hz [rad/s] */
 
-#define RL_RES_MIN_VALID       (0.005f)  /* 最小有效电阻 [Ohm] */
-#define RL_RES_MAX_VALID       (5.0f)    /* 最大有效电阻 [Ohm] */
-#define RL_IND_MIN_VALID       (2e-6f)   /* 最小有效电感 [H] */
-#define RL_IND_MAX_VALID       (4000e-6f)/* 最大有效电感 [H] */
-#define RL_UNBALANCE_THRESHOLD (0.2f)    /* 相不平衡阈值 */
+#define RL_RES_MIN_VALID       (0.005f)   /* 最小有效电阻 [Ohm] */
+#define RL_RES_MAX_VALID       (5.0f)     /* 最大有效电阻 [Ohm] */
+#define RL_IND_MIN_VALID       (2e-6f)    /* 最小有效电感 [H] */
+#define RL_IND_MAX_VALID       (4000e-6f) /* 最大有效电感 [H] */
+#define RL_UNBALANCE_THRESHOLD (0.2f)     /* 相不平衡阈值 */
 
 /* ============ 内部辅助函数 ============ */
 
@@ -162,8 +162,7 @@ int rl_resistance_step(struct motor *motor)
 	}
 
 	/* 累加 I_beta 用于相平衡检测 */
-	rl->I_beta_accumulator +=
-		0.01f * CONTROL_PERIOD_DT * (I_beta - rl->I_beta_accumulator);
+	rl->I_beta_accumulator += 0.01f * CONTROL_PERIOD_DT * (I_beta - rl->I_beta_accumulator);
 
 	/* 施加电压（固定角度0） */
 	open_loop_force_align(motor, rl->voltage_accumulator, 0.0f);
@@ -176,7 +175,7 @@ int rl_resistance_step(struct motor *motor)
 
 	/* 检查完成 */
 	if (rl->sample_cnt < rl->target_samples) {
-		return 0;  /* 继续 */
+		return 0; /* 继续 */
 	}
 
 	/* 阶段完成，计算结果 */
@@ -193,11 +192,9 @@ int rl_resistance_step(struct motor *motor)
 	rl->measured_resistance = fabsf(rl->voltage_accumulator) / fabsf(I_alpha);
 
 	/* 检查相不平衡 */
-	if (fabsf(rl->I_beta_accumulator) / rl->current_setpoint >
-	    RL_UNBALANCE_THRESHOLD) {
+	if (fabsf(rl->I_beta_accumulator) / rl->current_setpoint > RL_UNBALANCE_THRESHOLD) {
 		motor->data.debug.test_flag1 = 0xE4;
-		motor->data.debug.test_flag2 =
-			(uint16_t)(fabsf(rl->I_beta_accumulator) * 1000.0f);
+		motor->data.debug.test_flag2 = (uint16_t)(fabsf(rl->I_beta_accumulator) * 1000.0f);
 		return -1;
 	}
 
@@ -205,17 +202,15 @@ int rl_resistance_step(struct motor *motor)
 	if (rl->measured_resistance < RL_RES_MIN_VALID ||
 	    rl->measured_resistance > RL_RES_MAX_VALID) {
 		motor->data.debug.test_flag1 = 0xE5;
-		motor->data.debug.test_flag2 =
-			(uint16_t)(rl->measured_resistance * 1000.0f);
+		motor->data.debug.test_flag2 = (uint16_t)(rl->measured_resistance * 1000.0f);
 		return -1;
 	}
 
 	/* 调试标志：电阻测量成功 */
 	motor->data.debug.test_flag1 = 0x21;
-	motor->data.debug.test_flag2 =
-		(uint16_t)(rl->measured_resistance * 1000.0f);
+	motor->data.debug.test_flag2 = (uint16_t)(rl->measured_resistance * 1000.0f);
 
-	return 1;  /* 完成 */
+	return 1; /* 完成 */
 }
 
 /**
@@ -258,7 +253,7 @@ int rl_inductance_step(struct motor *motor)
 
 	/* 检查完成 */
 	if (rl->sample_cnt < rl->target_samples) {
-		return 0;  /* 继续 */
+		return 0; /* 继续 */
 	}
 
 	/* 阶段完成，计算结果 */
@@ -279,8 +274,7 @@ int rl_inductance_step(struct motor *motor)
 	if (rl->measured_inductance < RL_IND_MIN_VALID ||
 	    rl->measured_inductance > RL_IND_MAX_VALID) {
 		motor->data.debug.test_flag1 = 0xE3;
-		motor->data.debug.test_flag2 =
-			(uint16_t)(rl->measured_inductance * 1000000.0f);
+		motor->data.debug.test_flag2 = (uint16_t)(rl->measured_inductance * 1000000.0f);
 		return -1;
 	}
 
@@ -288,7 +282,7 @@ int rl_inductance_step(struct motor *motor)
 	motor->data.debug.test_flag1 = 0x30;
 	motor->data.debug.test_flag2 = 0;
 
-	return 1;  /* 完成 */
+	return 1; /* 完成 */
 }
 
 /**

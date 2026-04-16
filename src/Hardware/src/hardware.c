@@ -6,6 +6,7 @@
 #include "adc.h"
 #include "tim.h"
 #include "dma.h"
+#include "encoder.h"
 static void SystemClock_Config(void);
 static void Error_Handler(void);
 
@@ -22,6 +23,7 @@ void hardware_init(void)
 	MX_TIM6_Init();
 	MX_USART1_UART_Init();
 	MX_SPI1_Init();
+	encoder_init_pipeline();  /* 预热 AS5047 pipeline */
 }
 void hardware_start_irq(void)
 {

@@ -12,50 +12,45 @@
 #include "motor_interface_driver.h"
 #include "motor_interface_params.h"
 /** @brief 反馈错误码枚举 */
-enum feedback_error_code
-{
+enum feedback_error_code {
 	FEEDBACK_ERROR_NONE = 0,       /**< @brief 无错误 */
 	FEEDBACK_ERROR_HW_FAILURE = 1, /**< @brief 硬件故障 */
 	FEEDBACK_ERROR_PARAM = 2,      /**< @brief 参数错误 */
 };
 
 /** @brief 反馈状态枚举 */
-enum feedback_state
-{
-	FEEDBACK_STATE_OK = 0,		   /**< @brief 正常状态 */
+enum feedback_state {
+	FEEDBACK_STATE_OK = 0,             /**< @brief 正常状态 */
 	FEEDBACK_STATE_NOT_CALIBRATED = 1, /**< @brief 未校准状态 */
 };
 
 /**
  * @brief 反馈原始数据与中间计算数据结构体
  */
-struct feedback_data
-{
-	volatile uint16_t raw;		       /**< @brief 原始编码器读数 */
-	volatile uint16_t prev_raw;	       /**< @brief 上一次原始读数（用于差分） */
-	volatile int32_t total_counts;	       /**< @brief 累积计数（考虑溢出） */
+struct feedback_data {
+	volatile uint16_t raw;                 /**< @brief 原始编码器读数 */
+	volatile uint16_t prev_raw;            /**< @brief 上一次原始读数（用于差分） */
+	volatile int32_t total_counts;         /**< @brief 累积计数（考虑溢出） */
 	volatile float accumulated_mangle_rad; /**< @brief 累积机械角度，单位：rad */
-	volatile float prev_mangle_rad;	       /**< @brief 上一次机械角度（用于速度差分），单位：rad */
-	volatile float mech_omega_rad_s;       /**< @brief 机械角速度，单位：rad/s */
-	float odometer_offset_mangle;	       /**< @brief 里程计零点偏移角度，单位：rad */
+	volatile float prev_mangle_rad;  /**< @brief 上一次机械角度（用于速度差分），单位：rad */
+	volatile float mech_omega_rad_s; /**< @brief 机械角速度，单位：rad/s */
+	float odometer_offset_mangle;    /**< @brief 里程计零点偏移角度，单位：rad */
 };
 
 /**
  * @brief 反馈输出数据结构体
  */
-struct feedback_output
-{
-	float eangle_rad;	  /**< @brief 电角度，单位：rad */
-	float velocity_rad_s;	  /**< @brief 机械角速度，单位：rad/s */
-	float odometer;		  /**< @brief 里程（累积线位移），单位：m */
+struct feedback_output {
+	float eangle_rad;         /**< @brief 电角度，单位：rad */
+	float velocity_rad_s;     /**< @brief 机械角速度，单位：rad/s */
+	float odometer;           /**< @brief 里程（累积线位移），单位：m */
 	float line_velocity_mm_s; /**< @brief 机械线速度，单位：mm/s */
 };
 
 /**
  * @brief 编码器反馈结构体
  */
-struct feedback
-{
+struct feedback {
 	const struct encoder_ops *ops; /**< @brief 编码器操作接口 */
 	struct feedback_param *param;  /**< @brief 反馈参数指针 */
 	struct feedback_output output; /**< @brief 输出数据 */
@@ -156,8 +151,7 @@ static inline float feedback_get_line_velocity(struct feedback *fb)
 static inline void _feedback_update_param_wheel_radius(struct feedback *feedback,
 						       float wheel_radius)
 {
-	if (!feedback)
-	{
+	if (!feedback) {
 		return;
 	}
 
@@ -172,8 +166,7 @@ static inline void _feedback_update_param_wheel_radius(struct feedback *feedback
  */
 static inline void _feedback_update_param_gear_ratio(struct feedback *feedback, float gear_ratio)
 {
-	if (!feedback)
-	{
+	if (!feedback) {
 		return;
 	}
 
@@ -188,8 +181,7 @@ static inline void _feedback_update_param_gear_ratio(struct feedback *feedback, 
  */
 static inline void _feedback_update_param_pole_pairs(struct feedback *feedback, float pole_pairs)
 {
-	if (!feedback)
-	{
+	if (!feedback) {
 		return;
 	}
 
@@ -204,8 +196,7 @@ static inline void _feedback_update_param_pole_pairs(struct feedback *feedback, 
  */
 static inline void _feedback_update_param_direction(struct feedback *feedback, float direction)
 {
-	if (!feedback)
-	{
+	if (!feedback) {
 		return;
 	}
 
@@ -221,8 +212,7 @@ static inline void _feedback_update_param_direction(struct feedback *feedback, f
 static inline void _feedback_update_param_encoder_resolution(struct feedback *feedback,
 							     uint16_t encoder_resolution)
 {
-	if (!feedback)
-	{
+	if (!feedback) {
 		return;
 	}
 
@@ -239,8 +229,7 @@ static inline void _feedback_update_param_encoder_offset(struct feedback *feedba
 							 uint16_t encoder_offset,
 							 float encoder_offset_frac)
 {
-	if (!feedback)
-	{
+	if (!feedback) {
 		return;
 	}
 
@@ -256,8 +245,7 @@ static inline void _feedback_update_param_encoder_offset(struct feedback *feedba
  */
 static inline void feedback_reset_odometer(struct feedback *feedback)
 {
-	if (!feedback)
-	{
+	if (!feedback) {
 		return;
 	}
 

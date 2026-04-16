@@ -43,6 +43,9 @@ target_include_directories(motor PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/interface
 )
 
+# Debug 模式下给 motorlib 单独开 O2 优化，确保高频控制环性能
+target_compile_options(motor PRIVATE -O2)
+
 # motor 依赖 CMSIS-DSP
 target_link_libraries(motor PRIVATE
         cmsis-dsp-v1.10.0

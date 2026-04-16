@@ -41,8 +41,11 @@ struct motor_debug {
 	volatile float test_tar_pos;   /**< @brief 调试：目标位置 */
 	volatile float test_real_pos;  /**< @brief 调试：实际位置 */
 	volatile float test_plann_vel; /**< @brief 调试：规划速度 */
-	uint16_t test_flag1;           /**< @brief 调试：标志1 */
-	uint16_t test_flag2;           /**< @brief 调试：标志2 */
+	volatile float test_tim1;
+	volatile float test_tim2;
+
+	uint16_t test_flag1; /**< @brief 调试：标志1 */
+	uint16_t test_flag2; /**< @brief 调试：标志2 */
 };
 #endif
 
