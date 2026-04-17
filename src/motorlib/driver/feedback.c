@@ -14,6 +14,131 @@
 /** @brief 低通滤波系数（0~1，越大响应越快） */
 #define VELOCITY_LPF_ALPHA 0.08f
 
+#if FEEDBACK_USE_PLL
+/**
+ * @brief 整数取模运算，确保结果在 [0, m-1] 范围内
+ * @param[in] a 被除数
+ * @param[in] m 除数（正数）
+ * @return 取模结果
+ */
+static int32_t mod(int32_t a, int32_t m)
+{
+	int32_t r = a % m;
+	if (r < 0) {
+		r += m;
+	}
+	return r;
+}
+
+/**
+ * @brief 将角度包装到 [-π, π] 范围内
+ * @param[in] angle 输入角度
+ * @param[in] period 周期（通常为2π或CPR）
+ * @return 包装后的角度
+ */
+static float wrap_pm(float angle, float period)
+{
+	angle = fmodf(angle + period / 2.0f, period);
+	if (angle < 0.0f) {
+		angle += period;
+	}
+	return angle - period / 2.0f;
+}
+
+/**
+ * @brief 将角度包装到 [0, period] 范围内
+ * @param[in] angle 输入角度
+ * @param[in] period 周期
+ * @return 包装后的角度
+ */
+static float fmodf_pos(float angle, float period)
+{
+	angle = fmodf(angle, period);
+	if (angle < 0.0f) {
+		angle += period;
+	}
+	return angle;
+}
+
+/**
+ * @brief 编码器模型函数（简单向下取整，与ODrive保持一致）
+ * @param[in] internal_pos 内部位置估计
+ * @return 编码器计数
+ */
+static int32_t encoder_model(float internal_pos)
+{
+	return (int32_t)floorf(internal_pos);
+}
+
+/**
+ * @brief 更新PLL增益（与ODrive保持一致）
+ * @param[in] feedback 反馈实例
+ * @param[in] dt 控制周期，单位：s
+ */
+static void feedback_update_pll_gains(struct feedback *feedback, float dt)
+{
+	struct feedback_data *data = &feedback->data;
+
+	/* ODrive公式：pll_kp = 2.0f * bandwidth */
+	data->pll_kp = 2.0f * FEEDBACK_PLL_BANDWIDTH;
+
+	/* 临界阻尼：pll_ki = 0.25f * (pll_kp * pll_kp) */
+	data->pll_ki = 0.25f * (data->pll_kp * data->pll_kp);
+
+	/* 检查离散时间近似是否稳定（与ODrive相同检查） */
+	if (!(dt * data->pll_kp < 1.0f)) {
+		/* 增益不稳定，使用保守值 */
+		data->pll_kp = 0.9f / dt;
+		data->pll_ki = 0.25f * (data->pll_kp * data->pll_kp);
+	}
+}
+
+/**
+ * @brief PLL更新函数（与ODrive保持一致）
+ * @param[in] feedback 反馈实例
+ * @param[in] dt 采样周期，单位：s
+ * @param[in] count_in_cpr 当前CPR内的编码器计数（0~CPR-1）
+ * @param[in] shadow_count 阴影计数（连续计数，无溢出）
+ * @return 速度估计（计数/秒）
+ */
+static float feedback_pll_update(struct feedback *feedback, float dt, int32_t count_in_cpr,
+				 int32_t shadow_count)
+{
+	struct feedback_data *data = &feedback->data;
+	struct feedback_param *param = feedback->param;
+	const int32_t cpr = (int32_t)param->encoder_resolution;
+
+	/* 1. 预测当前位置 */
+	data->pos_estimate_counts += dt * data->vel_estimate_counts;
+	data->pos_cpr_counts += dt * data->vel_estimate_counts;
+
+	/* 2. 离散相位检测器（与ODrive相同） */
+	float delta_pos_counts = (float)(shadow_count - encoder_model(data->pos_estimate_counts));
+	float delta_pos_cpr_counts = (float)(count_in_cpr - encoder_model(data->pos_cpr_counts));
+	delta_pos_cpr_counts = wrap_pm(delta_pos_cpr_counts, (float)cpr);
+
+	/* 调试变量（与ODrive相同） */
+	data->delta_pos_cpr_counts += 0.1f * (delta_pos_cpr_counts - data->delta_pos_cpr_counts);
+
+	/* 3. PLL反馈（与ODrive相同） */
+	data->pos_estimate_counts += dt * data->pll_kp * delta_pos_counts;
+	data->pos_cpr_counts += dt * data->pll_kp * delta_pos_cpr_counts;
+	data->pos_cpr_counts = fmodf_pos(data->pos_cpr_counts, (float)cpr);
+	data->vel_estimate_counts += dt * data->pll_ki * delta_pos_cpr_counts;
+
+	/* 4. 零速对齐（与ODrive相同，防止抖动） */
+	if (fabsf(data->vel_estimate_counts) < 0.5f * dt * data->pll_ki) {
+		data->vel_estimate_counts = 0.0f;
+	}
+
+	/* 5. 转换为机械角速度（rad/s） */
+	float mech_omega_rad_s =
+		data->vel_estimate_counts * (MOTORLIB_TWOPI / (float)cpr) * param->direction;
+
+	return mech_omega_rad_s;
+}
+#endif /* FEEDBACK_USE_PLL */
+
 /**
  * @brief 角度归一化到 [0, 2PI]
  * @param[in] angle 输入角度，单位：rad
@@ -90,6 +215,19 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
 	data->prev_mangle_rad = 0.0f;
 	data->mech_omega_rad_s = 0.0f;
 	data->odometer_offset_mangle = 0.0f; /* 初始无偏移 */
+
+#if FEEDBACK_USE_PLL
+	/* 初始化PLL状态 */
+	const int32_t cpr = (int32_t)param->encoder_resolution;
+	data->pos_estimate_counts = 0.0f;
+	data->pos_cpr_counts = 0.0f;
+	data->vel_estimate_counts = 0.0f;
+	data->delta_pos_cpr_counts = 0.0f;
+
+	/* 初始化PLL增益（需要dt，但此时未知，暂设为0） */
+	data->pll_kp = 0.0f;
+	data->pll_ki = 0.0f;
+#endif
 
 	feedback->output.eangle_rad = 0.0f;
 	feedback->output.velocity_rad_s = 0.0f;
@@ -233,10 +371,36 @@ void feedback_update(struct feedback *feedback, float dt)
 	/* 4. 计算电角度 */
 	feedback->output.eangle_rad = feedback_calc_elec_angle(feedback, cur_mangle);
 
-	/* 5. 差分法计算机械角速度 */
+	/* 5. 计算机械角速度（根据宏选择PLL或差分法） */
+#if FEEDBACK_USE_PLL
+	/* 使用PLL（与ODrive保持一致） */
+	const int32_t cpr = (int32_t)param->encoder_resolution;
+
+	/* 第一次运行时初始化PLL增益 */
+	if (data->pll_kp == 0.0f && data->pll_ki == 0.0f) {
+		feedback_update_pll_gains(feedback, dt);
+	}
+
+	/* 计算当前CPR内的计数（0~CPR-1） */
+	int32_t count_in_cpr = data->total_counts % cpr;
+	if (count_in_cpr < 0) {
+		count_in_cpr += cpr;
+	}
+
+	/* 运行PLL更新 */
+	feedback->output.velocity_rad_s =
+		feedback_pll_update(feedback, dt, count_in_cpr, data->total_counts);
+
+	/* 更新机械角速度状态（保持兼容性） */
+	data->mech_omega_rad_s = feedback->output.velocity_rad_s;
+#else
+	/* 使用差分法（原有实现） */
 	feedback->output.velocity_rad_s = feedback_calc_velocity(feedback, dt, cur_mangle);
+#endif
+
 	feedback->output.line_velocity_mm_s =
 		feedback->output.velocity_rad_s * param->wheel_radius / param->gear_ratio;
+
 	/* 6. 应用小数偏移到电角度输出	小数偏移用于子计数精度的相位对齐 */
 	if (param->encoder_offset_frac != 0.0f) {
 		/* 将小数偏移转换为电角度弧度 */

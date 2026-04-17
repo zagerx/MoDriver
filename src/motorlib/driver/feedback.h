@@ -11,6 +11,17 @@
 #include <stdint.h>
 #include "motor_interface_driver.h"
 #include "motor_interface_params.h"
+
+/* PLL配置开关 */
+#ifndef FEEDBACK_USE_PLL
+#define FEEDBACK_USE_PLL 1 /* 0:使用差分法, 1:使用PLL（与ODrive一致） */
+#endif
+
+/* PLL默认带宽（Hz） */
+#ifndef FEEDBACK_PLL_BANDWIDTH
+#define FEEDBACK_PLL_BANDWIDTH 1000.0f /* 与ODrive默认值一致 */
+#endif
+
 /** @brief 反馈错误码枚举 */
 enum feedback_error_code {
 	FEEDBACK_ERROR_NONE = 0,       /**< @brief 无错误 */
@@ -35,6 +46,16 @@ struct feedback_data {
 	volatile float prev_mangle_rad;  /**< @brief 上一次机械角度（用于速度差分），单位：rad */
 	volatile float mech_omega_rad_s; /**< @brief 机械角速度，单位：rad/s */
 	float odometer_offset_mangle;    /**< @brief 里程计零点偏移角度，单位：rad */
+
+#if FEEDBACK_USE_PLL
+	/* PLL状态变量（与ODrive保持一致） */
+	float pos_estimate_counts;  /**< @brief 位置估计（编码器计数） */
+	float pos_cpr_counts;       /**< @brief CPR内位置估计（0~CPR-1） */
+	float vel_estimate_counts;  /**< @brief 速度估计（计数/秒） */
+	float pll_kp;               /**< @brief PLL比例增益 */
+	float pll_ki;               /**< @brief PLL积分增益 */
+	float delta_pos_cpr_counts; /**< @brief 相位检测器输出（调试用） */
+#endif
 };
 
 /**
