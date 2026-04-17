@@ -8,6 +8,7 @@
 #define CLOSE_LOOP_H
 
 struct motor;
+void motor_position_temp_loop(struct motor *motor, float tar_pos, float dt);
 
 /**
  * @brief 电机位置环控制

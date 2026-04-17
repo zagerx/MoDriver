@@ -54,7 +54,8 @@ void foc_pid_reset(struct foc_pid *pid);
  *
  * @return 计算后的输出值
  */
-float foc_pid_run(struct foc_pid *pid, float target, float meas, float dt);
+float foc_pid_positionloop_run(struct foc_pid *pid, float target, float meas, float dt);
+float foc_pid_velocityloop_run(struct foc_pid *pid, float target, float meas, float dt);
 
 /**
  * @brief 饱和反馈处理

@@ -107,6 +107,7 @@ void motor_init(struct motor *motor)
 	foc_bind(foc, fb, currsmp, &motor->param_ext->foc_param);
 
 	motor_protection_init(motor);
+	anticogging_init(motor);
 }
 
 /**
@@ -189,7 +190,14 @@ void motor_set_target_pos(struct motor *motor, float target_pos, float target_ve
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
 	trajectory_planner_update_target(traj_plan, target_pos, target_vel);
 }
-
+void motor_set_test_target(struct motor *motor, float target1, float target2)
+{
+	if (!motor) {
+		return;
+	}
+	motor->data.debug.test_value1 = target1;
+	motor->data.debug.test_value2 = target2;
+}
 /**
  * @brief 紧急停止电机
  * @param[in] motor 电机实例指针

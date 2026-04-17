@@ -26,7 +26,7 @@
 #define UNDERVOLTAGE_THRESHOLD (20.0f) /* 欠压阈值 20V */
 
 /* 堵转保护阈值 */
-#define STALL_CURRENT_THRESHOLD  (10.0f) /* 堵转电流阈值 A */
+#define STALL_CURRENT_THRESHOLD  (15.0f) /* 堵转电流阈值 A */
 #define STALL_VELOCITY_THRESHOLD (5.0f)  /* 堵转速度阈值 10mm/s */
 
 /*控制相关     */
@@ -37,7 +37,7 @@
 #define SPEED_LOOP_INTERVAL                                                                        \
 	(SPEED_PERIOD_DT / CONTROL_PERIOD_DT) /* 速度环执行间隔，单位为控制周期数 */
 
-#define POSITION_LOOP_FREQ     500.0f                      /* 位置环频率 500Hz */
+#define POSITION_LOOP_FREQ     1000.0f                     /* 位置环频率 500Hz */
 #define POSITION_PERIOD_DT     (1.0f / POSITION_LOOP_FREQ) /* 位置环 周期 10ms */
 #define POSITION_LOOP_INTERVAL (POSITION_PERIOD_DT / CONTROL_PERIOD_DT)
 

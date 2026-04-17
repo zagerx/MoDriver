@@ -300,6 +300,9 @@ enum motor_mode motor_get_mode(const struct motor *motor)
 	if (state == motor_mode_debug) {
 		return MODE_DEBUG;
 	}
+	if (state == motor_mode_anticogging_calib) {
+		return MODE_ANTICOGGING_CALIB;
+	}
 	return MODE_NONE;
 }
 
@@ -340,6 +343,11 @@ void motor_tran_mode(struct motor *motor, enum motor_mode new_mode)
 	case MODE_DEBUG: {
 		if (sm_mode->current_state != motor_mode_debug) {
 			TRAN_STATE(sm_mode, motor_mode_debug);
+		}
+	} break;
+	case MODE_ANTICOGGING_CALIB: {
+		if (sm_mode->current_state != motor_mode_anticogging_calib) {
+			TRAN_STATE(sm_mode, motor_mode_anticogging_calib);
 		}
 	} break;
 	default:

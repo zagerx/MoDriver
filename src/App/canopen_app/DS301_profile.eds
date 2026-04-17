@@ -2064,7 +2064,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=0.002
+DefaultValue=0.008
 PDOMapping=0
 
 [2009sub19]
@@ -2073,7 +2073,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=1.0
+DefaultValue=0.1
 PDOMapping=0
 
 [2009sub1A]
@@ -2100,7 +2100,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=10.0
+DefaultValue=120
 PDOMapping=0
 
 [2009sub1D]
@@ -2109,7 +2109,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
-DefaultValue=5.0
+DefaultValue=5500.0
 PDOMapping=0
 
 [2009sub1E]

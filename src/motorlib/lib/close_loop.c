@@ -13,7 +13,17 @@
 #include "foc_pid.h"
 #include "svpwm.h"
 #include "motorlib_control_param.h"
-
+void motor_position_temp_loop(struct motor *motor, float tar_pos, float dt)
+{
+	/* 获取FOC相关结构体指针 */
+	struct foc *foc = &motor->foc;
+	struct foc_pid *position_pi = &foc->ctrl.position;
+	struct foc_measurement *meas = &foc->meas;
+	/* 获取轨迹规划的位置和速度（单位转换：mm -> m） */
+	float current_pos = meas->fd_out->odometer;
+	/* 位置环PID计算，输出作为速度环的目标输入 */
+	foc->ref.velocity = foc_pid_positionloop_run(position_pi, tar_pos, current_pos, dt);
+}
 /**
  * @brief 电机位置环控制
  * @param[in] motor 电机实例指针
@@ -35,7 +45,7 @@ void motor_position_loop(struct motor *motor, float dt)
 	float current_pos = meas->fd_out->odometer;
 
 	/* 位置环PID计算，输出作为速度环的目标输入 */
-	float temp = foc_pid_run(position_pi, plan_position, current_pos, dt);
+	float temp = foc_pid_positionloop_run(position_pi, plan_position, current_pos, dt);
 	foc->ref.velocity = temp + plan_velocity; /* 速度前馈：轨迹规划的速度 */
 }
 
@@ -83,7 +93,7 @@ void motor_velocity_loop(struct motor *motor, float target_vel)
 	float vel = meas->fd_out->line_velocity_mm_s;
 
 	/* 速度环PI计算，输出q轴电流参考值 */
-	foc->ref.i_q = foc_pid_run(velocity_pi, target_vel, vel, SPEED_PERIOD_DT);
+	foc->ref.i_q = foc_pid_velocityloop_run(velocity_pi, target_vel, vel, SPEED_PERIOD_DT);
 	foc->ref.i_d = 0.0f; /* Id=0控制策略 */
 }
 

@@ -22,6 +22,7 @@ struct motor_param_ext;
 #include "inverter.h"
 #include "feedback.h"
 #include "currsmp.h"
+#include "anticogging.h"
 // struct inverter;
 // struct feedback;
 // struct currsmp;
@@ -38,6 +39,8 @@ struct motor_param_ext;
  * @brief 电机调试数据结构体
  */
 struct motor_debug {
+	float test_value1; /**< @brief 调试：测试值1 */
+	float test_value2; /**< @brief 调试：测试值2 */
 
 	volatile float test_tim1;
 	volatile float test_tim2;
@@ -68,14 +71,15 @@ struct motor_data {
  * @brief 电机实例结构体
  */
 struct motor {
-	struct motor_param_ext *param_ext;  /**< @brief 扩展参数 */
-	struct inverter inverter;           /**< @brief 逆变器实例 */
-	struct feedback feedback;           /**< @brief 反馈实例 */
-	struct currsmp currsmp;             /**< @brief 电流采样实例 */
-	struct statemachine sm;             /**< @brief 状态机实例 */
-	struct statemachine sm_mode;        /**< @brief 模式状态机实例 */
-	struct motor_data data;             /**< @brief 数据 */
-	struct calibration calib;           /**< @brief 校准实例 */
+	struct motor_param_ext *param_ext; /**< @brief 扩展参数 */
+	struct inverter inverter;          /**< @brief 逆变器实例 */
+	struct feedback feedback;          /**< @brief 反馈实例 */
+	struct currsmp currsmp;            /**< @brief 电流采样实例 */
+	struct statemachine sm;            /**< @brief 状态机实例 */
+	struct statemachine sm_mode;       /**< @brief 模式状态机实例 */
+	struct motor_data data;            /**< @brief 数据 */
+	struct calibration calib;          /**< @brief 校准实例 */
+	struct anticogging anticoggings;
 	struct trajectory_plan traj_plan;   /**< @brief 轨迹规划实例 */
 	struct foc foc;                     /**< @brief FOC相关数据 */
 	struct protection_manager prot_mgr; /**< @brief 保护模块实例 */

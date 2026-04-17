@@ -104,6 +104,7 @@ void motor_tran_state(struct motor *motor, enum motor_status new_state);
  * @details 更新轨迹规划器的目标位置与速度，用于PP模式
  */
 void motor_set_target_pos(struct motor *motor, float target_pos, float target_vel);
+void motor_set_test_target(struct motor *motor, float target1, float target2);
 
 /**
  * @brief 紧急停止电机

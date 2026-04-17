@@ -38,8 +38,9 @@ enum motor_mode {
 	MODE_CSTCA = 0x0B, /*!< 循环同步转矩带通讯角模式 (CST with Commutation Angle) */
 
 	/* 制造商特定 (0x7F-0xFF 保留) */
-	MODE_DEBUG = 0X7F,        // 调试模式
-	MODE_MANUFACTURER = 0xFF, /*!< 制造商特定模式 */
+	MODE_DEBUG = 0X7F,             // 调试模式
+	MODE_ANTICOGGING_CALIB = 0x80, // 齿槽补偿校准模式
+	MODE_MANUFACTURER = 0xFF,      /*!< 制造商特定模式 */
 };
 
 #endif /* MOTOR_INTERFACE_MODE_H */

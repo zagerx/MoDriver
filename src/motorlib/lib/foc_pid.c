@@ -7,7 +7,8 @@
  */
 
 #include "foc_pid.h"
-
+#include <stdbool.h>
+#include "math.h"
 /**
  * @brief 辅助宏：限制数值范围
  * @param x 输入值
@@ -51,7 +52,7 @@ void foc_pid_reset(struct foc_pid *pid)
  * @param dt 采样周期
  * @return PID 控制器输出值
  */
-float foc_pid_run(struct foc_pid *pid, float target, float meas, float dt)
+float foc_pid_positionloop_run(struct foc_pid *pid, float target, float meas, float dt)
 {
 	float kp, ki, limit;
 
@@ -104,23 +105,62 @@ float foc_pid_run(struct foc_pid *pid, float target, float meas, float dt)
 }
 
 /**
- * @brief FOC PID 饱和反馈处理
+ * @brief 运行 FOC PID 控制器
  * @param pid PID 控制器结构体指针
- * @param output_real 实际输出值
- * @param output_desire 期望输出值
+ * @param target 目标值
+ * @param meas 测量值
+ * @param dt 采样周期
+ * @return PID 控制器输出值
  */
-void foc_pid_saturation_feedback(struct foc_pid *pid, float output_real, float output_desire)
+
+float foc_pid_velocityloop_run(struct foc_pid *pid, float target, float meas, float dt)
 {
-	// 如果实际输出等于期望输出，说明没饱和，啥都不用做
-	if (output_real == output_desire) {
-		return;
+	const float kp = pid->params->kp;
+	const float ki = pid->params->ki;
+	const float limit = pid->params->limit;
+	const float int_limit = 3.0f;
+	const float ff = 0.000f;
+	const float tau_aw = 1.5f;
+
+	float error = target - meas;
+
+	// 1. 前馈 + P项
+	float vel_ff = ff * target;
+	float p_term = kp * error;
+	float output_pre = p_term + pid->integral + vel_ff;
+
+	// 2. 条件积分（防止继续饱和）
+	bool saturate_high = (output_pre > limit);
+	bool saturate_low = (output_pre < -limit);
+	bool allow_integrate = true;
+
+	if (saturate_high && error > 0) {
+		allow_integrate = false;
+	}
+	if (saturate_low && error < 0) {
+		allow_integrate = false;
 	}
 
-	float scale = output_real / output_desire;
+	if (allow_integrate) {
+		pid->integral += ki * error * dt;
+	}
 
-	pid->integral *= scale;
+	// 3. 时间常数化抗饱和
+	if (saturate_high || saturate_low) {
+		float desired_integral =
+			saturate_high ? (limit - p_term - vel_ff) : (-limit - p_term - vel_ff);
+
+		// 一阶低通向目标值收敛
+		float alpha = dt / (tau_aw + dt);
+		pid->integral = (1.0f - alpha) * pid->integral + alpha * desired_integral;
+	}
+
+	// 4. 限幅与输出
+	pid->integral = fmaxf(fminf(pid->integral, int_limit), -int_limit);
+
+	float output = p_term + pid->integral + vel_ff;
+	return fmaxf(fminf(output, limit), -limit);
 }
-
 /**
  * @brief 运行 FOC 电流环 PID 控制器（优化版本）
  * @param pid PID 控制器结构体指针
