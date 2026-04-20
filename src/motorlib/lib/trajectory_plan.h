@@ -128,11 +128,11 @@ void trajectory_planner_bind_param(struct trajectory_plan *trajectory, trajector
  * @param start_pos 起始位置
  * @param start_vel 起始速度
  * @param start_acc 起始加速度
- * @param exex_cycle 执行周期
+ * @param exec_cycle 执行周期
  * @return 初始化结果，0表示成功
  */
 int trajectory_planner_init(struct trajectory_plan *trajectory, float start_pos, float start_vel,
-			    float start_acc, float exex_cycle);
+			    float start_acc, float exec_cycle);
 
 /**
  * @brief 轨迹规划器动作执行

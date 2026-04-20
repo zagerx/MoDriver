@@ -96,9 +96,36 @@ struct protection_manager {
 
 /* ============ 接口函数 ============ */
 
+/**
+ * @brief 初始化电机保护管理器
+ * @param[in] motor 电机实例
+ * @return 无
+ * @details 配置过压、欠压、堵转等保护类型的阈值与回调函数（温度保护当前未启用）
+ */
 void motor_protection_init(struct motor *motor);
+
+/**
+ * @brief 更新电机保护状态
+ * @param[in] motor 电机实例
+ * @param[in] dt 时间步长，单位：s
+ * @return 无
+ * @details 周期性调用，检测各保护条件并根据防抖/恢复时间进行状态转移
+ */
 void motor_protection_update(struct motor *motor, float dt);
+
+/**
+ * @brief 清除指定类型的保护故障
+ * @param[in] motor 电机实例
+ * @param[in] type 保护类型
+ * @return 无
+ */
 void motor_protection_clear_fault(struct motor *motor, enum protection_type type);
+
+/**
+ * @brief 清除所有保护故障
+ * @param[in] motor 电机实例
+ * @return 无
+ */
 void motor_protection_clear_all_faults(struct motor *motor);
 
 /**
@@ -109,6 +136,11 @@ void motor_protection_clear_all_faults(struct motor *motor);
  */
 bool motor_protection_has_fault(struct motor *motor);
 
+/**
+ * @brief 获取当前故障位图
+ * @param[in] motor 电机实例
+ * @return uint32_t 故障位组合值
+ */
 uint32_t motor_protection_get_faults(struct motor *motor);
 
 #endif

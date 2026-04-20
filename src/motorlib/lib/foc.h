@@ -70,7 +70,7 @@ struct foc_control {
 
 /**
  * @brief FOC主结构体
- * @details 整合FOC控制所需的所有数据和控制器，包括反馈、采样、参数、测量值、参考值和控制器
+ * @details 整合FOC控制所需的所有数据和控制器，包括反馈、采样、参数、测量值、参考值、控制器和开环自增角度
  */
 struct foc {
 
@@ -94,7 +94,7 @@ struct foc {
  * @brief 绑定FOC数据源
  * @param[in] foc FOC实例指针
  * @param[in] feedback 反馈输出数据指针
- * @param[in] currsmp 电流采样输出数据指针
+ * @param[in] currsmp_out 电流采样输出数据指针
  * @param[in] foc_param FOC参数指针
  * @return 无
  */

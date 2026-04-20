@@ -13,6 +13,14 @@
 #include "foc_pid.h"
 #include "svpwm.h"
 #include "motorlib_control_param.h"
+/**
+ * @brief 电机位置环控制
+ * @param[in] motor 电机实例指针
+ * @param[in] tar_pos 目标位置
+ * @param[in] dt 时间步长（单位：秒）
+ * @details 执行位置闭环控制，根据目标位置与实际位置做PID运算，输出速度指令
+ * @return 速度指令
+ */
 float motor_position_loop(struct motor *motor, float tar_pos, float dt)
 {
 	/* 获取FOC相关结构体指针 */
@@ -26,32 +34,6 @@ float motor_position_loop(struct motor *motor, float tar_pos, float dt)
 	float out = foc_pid_positionloop_run(position_pi, tar_pos, current_pos, dt);
 	return out;
 }
-/**
- * @brief 电机位置环控制
- * @param[in] motor 电机实例指针
- * @param[in] dt 时间步长（单位：秒）
- * @details 执行位置闭环控制，读取轨迹规划位置并与实际位置做PID运算，输出速度指令
- * @note 位置环输出 = 位置PID计算结果 + 轨迹规划速度前馈（前馈系数为1）
- */
-// void motor_position_loop(struct motor *motor, float dt)
-// {
-// 	/* 获取FOC相关结构体指针 */
-// 	struct foc *foc = &motor->foc;
-// 	struct foc_pid *position_pi = &foc->ctrl.position;
-// 	struct foc_measurement *meas = &foc->meas;
-// 	struct trajectory_plan *traj_plan = &motor->traj_plan;
-
-// 	/* 获取轨迹规划的位置和速度（单位转换：mm -> m） */
-// 	float plan_position = trajectory_planner_get_pos(traj_plan);
-// 	struct feedback *feedback = &motor->feedback;
-// 	float plan_velocity = trajectory_planner_get_vel(traj_plan);
-// 	// 速度前馈系数（根据实际系统调整）
-// 	float current_pos; //= meas->fd_out->mangle_rad;
-
-// 	/* 位置环PID计算，输出作为速度环的目标输入 */
-// 	float temp = foc_pid_positionloop_run(position_pi, plan_position, current_pos, dt);
-// 	foc->ref.velocity = temp + plan_velocity; /* 速度前馈：轨迹规划的速度 */
-// }
 
 /**
  * @brief 复位位置环控制器

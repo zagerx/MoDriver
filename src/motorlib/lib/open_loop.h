@@ -46,9 +46,9 @@ float open_loop_get_force_angle(struct motor *motor);
 void open_loop_encoder(struct motor *motor, float q_axis_voltage);
 
 /**
- * @brief 更新id/iq电流
+ * @brief d轴电流调试模式
  * @param[in] motor 电机实例
- * @param[in] tar 目标值
+ * @param[in] tar 目标电流值
  * @return 无
  */
 void currment_debug(struct motor *motor, float tar);

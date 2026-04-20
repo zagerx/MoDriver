@@ -40,7 +40,7 @@ void foc_bind(struct foc *foc, struct feedback *feedback, struct currsmp *currsm
 
 /**
  * @brief 更新id/iq电流
- * @param[in] foc FOC实例
+ * @param[in,out] foc FOC实例
  * @return 无
  * @details 使用Clarke和Park变换计算d/q轴电流
  */

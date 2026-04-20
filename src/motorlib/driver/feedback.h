@@ -63,7 +63,7 @@ struct feedback {
 
 /**
  * @brief 绑定编码器操作接口
- * @param[in] feedback 反馈实例
+ * @param[in] motor 电机实例
  * @param[in] ops 编码器操作接口
  * @return 无
  */
@@ -80,12 +80,16 @@ void feedback_bind_encoder_param(struct motor *motor, struct feedback_param *par
 /**
  * @brief 初始化反馈模块
  * @param[in] motor 电机实例
- * @return feedback_error_code 错误码
- * @retval FEEDBACK_ERROR_NONE 初始化成功
- * @retval FEEDBACK_ERROR_PARAM 参数错误
- * @retval FEEDBACK_ERROR_HW_FAILURE 硬件故障
+ * @return 无
  */
 void feedback_init(struct motor *motor);
+
+/**
+ * @brief 重置编码器内部状态
+ * @param[in] motor 电机实例
+ * @return 无
+ * @note 校准后调用，将当前编码器位置作为新零点，丢弃校准期间的位移
+ */
 void feedback_reset_encoder(struct motor *motor);
 
 /**
@@ -168,7 +172,8 @@ static inline void _feedback_update_param_encoder_resolution(struct feedback *fe
 /**
  * @brief 更新编码器零位偏移参数
  * @param[in] feedback 反馈实例
- * @param[in] encoder_offset 编码器零位偏移
+ * @param[in] encoder_offset 编码器零位偏移整数部分
+ * @param[in] encoder_offset_frac 编码器零位偏移小数部分
  * @return 无
  */
 static inline void _feedback_update_param_encoder_offset(struct feedback *feedback,

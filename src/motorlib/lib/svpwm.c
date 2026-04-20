@@ -71,7 +71,7 @@ static inline float safe_sqrtf(float x)
  *       1. 输入：vbus必须>0，ud/uq为任意物理电压值
  *       2. 处理：计算U_limit = Vbus / sqrt(3)，若模长超出则等比例缩放
  *       3. 输出：保证√(ud²+uq²) ≤ Vbus/√3，相位角不变
- *       4. 异常：vbus≤0时强制输出零
+ *       4. 异常：vbus≤0.001f时强制输出零
  */
 void svpwm_limit_voltage(float vbus, float *ud, float *uq)
 {

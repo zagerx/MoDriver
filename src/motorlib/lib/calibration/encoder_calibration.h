@@ -51,7 +51,7 @@ int enc_scan_backward_step(struct motor *motor);
 /**
  * @brief 计算编码器零点偏移
  * @param[in] motor 电机实例
- * @param[in] scan_delta 正向扫描累计值
+ * @param[in] scan_delta 正向扫描累计值（保留参数，当前未使用）
  */
 void enc_calc_offset(struct motor *motor, int32_t scan_delta);
 

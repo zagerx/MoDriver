@@ -105,6 +105,23 @@ float foc_pid_positionloop_run(struct foc_pid *pid, float target, float meas, fl
 }
 
 /**
+ * @brief 电流环PID饱和处理
+ * @param[in,out] pid PID控制器实例
+ * @param[in] output_real 实际输出值
+ * @param[in] output_desire 期望输出值
+ */
+void foc_currentpid_saturation(struct foc_pid *pid, float output_real, float output_desire)
+{
+	// 如果实际输出等于期望输出，说明没饱和，啥都不用做
+	if (output_real == output_desire) {
+		return;
+	}
+
+	float scale = output_real / output_desire;
+
+	pid->integral *= scale;
+}
+/**
  * @brief 运行 FOC PID 控制器
  * @param pid PID 控制器结构体指针
  * @param target 目标值
@@ -221,20 +238,4 @@ float foc_currentloop_pid_run(struct foc_pid *pid, float target, float meas, flo
 	return output;
 }
 
-/**
- * @brief FOC 电流 PID 饱和处理
- * @param pid PID 控制器结构体指针
- * @param output_real 实际输出值
- * @param output_desire 期望输出值
- */
-void foc_currentpid_saturation(struct foc_pid *pid, float output_real, float output_desire)
-{
-	// 如果实际输出等于期望输出，说明没饱和，啥都不用做
-	if (output_real == output_desire) {
-		return;
-	}
 
-	float scale = output_real / output_desire;
-
-	pid->integral *= scale;
-}

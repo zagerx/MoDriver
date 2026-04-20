@@ -82,7 +82,7 @@ static bool check_recover(bool *is_triggered, float *recover_acc, uint16_t recov
  * @brief 初始化电机保护管理器
  * @param[in] motor 电机实例
  * @return 无
- * @details 配置过压、欠压、堵转、温度等保护类型的阈值与回调函数
+ * @details 配置过压、欠压、堵转等保护类型的阈值与回调函数（温度保护当前未启用）
  */
 void motor_protection_init(struct motor *motor)
 {

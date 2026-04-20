@@ -65,7 +65,7 @@ static inline float get_I_beta(struct motor *motor)
 /* ============ 接口实现 ============ */
 
 /**
- * @brief 初始化RL校准（电阻测量前）
+ * @brief RL校准准备（电阻测量前）
  * @param[in] motor 电机实例
  */
 void rl_calib_prepare(struct motor *motor)

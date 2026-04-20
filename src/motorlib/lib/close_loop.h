@@ -8,16 +8,16 @@
 #define CLOSE_LOOP_H
 
 struct motor;
-float motor_position_loop(struct motor *motor, float tar_pos, float dt);
 
 /**
  * @brief 电机位置环控制
  * @param[in] motor 电机实例指针
+ * @param[in] tar_pos 目标位置
  * @param[in] dt 时间步长（单位：秒）
- * @details 执行位置闭环控制，读取轨迹规划位置并与实际位置做PID运算，输出速度指令
- * @note 位置环输出 = 位置PID计算结果 + 轨迹规划速度前馈
+ * @details 执行位置闭环控制，根据目标位置与实际位置做PID运算，输出速度指令
+ * @return 速度指令
  */
-// void motor_position_loop(struct motor *motor, float dt);
+float motor_position_loop(struct motor *motor, float tar_pos, float dt);
 
 /**
  * @brief 复位位置环控制器

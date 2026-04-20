@@ -69,7 +69,7 @@ void currsmp_update_raw(struct currsmp *currsmp, uint16_t *adc_raw)
  * @brief 更新电流采样计算值（转换为物理量）
  * @param[in] currsmp 电流采样实例
  * @return 无
- * @details 使用原始值和参数计算相电流、母线电流、母线电压
+ * @details 使用原始值和参数计算相电流
  */
 void currsmp_update_phase_currment(struct currsmp *currsmp)
 {
@@ -84,8 +84,6 @@ void currsmp_update_phase_currment(struct currsmp *currsmp)
 			      currsmp->param->gain_phase;
 	currsmp->output.i_c = (currsmp->input.i_c_raw - currsmp->param->c_chn_offset) *
 			      currsmp->param->gain_phase;
-	// currsmp->output.i_bus = (currsmp->input.i_bus_raw) * currsmp->param->gain_i_bus;
-	// currsmp->output.v_bus = (currsmp->input.v_bus_raw) * currsmp->param->gain_v_bus;
 }
 
 /**

@@ -38,7 +38,7 @@ struct anticogging {
 	bool velocity_stable; /* 速度稳定标志 */
 
 	/* 补偿数据 */
-	float cogging_map[ANTICOGGING_POINTS_PER_REV]; /* 3600点补偿表（Nm） */
+	float cogging_map[ANTICOGGING_POINTS_PER_REV]; /* 3600点补偿表（A） */
 
 	/* 配置参数（可运行时调整） */
 	float pos_threshold; /* 位置稳定阈值（编码器计数） */

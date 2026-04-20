@@ -53,7 +53,7 @@ void enter_stall_fault(struct motor *motor, uint32_t fault_bit)
 /**
  * @brief 堵转保护恢复处理
  * @param motor 电机实例
- * @note 堵转保护通常需要手动复位，不会自动恢复
+ * @note 堵转保护在满足恢复条件且经过恢复延时后自动恢复
  */
 void recover_stall_fault(struct motor *motor)
 {

@@ -117,10 +117,10 @@ void trajectory_planner_action(struct trajectory_plan *trajectory, float dt)
  * @return 无
  *
  * @note 边界条件：
- *       - 任何非END/IDLE状态都可进入STOPPING
+ *       - 仅RUNNING状态可进入STOPPING
  *       - 立即强制设置STOPPING状态
  *       - 必须保证加载有效轨迹（规划失败时使用零轨迹）
- *       - STOPPING状态重复调用：重新规划（更安全）
+ *       - STOPPING状态重复调用：不重新规划
  */
 void trajectory_planner_stop(struct trajectory_plan *trajectory)
 {

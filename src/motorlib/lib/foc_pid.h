@@ -45,7 +45,7 @@ void foc_pid_init(struct foc_pid *pid, float kp, float ki, float limit);
 void foc_pid_reset(struct foc_pid *pid);
 
 /**
- * @brief PID核心计算
+ * @brief 位置环PID计算
  *
  * @param[in,out] pid    PID控制器实例
  * @param[in]     target 目标值
@@ -55,16 +55,18 @@ void foc_pid_reset(struct foc_pid *pid);
  * @return 计算后的输出值
  */
 float foc_pid_positionloop_run(struct foc_pid *pid, float target, float meas, float dt);
-float foc_pid_velocityloop_run(struct foc_pid *pid, float target, float meas, float dt);
 
 /**
- * @brief 饱和反馈处理
+ * @brief 速度环PID计算
  *
- * @param[in,out] pid           PID控制器实例
- * @param[in]     output_real   实际输出值
- * @param[in]     output_desire 期望输出值
+ * @param[in,out] pid    PID控制器实例
+ * @param[in]     target 目标值
+ * @param[in]     meas   测量值
+ * @param[in]     dt     时间步长
+ *
+ * @return 计算后的输出值
  */
-void foc_pid_saturation_feedback(struct foc_pid *pid, float output_real, float output_desire);
+float foc_pid_velocityloop_run(struct foc_pid *pid, float target, float meas, float dt);
 
 /**
  * @brief 电流环PID饱和处理

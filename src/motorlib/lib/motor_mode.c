@@ -218,11 +218,9 @@ void motor_mode_HOMING(struct statemachine *sm)
 }
 
 /**
- * @brief 电机开环编码器状态
- *
- * @param sm 状态机实例
- *
- * 电机开环编码器测试状态。
+ * @brief 电机d轴电流调试模式
+ * @param[in] sm 状态机实例
+ * @details 通过d轴电流环PID控制进行电流调试
  */
 #include "motorlib_control_param.h"
 void motor_mode_debug(struct statemachine *sm)

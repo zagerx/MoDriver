@@ -74,6 +74,14 @@ void trajectory_planner_stop(struct trajectory_plan *trajectory)
 	(void)trajectory; // 避免未使用警告
 }
 
+/**
+ * @brief 更新目标位置和速度（桥接模式简化实现）
+ * @param[in] trajectory 轨迹规划器实例指针
+ * @param[in] new_target_pos 新的目标位置
+ * @param[in] new_vel 新的目标速度
+ * @return 规划状态
+ * @note 桥接模式下直接设置位置和速度，不做轨迹规划
+ */
 traj_plan_status_t trajectory_planner_update_target(struct trajectory_plan *trajectory,
 						    float new_target_pos, float new_vel)
 {

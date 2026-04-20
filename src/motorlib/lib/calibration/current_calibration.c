@@ -14,7 +14,7 @@
 #define CURRENT_CALIB_DEFAULT_SAMPLES 1000u
 
 /**
- * @brief 初始化电流校准
+ * @brief 电流校准准备
  * @param[in] motor 电机实例
  */
 void curr_calib_prepare(struct motor *motor)

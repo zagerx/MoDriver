@@ -55,12 +55,12 @@ static int32_t encoder_model(float internal_pos)
 }
 
 /**
- * @brief PLL更新函数（与ODrive保持一致）
+ * @brief PLL更新函数
  * @param[in] feedback 反馈实例
  * @param[in] dt 采样周期，单位：s
  * @param[in] count_in_cpr 当前CPR内的编码器计数（0~CPR-1）
  * @param[in] shadow_count 阴影计数（连续计数，无溢出）
- * @return 速度估计（计数/秒）
+ * @return 机械角速度（rad/s）
  */
 static float feedback_pll_update(struct feedback *feedback, float dt, int32_t count_in_cpr,
 				 int32_t shadow_count)
@@ -145,12 +145,8 @@ void feedback_bind_encoder_param(struct motor *motor, struct feedback_param *par
 
 /**
  * @brief 初始化反馈模块，校验参数合法性
- * @param[in] feedback 反馈实例
- * @return feedback_error_code 错误码
- * @retval FEEDBACK_ERROR_NONE 初始化成功
- * @retval FEEDBACK_ERROR_PARAM 参数错误
- * @retval FEEDBACK_ERROR_HW_FAILURE 硬件故障
- * @note 校验轮子半径、减速比、极对数、方向、编码器分辨率等参数
+ * @param[in] motor 电机实例
+ * @note
  */
 void feedback_init(struct motor *motor)
 {
@@ -237,7 +233,7 @@ void feedback_update_raw(struct motor *motor)
  * @param[in] motor 电机实例
  * @param[in] dt 采样周期，单位：s
  * @return 无
- * @details 执行编码器读取、PLL速度估计、电角度插值计算和里程更新
+ * @details 执行编码器读取、角度计算、速度计算
  * @note 电角度采用ODrive方案：编码器整数计数 + PLL速度插值
  */
 void feedback_update(struct motor *motor, float dt)

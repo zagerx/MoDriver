@@ -6,7 +6,6 @@
 #include <math.h>
 #include "motorlib_constants.h"
 /* 内部辅助函数声明 */
-static bool check_position_stable(struct motor *motor, float target_pos_turns);
 static bool check_velocity_stable(struct motor *motor);
 static float get_velocity_integrator_output(struct motor *motor);
 static void remove_cogging_bias(struct anticogging *anticog);
@@ -243,36 +242,6 @@ bool anticogging_is_calibration_done(struct motor *motor)
 }
 
 /* ============ 内部辅助函数实现 ============ */
-
-/**
- * @brief 检查位置是否稳定
- * @param target_pos_turns 目标位置（转）
- */
-static bool check_position_stable(struct motor *motor, float target_pos_turns)
-{
-	struct feedback *fb = &motor->feedback;
-	struct anticogging *anticog = &motor->anticoggings;
-
-	/* 检查参数有效性 */
-	if (!fb->param || fb->param->encoder_resolution == 0) {
-		return false;
-	}
-
-	/* 获取当前线位移（米）和目标线位移（米） */
-	// float current_linear = fb->output.odometer; /* 单位：米 */
-	// float target_linear = turns_to_linear(motor, target_pos_turns);
-	// float pos_err = target_linear - current_linear;
-
-	/* 计算允许的位置误差（转换为米） */
-	/* 位置阈值单位是编码器计数，需要转换为米 */
-	// float counts_per_rev = (float)fb->param->encoder_resolution;
-	// float meters_per_count = (fb->param->wheel_radius * 0.001f * 2.0f * MOTORLIB_PI) /
-	// 			 (counts_per_rev * fb->param->gear_ratio);
-	// float pos_threshold_meters = anticog->pos_threshold * meters_per_count;
-
-	// return fabsf(pos_err) <= pos_threshold_meters;
-	return 0;
-}
 
 /**
  * @brief 检查速度是否稳定

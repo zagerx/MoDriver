@@ -65,7 +65,7 @@ static inline float normalize_angle_0_2pi(float angle)
 /* ============ 接口实现 ============ */
 
 /**
- * @brief 初始化编码器校准
+ * @brief 编码器校准准备
  * @param[in] motor 电机实例
  */
 void enc_calib_prepare(struct motor *motor)
@@ -338,9 +338,8 @@ void enc_calc_offset(struct motor *motor, int32_t scan_delta)
 }
 
 /**
- * @brief 应用编码器校准结果
+ * @brief 禁用逆变器（校准结果已在enc_calc_offset中应用）
  * @param[in] motor 电机实例
- * @note 结果已在计算时应用，此函数保留用于禁用逆变器
  */
 void enc_calib_apply(struct motor *motor)
 {
