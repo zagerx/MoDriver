@@ -11,6 +11,7 @@
 #include "feedback.h"
 #include "inverter.h"
 #include "foc.h"
+#include "motor_interface_params.h"
 #include "open_loop.h"
 #include "motorlib_control_param.h"
 #include "motorlib_constants.h"
@@ -20,14 +21,14 @@
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
 /* ============ 配置参数 ============ */
-#define ENC_CALIB_SCAN_DISTANCE       (14.0f * MOTORLIB_PI)  /* 扫描电角度距离 */
-#define ENC_CALIB_SCAN_OMEGA          (MOTORLIB_TWOPI)       /* 扫描电角速度 */
-#define ENC_CALIB_ALIGN_TIME          (1.0f)                 /* 对齐保持时间 [s] */
-#define ENC_CALIB_DIRECTION_THRESHOLD (8)                    /* 方向检测最小编码器变化 */
-#define ENC_CALIB_CPR_TOLERANCE       (0.02f)                /* CPR校验容差 2% */
+#define ENC_CALIB_SCAN_DISTANCE       (14.0f * MOTORLIB_PI) /* 扫描电角度距离 */
+#define ENC_CALIB_SCAN_OMEGA          (MOTORLIB_TWOPI)      /* 扫描电角速度 */
+#define ENC_CALIB_ALIGN_TIME          (1.0f)                /* 对齐保持时间 [s] */
+#define ENC_CALIB_DIRECTION_THRESHOLD (8)                   /* 方向检测最小编码器变化 */
+#define ENC_CALIB_CPR_TOLERANCE       (0.02f)               /* CPR校验容差 2% */
 
 /* 预计算的tick阈值 */
-#define ENC_CALIB_ALIGN_TICKS         ((uint32_t)(ENC_CALIB_ALIGN_TIME / CONTROL_PERIOD_DT))
+#define ENC_CALIB_ALIGN_TICKS ((uint32_t)(ENC_CALIB_ALIGN_TIME / CONTROL_PERIOD_DT))
 
 /* ============ 内部辅助函数 ============ */
 
@@ -126,7 +127,7 @@ int enc_align_step(struct motor *motor)
 	enc->align_tick_cnt++;
 
 	if (enc->align_tick_cnt < ENC_CALIB_ALIGN_TICKS) {
-		return 0;  /* 继续 */
+		return 0; /* 继续 */
 	}
 
 	/* 对齐完成，记录初始编码器值 */
@@ -138,7 +139,7 @@ int enc_align_step(struct motor *motor)
 	enc->tick_cnt = 0;
 	enc->align_tick_cnt = 0;
 
-	return 1;  /* 完成 */
+	return 1; /* 完成 */
 }
 
 /**
@@ -162,8 +163,7 @@ int enc_scan_forward_step(struct motor *motor)
 	feedback = &motor->feedback;
 
 	/* 正向扫描：以固定电角速度旋转 */
-	open_loop_force_drag(motor, CONTROL_PERIOD_DT, ALIGN_VOLTAGE,
-			     ENC_CALIB_SCAN_OMEGA);
+	open_loop_force_drag(motor, CONTROL_PERIOD_DT, ALIGN_VOLTAGE, ENC_CALIB_SCAN_OMEGA);
 
 	/* 读取编码器并累加 */
 	current_raw = feedback_get_raw(feedback);
@@ -175,10 +175,10 @@ int enc_scan_forward_step(struct motor *motor)
 	/* 检查是否达到扫描距离 */
 	current_eangle = open_loop_get_force_angle(motor);
 	if ((current_eangle - enc->calib_start_eangle) < ENC_CALIB_SCAN_DISTANCE) {
-		return 0;  /* 继续 */
+		return 0; /* 继续 */
 	}
 
-	return 1;  /* 完成 */
+	return 1; /* 完成 */
 }
 
 /**
@@ -196,7 +196,7 @@ bool enc_check_response(struct motor *motor, int32_t *out_delta)
 	float mech_rounds, elec_rounds, ratio;
 	int pole_pairs;
 	float expected_enc_delta, actual_enc_delta, cpr_error;
-
+	struct motor_param_ext *param_ext = motor->param_ext;
 	if (!motor || !out_delta) {
 		return false;
 	}
@@ -236,7 +236,9 @@ bool enc_check_response(struct motor *motor, int32_t *out_delta)
 	}
 
 	/* 更新反馈参数 */
-	_feedback_update_param_pole_pairs(feedback, (float)pole_pairs);
+
+	// _feedback_update_param_pole_pairs(feedback, (float)pole_pairs);
+	param_ext->electrical_param.pole_pairs = (float)pole_pairs;
 	_feedback_update_param_direction(feedback, detected_direction);
 
 	/* 准备反向扫描 */
@@ -267,8 +269,7 @@ int enc_scan_backward_step(struct motor *motor)
 	feedback = &motor->feedback;
 
 	/* 反向扫描：以相同速度反向旋转 */
-	open_loop_force_drag(motor, CONTROL_PERIOD_DT, ALIGN_VOLTAGE,
-			     -ENC_CALIB_SCAN_OMEGA);
+	open_loop_force_drag(motor, CONTROL_PERIOD_DT, ALIGN_VOLTAGE, -ENC_CALIB_SCAN_OMEGA);
 
 	/* 读取编码器并累加 */
 	current_raw = feedback_get_raw(feedback);
@@ -280,10 +281,10 @@ int enc_scan_backward_step(struct motor *motor)
 	/* 检查是否回到起始电角度 */
 	current_eangle = open_loop_get_force_angle(motor);
 	if ((current_eangle - enc->calib_start_eangle) > 0.0f) {
-		return 0;  /* 继续 */
+		return 0; /* 继续 */
 	}
 
-	return 1;  /* 完成 */
+	return 1; /* 完成 */
 }
 
 /**
@@ -305,7 +306,7 @@ void enc_calc_offset(struct motor *motor, int32_t scan_delta)
 
 	enc = &motor->calib.enc;
 	feedback = &motor->feedback;
-	(void)scan_delta;  /* 保留参数，与原逻辑一致 */
+	(void)scan_delta; /* 保留参数，与原逻辑一致 */
 
 	/* 整数部分：平均值 */
 	offset_int = (int32_t)(enc->encvaluesum / (int64_t)enc->num_steps);
@@ -332,8 +333,7 @@ void enc_calc_offset(struct motor *motor, int32_t scan_delta)
 	}
 
 	/* 更新反馈参数 */
-	_feedback_update_param_encoder_offset(feedback, (uint16_t)offset_int,
-					      offset_frac);
+	_feedback_update_param_encoder_offset(feedback, (uint16_t)offset_int, offset_frac);
 	_feedback_update_param_encoder_resolution(feedback, ENCODER_RESOLUTION);
 }
 

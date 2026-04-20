@@ -8,8 +8,8 @@ Description=
 CreationTime=7:00PM
 CreationDate=11-23-2020
 CreatedBy=
-ModificationTime=2:07AM
-ModificationDate=04-17-2026
+ModificationTime=1:34AM
+ModificationDate=04-21-2026
 ModifiedBy=
 
 [DeviceInfo]
@@ -1852,33 +1852,6 @@ DefaultValue=0x23
 PDOMapping=0
 
 [2009sub1]
-ParameterName=wheel_radius
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0008
-AccessType=rw
-DefaultValue=17.5
-PDOMapping=0
-
-[2009sub2]
-ParameterName=gear_ratio
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0008
-AccessType=rw
-DefaultValue=1.0
-PDOMapping=0
-
-[2009sub3]
-ParameterName=pole_pairs
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0008
-AccessType=rw
-DefaultValue=0.0
-PDOMapping=0
-
-[2009sub4]
 ParameterName=direction
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1887,7 +1860,7 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2009sub5]
+[2009sub2]
 ParameterName=encoder_resolution
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1896,7 +1869,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2009sub6]
+[2009sub3]
 ParameterName=encoder_offset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1905,7 +1878,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2009sub7]
+[2009sub4]
 ParameterName=encoder_offset_frac
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1914,7 +1887,7 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2009sub8]
+[2009sub5]
 ParameterName=a_chn_offset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1923,7 +1896,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2009sub9]
+[2009sub6]
 ParameterName=b_chn_offset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1932,7 +1905,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2009subA]
+[2009sub7]
 ParameterName=c_chn_offset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1941,7 +1914,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[2009subB]
+[2009sub8]
 ParameterName=gain_phase
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1950,7 +1923,7 @@ AccessType=rw
 DefaultValue=0.006855
 PDOMapping=0
 
-[2009subC]
+[2009sub9]
 ParameterName=gain_i_bus
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1959,7 +1932,7 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2009subD]
+[2009subA]
 ParameterName=gain_v_bus
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1968,7 +1941,7 @@ AccessType=rw
 DefaultValue=0.01059
 PDOMapping=0
 
-[2009subE]
+[2009subB]
 ParameterName=acc_max
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1977,7 +1950,7 @@ AccessType=rw
 DefaultValue=9800.0
 PDOMapping=0
 
-[2009subF]
+[2009subC]
 ParameterName=vmax
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1986,7 +1959,7 @@ AccessType=rw
 DefaultValue=5000.0
 PDOMapping=0
 
-[2009sub10]
+[2009subD]
 ParameterName=d_kp
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1995,7 +1968,7 @@ AccessType=rw
 DefaultValue=0.1
 PDOMapping=0
 
-[2009sub11]
+[2009subE]
 ParameterName=d_ki
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2004,7 +1977,7 @@ AccessType=rw
 DefaultValue=800.0
 PDOMapping=0
 
-[2009sub12]
+[2009subF]
 ParameterName=d_kd
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2013,7 +1986,7 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2009sub13]
+[2009sub10]
 ParameterName=d_limit
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2022,7 +1995,7 @@ AccessType=rw
 DefaultValue=13.0
 PDOMapping=0
 
-[2009sub14]
+[2009sub11]
 ParameterName=q_kp
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2031,7 +2004,7 @@ AccessType=rw
 DefaultValue=0.1
 PDOMapping=0
 
-[2009sub15]
+[2009sub12]
 ParameterName=q_ki
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2040,7 +2013,7 @@ AccessType=rw
 DefaultValue=800.0
 PDOMapping=0
 
-[2009sub16]
+[2009sub13]
 ParameterName=q_kd
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2049,7 +2022,7 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2009sub17]
+[2009sub14]
 ParameterName=q_limit
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2058,7 +2031,7 @@ AccessType=rw
 DefaultValue=13.0
 PDOMapping=0
 
-[2009sub18]
+[2009sub15]
 ParameterName=vel_kp
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2067,7 +2040,7 @@ AccessType=rw
 DefaultValue=0.008
 PDOMapping=0
 
-[2009sub19]
+[2009sub16]
 ParameterName=vel_ki
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2076,7 +2049,7 @@ AccessType=rw
 DefaultValue=0.1
 PDOMapping=0
 
-[2009sub1A]
+[2009sub17]
 ParameterName=vel_kd
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2085,7 +2058,7 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2009sub1B]
+[2009sub18]
 ParameterName=vel_limit
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2094,7 +2067,7 @@ AccessType=rw
 DefaultValue=10.0
 PDOMapping=0
 
-[2009sub1C]
+[2009sub19]
 ParameterName=pos_kp
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2103,7 +2076,7 @@ AccessType=rw
 DefaultValue=120
 PDOMapping=0
 
-[2009sub1D]
+[2009sub1A]
 ParameterName=pos_ki
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2112,7 +2085,7 @@ AccessType=rw
 DefaultValue=5500.0
 PDOMapping=0
 
-[2009sub1E]
+[2009sub1B]
 ParameterName=pos_kd
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2121,7 +2094,7 @@ AccessType=rw
 DefaultValue=00.0
 PDOMapping=0
 
-[2009sub1F]
+[2009sub1C]
 ParameterName=pos_limit
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2130,7 +2103,7 @@ AccessType=rw
 DefaultValue=5000.0
 PDOMapping=0
 
-[2009sub20]
+[2009sub1D]
 ParameterName=rs
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -2139,13 +2112,40 @@ AccessType=rw
 DefaultValue=0.0
 PDOMapping=0
 
-[2009sub21]
+[2009sub1E]
 ParameterName=ls
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0008
 AccessType=rw
 DefaultValue=0.0
+PDOMapping=0
+
+[2009sub1F]
+ParameterName=pole_pairs
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0008
+AccessType=rw
+DefaultValue=0.0
+PDOMapping=0
+
+[2009sub20]
+ParameterName=wheel_radius
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0008
+AccessType=rw
+DefaultValue=17.5
+PDOMapping=0
+
+[2009sub21]
+ParameterName=gear_ratio
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0008
+AccessType=rw
+DefaultValue=1.0
 PDOMapping=0
 
 [2009sub22]

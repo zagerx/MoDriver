@@ -6,6 +6,7 @@
 
 #include "foc_pid.h"
 #include "motor_interface_mode.h"
+#include "motor_interface_params.h"
 #include "motor_mode.h"
 #include "statemachine.h"
 #include "close_loop.h"
@@ -62,12 +63,15 @@ void motor_mode_PP(struct statemachine *sm)
 	struct motor *motor = (struct motor *)(sm->data);
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
 	struct foc *foc = &motor->foc;
-	float start_pos = foc->meas.fd_out->odometer; /* 当前位置作为起始位置 */
+	float start_pos; // foc->meas.fd_out->odometer; /* 当前位置作为起始位置 */
 	float plan_target, actual_pos;
+	struct motor_param_ext *param_ext = motor->param_ext;
+	float wheel_radius = param_ext->electrical_param.wheel_radius; /* 轮子半径，单位mm */
 	switch (sm->phase) {
 	case ENTER:
 		sm->phase = RUNING;
 		sm->count = 0;
+		start_pos = foc->meas.fd_out->mangle_rad * wheel_radius; /* 当前位置作为起始位置 */
 		trajectory_planner_init(traj_plan, start_pos, 0.0f, 0.0f, POSITION_PERIOD_DT);
 		motor_position_loop_reset(motor);
 		break;
@@ -77,9 +81,8 @@ void motor_mode_PP(struct statemachine *sm)
 #define TARGET_REACHED_VEL_TOL 5.0f // 速度容差：1 mm/s
 
 		/* 判断目标到达 */
-		// traj_exec_data_t *exec = &traj_plan->data.exec_data;
 		plan_target = trajectory_planner_read_plantarget(traj_plan); // 目标位置
-		actual_pos = foc->meas.fd_out->odometer;                     // 实际位置
+		actual_pos = foc->meas.fd_out->mangle_rad * wheel_radius;    // 实际位置
 
 		if (fabsf(actual_pos - plan_target) < TARGET_REACHED_POS_TOL) {
 			motor_set_flag(motor, MOTOR_FLAGS_TARGET_REACHED);
@@ -89,10 +92,13 @@ void motor_mode_PP(struct statemachine *sm)
 
 		if (sm->count % (uint16_t)POSITION_LOOP_INTERVAL == 0) {
 			trajectory_planner_action(traj_plan, POSITION_PERIOD_DT);
-			motor_position_loop(motor, POSITION_PERIOD_DT);
+			float plan_position = trajectory_planner_get_pos(traj_plan) / wheel_radius;
+			foc->ref.velocity =
+				motor_position_loop(motor, plan_position, POSITION_PERIOD_DT);
 		}
 		if (sm->count % (uint16_t)(SPEED_LOOP_INTERVAL) == 0) {
-			motor_velocity_loop(motor, foc->ref.velocity);
+			float plan_velocity = trajectory_planner_get_vel(traj_plan) / wheel_radius;
+			motor_velocity_loop(motor, foc->ref.velocity + plan_velocity);
 		}
 		motor_currment_loop(motor);
 		sm->count++;
@@ -274,7 +280,45 @@ void motor_mode_debug(struct statemachine *sm)
 		break;
 	}
 }
+void motor_mode_debug_posvel(struct statemachine *sm)
+{
+	enum {
+		RUNING = USER_STATUS,
+	};
 
+	struct motor *motor = (struct motor *)(sm->data);
+	struct foc *foc = &motor->foc;
+	switch (sm->phase) {
+	case ENTER:
+		sm->count = 0;
+		motor_position_loop_reset(motor);
+		motor->data.debug.test_value1 = foc->meas.fd_out->mangle_rad;
+		sm->phase = RUNING;
+		break;
+
+	case RUNING:
+		/* 执行控制环 */
+		if (sm->count % (uint16_t)POSITION_LOOP_INTERVAL == 0) {
+			/* 位置环 */
+			float target_linear = motor->data.debug.test_value1;
+			foc->ref.velocity =
+				motor_position_loop(motor, target_linear, POSITION_PERIOD_DT);
+		}
+		if (sm->count % (uint16_t)SPEED_LOOP_INTERVAL == 0) {
+			motor_velocity_loop(motor, foc->ref.velocity);
+		}
+		/* 电流环 */
+		motor_currment_loop(motor);
+		sm->count++;
+		break;
+
+	case EXIT:
+		break;
+
+	default:
+		break;
+	}
+}
 /**
  * @brief 获取电机当前操作模式
  * @param[in] motor 电机实例指针
@@ -302,6 +346,9 @@ enum motor_mode motor_get_mode(const struct motor *motor)
 	}
 	if (state == motor_mode_anticogging_calib) {
 		return MODE_ANTICOGGING_CALIB;
+	}
+	if (state == motor_mode_debug_posvel) {
+		return MODE_DEBUG_POSVEL;
 	}
 	return MODE_NONE;
 }
@@ -348,6 +395,11 @@ void motor_tran_mode(struct motor *motor, enum motor_mode new_mode)
 	case MODE_ANTICOGGING_CALIB: {
 		if (sm_mode->current_state != motor_mode_anticogging_calib) {
 			TRAN_STATE(sm_mode, motor_mode_anticogging_calib);
+		}
+	} break;
+	case MODE_DEBUG_POSVEL: {
+		if (sm_mode->current_state != motor_mode_debug_posvel) {
+			TRAN_STATE(sm_mode, motor_mode_debug_posvel);
 		}
 	} break;
 	default:

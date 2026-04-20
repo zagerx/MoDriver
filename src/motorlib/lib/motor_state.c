@@ -51,6 +51,7 @@ void motor_calib_state(struct statemachine *sm)
 		/* 根据校准结果迁移状态 */
 		if (calib_done) {
 			if (motor->calib.state == CAL_STATE_SUCCESS) {
+				feedback_reset_encoder(motor);
 				motor->param_ext->is_calibrated = 1;
 				TRAN_STATE(sm, motor_idle_state);
 			} else {

@@ -198,9 +198,6 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
     },
     .x2009_motorlib_params = {
         .highestSub_indexSupported = 0x23,
-        .wheel_radius = 17.5,
-        .gear_ratio = 1.0,
-        .pole_pairs = 0.0,
         .direction = 0.0,
         .encoder_resolution = 0x0000,
         .encoder_offset = 0x0000,
@@ -231,6 +228,9 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .pos_limit = 5000.0,
         .rs = 0.0,
         .ls = 0.0,
+        .pole_pairs = 0.0,
+        .wheel_radius = 17.5,
+        .gear_ratio = 1.0,
         .is_calibrated = 0x00,
         .crc16 = 0x0000
     },
@@ -1141,199 +1141,199 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.wheel_radius,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.direction,
             .subIndex = 1,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.gear_ratio,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.pole_pairs,
-            .subIndex = 3,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.direction,
-            .subIndex = 4,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
             .dataOrig = &OD_RAM.x2009_motorlib_params.encoder_resolution,
-            .subIndex = 5,
+            .subIndex = 2,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.encoder_offset,
-            .subIndex = 6,
+            .subIndex = 3,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.encoder_offset_frac,
-            .subIndex = 7,
+            .subIndex = 4,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.A_chn_offset,
-            .subIndex = 8,
+            .subIndex = 5,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.B_chn_offset,
-            .subIndex = 9,
+            .subIndex = 6,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.C_chn_offset,
-            .subIndex = 10,
+            .subIndex = 7,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.gain_phase,
-            .subIndex = 11,
+            .subIndex = 8,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.gain_i_bus,
-            .subIndex = 12,
+            .subIndex = 9,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.gain_v_bus,
-            .subIndex = 13,
+            .subIndex = 10,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.acc_max,
-            .subIndex = 14,
+            .subIndex = 11,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.vmax,
-            .subIndex = 15,
+            .subIndex = 12,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.D_kp,
-            .subIndex = 16,
+            .subIndex = 13,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.D_ki,
-            .subIndex = 17,
+            .subIndex = 14,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.D_kd,
-            .subIndex = 18,
+            .subIndex = 15,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.D_limit,
-            .subIndex = 19,
+            .subIndex = 16,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.Q_kp,
-            .subIndex = 20,
+            .subIndex = 17,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.Q_ki,
-            .subIndex = 21,
+            .subIndex = 18,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.Q_kd,
-            .subIndex = 22,
+            .subIndex = 19,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.Q_limit,
-            .subIndex = 23,
+            .subIndex = 20,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.vel_kp,
-            .subIndex = 24,
+            .subIndex = 21,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.vel_ki,
-            .subIndex = 25,
+            .subIndex = 22,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.vel_kd,
-            .subIndex = 26,
+            .subIndex = 23,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.vel_limit,
-            .subIndex = 27,
+            .subIndex = 24,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.pos_kp,
-            .subIndex = 28,
+            .subIndex = 25,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.pos_ki,
-            .subIndex = 29,
+            .subIndex = 26,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.pos_kd,
-            .subIndex = 30,
+            .subIndex = 27,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.pos_limit,
-            .subIndex = 31,
+            .subIndex = 28,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.rs,
-            .subIndex = 32,
+            .subIndex = 29,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.ls,
+            .subIndex = 30,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pole_pairs,
+            .subIndex = 31,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.wheel_radius,
+            .subIndex = 32,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x2009_motorlib_params.gear_ratio,
             .subIndex = 33,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4

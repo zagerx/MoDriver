@@ -11,7 +11,7 @@ static bool check_velocity_stable(struct motor *motor);
 static float get_velocity_integrator_output(struct motor *motor);
 static void remove_cogging_bias(struct anticogging *anticog);
 static int32_t mod_int32(int32_t a, int32_t m);
-static float turns_to_linear(struct motor *motor, float turns);
+// static float turns_to_linear(struct motor *motor, float turns);
 
 /**
  * @brief 初始化齿槽校准模块
@@ -112,7 +112,7 @@ void motor_mode_anticogging_calib(struct statemachine *sm)
 		anticog->position_stable = false;
 		anticog->velocity_stable = false;
 		anticog->stable_counter = 0.0f;
-
+		motor->data.debug.test_value1 = foc->meas.fd_out->mangle_rad;
 		/* 进入等待稳定状态 */
 		sm->phase = AC_WAITING_STABLE;
 		break;
@@ -121,10 +121,9 @@ void motor_mode_anticogging_calib(struct statemachine *sm)
 		/* 执行控制环 */
 		if (sm->count % (uint16_t)POSITION_LOOP_INTERVAL == 0) {
 			/* 位置环 */
-			float target_linear = turns_to_linear(motor, anticog->tar_pos);
-
-			target_linear = motor->data.debug.test_value1;
-			motor_position_temp_loop(motor, target_linear, POSITION_PERIOD_DT);
+			float target_linear = motor->data.debug.test_value1;
+			foc->ref.velocity =
+				motor_position_loop(motor, target_linear, POSITION_PERIOD_DT);
 		}
 		if (sm->count % (uint16_t)SPEED_LOOP_INTERVAL == 0) {
 			/* 速度环：使用位置环计算的速度参考值，而不是固定为0 */
@@ -260,18 +259,19 @@ static bool check_position_stable(struct motor *motor, float target_pos_turns)
 	}
 
 	/* 获取当前线位移（米）和目标线位移（米） */
-	float current_linear = fb->output.odometer; /* 单位：米 */
-	float target_linear = turns_to_linear(motor, target_pos_turns);
-	float pos_err = target_linear - current_linear;
+	// float current_linear = fb->output.odometer; /* 单位：米 */
+	// float target_linear = turns_to_linear(motor, target_pos_turns);
+	// float pos_err = target_linear - current_linear;
 
 	/* 计算允许的位置误差（转换为米） */
 	/* 位置阈值单位是编码器计数，需要转换为米 */
-	float counts_per_rev = (float)fb->param->encoder_resolution;
-	float meters_per_count = (fb->param->wheel_radius * 0.001f * 2.0f * MOTORLIB_PI) /
-				 (counts_per_rev * fb->param->gear_ratio);
-	float pos_threshold_meters = anticog->pos_threshold * meters_per_count;
+	// float counts_per_rev = (float)fb->param->encoder_resolution;
+	// float meters_per_count = (fb->param->wheel_radius * 0.001f * 2.0f * MOTORLIB_PI) /
+	// 			 (counts_per_rev * fb->param->gear_ratio);
+	// float pos_threshold_meters = anticog->pos_threshold * meters_per_count;
 
-	return fabsf(pos_err) <= pos_threshold_meters;
+	// return fabsf(pos_err) <= pos_threshold_meters;
+	return 0;
 }
 
 /**
@@ -327,18 +327,18 @@ static int32_t mod_int32(int32_t a, int32_t m)
 	return r;
 }
 
-/**
- * @brief 将旋转位置（转）转换为线位移（米）
- */
-static float turns_to_linear(struct motor *motor, float turns)
-{
-	struct feedback_param *param = motor->feedback.param;
-	if (!param) {
-		return 0.0f;
-	}
+// /**
+//  * @brief 将旋转位置（转）转换为线位移（米）
+//  */
+// static float turns_to_linear(struct motor *motor, float turns)
+// {
+// 	struct feedback_param *param = motor->feedback.param;
+// 	if (!param) {
+// 		return 0.0f;
+// 	}
 
-	/* wheel_radius单位：mm */
-	float radius_m = param->wheel_radius;
-	float linear = turns * 2.0f * MOTORLIB_PI * radius_m / param->gear_ratio;
-	return linear;
-}
+// 	/* wheel_radius单位：mm */
+// 	float radius_m = param->wheel_radius;
+// 	float linear = turns * 2.0f * MOTORLIB_PI * radius_m / param->gear_ratio;
+// 	return linear;
+// }

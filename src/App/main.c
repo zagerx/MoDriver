@@ -27,7 +27,7 @@ static const struct motor_hw_ops m1_hw_ops = {
 	.inverter = &m1_inverter_ops,
 };
 struct motor_param_ext *pmotor1_param =
-	(struct motor_param_ext *)(&OD_RAM.x2009_motorlib_params.wheel_radius);
+	(struct motor_param_ext *)(&OD_RAM.x2009_motorlib_params.direction);
 /* 注意：定义为非 static 以便 it.c 访问 */
 struct canopen_app canopen_app = {
 	.sys_reset_ops = HAL_NVIC_SystemReset,

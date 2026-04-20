@@ -152,7 +152,7 @@ void process_data(uint8_t *data, uint16_t len)
 					} else if (input[0] > 8.5f && input[0] < 9.5f) {
 						motor_tran_mode(motor_1, MODE_DEBUG);
 					} else if (input[0] > 7.5f && input[0] < 8.5f) {
-						motor_tran_mode(motor_1, MODE_ANTICOGGING_CALIB);
+						motor_tran_mode(motor_1, MODE_DEBUG_POSVEL);
 					} else {
 						// 切换到无模式
 						motor_tran_mode(motor_1, MODE_NONE);

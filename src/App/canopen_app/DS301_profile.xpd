@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xpd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModifiedBy="" fileModificationDate="2026-04-18" fileModificationTime="05:09:56.7721244+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xpd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModifiedBy="" fileModificationDate="2026-04-21" fileModificationTime="01:34:49.4196810+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName></q1:vendorName>
         <q1:vendorID></q1:vendorID>
@@ -610,103 +610,103 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_200900">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="wheel_radius" uniqueID="UID_RECSUB_200901">
+            <q1:varDeclaration name="direction" uniqueID="UID_RECSUB_200901">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="gear_ratio" uniqueID="UID_RECSUB_200902">
-              <REAL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="pole_pairs" uniqueID="UID_RECSUB_200903">
-              <REAL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="direction" uniqueID="UID_RECSUB_200904">
-              <REAL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="encoder_resolution" uniqueID="UID_RECSUB_200905">
+            <q1:varDeclaration name="encoder_resolution" uniqueID="UID_RECSUB_200902">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="encoder_offset" uniqueID="UID_RECSUB_200906">
+            <q1:varDeclaration name="encoder_offset" uniqueID="UID_RECSUB_200903">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="encoder_offset_frac" uniqueID="UID_RECSUB_200907">
+            <q1:varDeclaration name="encoder_offset_frac" uniqueID="UID_RECSUB_200904">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="a_chn_offset" uniqueID="UID_RECSUB_200908">
+            <q1:varDeclaration name="a_chn_offset" uniqueID="UID_RECSUB_200905">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="b_chn_offset" uniqueID="UID_RECSUB_200909">
+            <q1:varDeclaration name="b_chn_offset" uniqueID="UID_RECSUB_200906">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="c_chn_offset" uniqueID="UID_RECSUB_20090A">
+            <q1:varDeclaration name="c_chn_offset" uniqueID="UID_RECSUB_200907">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="gain_phase" uniqueID="UID_RECSUB_20090B">
+            <q1:varDeclaration name="gain_phase" uniqueID="UID_RECSUB_200908">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="gain_i_bus" uniqueID="UID_RECSUB_20090C">
+            <q1:varDeclaration name="gain_i_bus" uniqueID="UID_RECSUB_200909">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="gain_v_bus" uniqueID="UID_RECSUB_20090D">
+            <q1:varDeclaration name="gain_v_bus" uniqueID="UID_RECSUB_20090A">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="acc_max" uniqueID="UID_RECSUB_20090E">
+            <q1:varDeclaration name="acc_max" uniqueID="UID_RECSUB_20090B">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="vmax" uniqueID="UID_RECSUB_20090F">
+            <q1:varDeclaration name="vmax" uniqueID="UID_RECSUB_20090C">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="d_kp" uniqueID="UID_RECSUB_200910">
+            <q1:varDeclaration name="d_kp" uniqueID="UID_RECSUB_20090D">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="d_ki" uniqueID="UID_RECSUB_200911">
+            <q1:varDeclaration name="d_ki" uniqueID="UID_RECSUB_20090E">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="d_kd" uniqueID="UID_RECSUB_200912">
+            <q1:varDeclaration name="d_kd" uniqueID="UID_RECSUB_20090F">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="d_limit" uniqueID="UID_RECSUB_200913">
+            <q1:varDeclaration name="d_limit" uniqueID="UID_RECSUB_200910">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="q_kp" uniqueID="UID_RECSUB_200914">
+            <q1:varDeclaration name="q_kp" uniqueID="UID_RECSUB_200911">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="q_ki" uniqueID="UID_RECSUB_200915">
+            <q1:varDeclaration name="q_ki" uniqueID="UID_RECSUB_200912">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="q_kd" uniqueID="UID_RECSUB_200916">
+            <q1:varDeclaration name="q_kd" uniqueID="UID_RECSUB_200913">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="q_limit" uniqueID="UID_RECSUB_200917">
+            <q1:varDeclaration name="q_limit" uniqueID="UID_RECSUB_200914">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="vel_kp" uniqueID="UID_RECSUB_200918">
+            <q1:varDeclaration name="vel_kp" uniqueID="UID_RECSUB_200915">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="vel_ki" uniqueID="UID_RECSUB_200919">
+            <q1:varDeclaration name="vel_ki" uniqueID="UID_RECSUB_200916">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="vel_kd" uniqueID="UID_RECSUB_20091A">
+            <q1:varDeclaration name="vel_kd" uniqueID="UID_RECSUB_200917">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="vel_limit" uniqueID="UID_RECSUB_20091B">
+            <q1:varDeclaration name="vel_limit" uniqueID="UID_RECSUB_200918">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="pos_kp" uniqueID="UID_RECSUB_20091C">
+            <q1:varDeclaration name="pos_kp" uniqueID="UID_RECSUB_200919">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="pos_ki" uniqueID="UID_RECSUB_20091D">
+            <q1:varDeclaration name="pos_ki" uniqueID="UID_RECSUB_20091A">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="pos_kd" uniqueID="UID_RECSUB_20091E">
+            <q1:varDeclaration name="pos_kd" uniqueID="UID_RECSUB_20091B">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="pos_limit" uniqueID="UID_RECSUB_20091F">
+            <q1:varDeclaration name="pos_limit" uniqueID="UID_RECSUB_20091C">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="rs" uniqueID="UID_RECSUB_200920">
+            <q1:varDeclaration name="rs" uniqueID="UID_RECSUB_20091D">
               <REAL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="ls" uniqueID="UID_RECSUB_200921">
+            <q1:varDeclaration name="ls" uniqueID="UID_RECSUB_20091E">
+              <REAL />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="pole_pairs" uniqueID="UID_RECSUB_20091F">
+              <REAL />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="wheel_radius" uniqueID="UID_RECSUB_200920">
+              <REAL />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="gear_ratio" uniqueID="UID_RECSUB_200921">
               <REAL />
             </q1:varDeclaration>
             <q1:varDeclaration name="is_calibrated" uniqueID="UID_RECSUB_200922">
@@ -2352,169 +2352,169 @@ The life time factor multiplied with the guard time gives the life time for the 
             <q1:defaultValue value="0x23" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_200901" access="readWrite">
-            <label lang="en">wheel_radius</label>
-            <REAL />
-            <q1:defaultValue value="17.5" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200902" access="readWrite">
-            <label lang="en">gear_ratio</label>
-            <REAL />
-            <q1:defaultValue value="1.0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200903" access="readWrite">
-            <label lang="en">pole_pairs</label>
-            <REAL />
-            <q1:defaultValue value="0.0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200904" access="readWrite">
             <label lang="en">direction</label>
             <REAL />
             <q1:defaultValue value="0.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200905" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200902" access="readWrite">
             <label lang="en">encoder_resolution</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200906" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200903" access="readWrite">
             <label lang="en">encoder_offset</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200907" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200904" access="readWrite">
             <label lang="en">encoder_offset_frac</label>
             <REAL />
             <q1:defaultValue value="0.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200908" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200905" access="readWrite">
             <label lang="en">a_chn_offset</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200909" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200906" access="readWrite">
             <label lang="en">b_chn_offset</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20090A" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200907" access="readWrite">
             <label lang="en">c_chn_offset</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20090B" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200908" access="readWrite">
             <label lang="en">gain_phase</label>
             <REAL />
             <q1:defaultValue value="0.006855" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20090C" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200909" access="readWrite">
             <label lang="en">gain_i_bus</label>
             <REAL />
             <q1:defaultValue value="0.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20090D" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20090A" access="readWrite">
             <label lang="en">gain_v_bus</label>
             <REAL />
             <q1:defaultValue value="0.01059" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20090E" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20090B" access="readWrite">
             <label lang="en">acc_max</label>
             <REAL />
             <q1:defaultValue value="9800.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20090F" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20090C" access="readWrite">
             <label lang="en">vmax</label>
             <REAL />
             <q1:defaultValue value="5000.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200910" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20090D" access="readWrite">
             <label lang="en">d_kp</label>
             <REAL />
             <q1:defaultValue value="0.1" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200911" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20090E" access="readWrite">
             <label lang="en">d_ki</label>
             <REAL />
             <q1:defaultValue value="800.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200912" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20090F" access="readWrite">
             <label lang="en">d_kd</label>
             <REAL />
             <q1:defaultValue value="0.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200913" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200910" access="readWrite">
             <label lang="en">d_limit</label>
             <REAL />
             <q1:defaultValue value="13.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200914" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200911" access="readWrite">
             <label lang="en">q_kp</label>
             <REAL />
             <q1:defaultValue value="0.1" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200915" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200912" access="readWrite">
             <label lang="en">q_ki</label>
             <REAL />
             <q1:defaultValue value="800.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200916" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200913" access="readWrite">
             <label lang="en">q_kd</label>
             <REAL />
             <q1:defaultValue value="0.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200917" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200914" access="readWrite">
             <label lang="en">q_limit</label>
             <REAL />
             <q1:defaultValue value="13.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200918" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200915" access="readWrite">
             <label lang="en">vel_kp</label>
             <REAL />
             <q1:defaultValue value="0.008" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200919" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200916" access="readWrite">
             <label lang="en">vel_ki</label>
             <REAL />
             <q1:defaultValue value="0.1" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20091A" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200917" access="readWrite">
             <label lang="en">vel_kd</label>
             <REAL />
             <q1:defaultValue value="0.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20091B" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200918" access="readWrite">
             <label lang="en">vel_limit</label>
             <REAL />
             <q1:defaultValue value="10.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20091C" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_200919" access="readWrite">
             <label lang="en">pos_kp</label>
             <REAL />
             <q1:defaultValue value="120" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20091D" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20091A" access="readWrite">
             <label lang="en">pos_ki</label>
             <REAL />
             <q1:defaultValue value="5500.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20091E" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20091B" access="readWrite">
             <label lang="en">pos_kd</label>
             <REAL />
             <q1:defaultValue value="00.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_20091F" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20091C" access="readWrite">
             <label lang="en">pos_limit</label>
             <REAL />
             <q1:defaultValue value="5000.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200920" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20091D" access="readWrite">
             <label lang="en">rs</label>
             <REAL />
             <q1:defaultValue value="0.0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_200921" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_20091E" access="readWrite">
             <label lang="en">ls</label>
             <REAL />
             <q1:defaultValue value="0.0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20091F" access="readWrite">
+            <label lang="en">pole_pairs</label>
+            <REAL />
+            <q1:defaultValue value="0.0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200920" access="readWrite">
+            <label lang="en">wheel_radius</label>
+            <REAL />
+            <q1:defaultValue value="17.5" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200921" access="readWrite">
+            <label lang="en">gear_ratio</label>
+            <REAL />
+            <q1:defaultValue value="1.0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_200922">
             <label lang="en">is_calibrated</label>
@@ -2608,7 +2608,7 @@ The life time factor multiplied with the guard time gives the life time for the 
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xpd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModificationDate="2026-04-18" fileModificationTime="05:09:56.7721244+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xpd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModificationDate="2026-04-21" fileModificationTime="01:34:49.4196810+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -2918,39 +2918,39 @@ The life time factor multiplied with the guard time gives the life time for the 
           </CANopenObject>
           <CANopenObject index="2009" name="motorlib_params" objectType="9" uniqueIDRef="UID_OBJ_2009" subNumber="36">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200900" />
-            <CANopenSubObject subIndex="01" name="wheel_radius" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200901" />
-            <CANopenSubObject subIndex="02" name="gear_ratio" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200902" />
-            <CANopenSubObject subIndex="03" name="pole_pairs" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200903" />
-            <CANopenSubObject subIndex="04" name="direction" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200904" />
-            <CANopenSubObject subIndex="05" name="encoder_resolution" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200905" />
-            <CANopenSubObject subIndex="06" name="encoder_offset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200906" />
-            <CANopenSubObject subIndex="07" name="encoder_offset_frac" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200907" />
-            <CANopenSubObject subIndex="08" name="a_chn_offset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200908" />
-            <CANopenSubObject subIndex="09" name="b_chn_offset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200909" />
-            <CANopenSubObject subIndex="0A" name="c_chn_offset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090A" />
-            <CANopenSubObject subIndex="0B" name="gain_phase" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090B" />
-            <CANopenSubObject subIndex="0C" name="gain_i_bus" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090C" />
-            <CANopenSubObject subIndex="0D" name="gain_v_bus" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090D" />
-            <CANopenSubObject subIndex="0E" name="acc_max" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090E" />
-            <CANopenSubObject subIndex="0F" name="vmax" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090F" />
-            <CANopenSubObject subIndex="10" name="d_kp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200910" />
-            <CANopenSubObject subIndex="11" name="d_ki" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200911" />
-            <CANopenSubObject subIndex="12" name="d_kd" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200912" />
-            <CANopenSubObject subIndex="13" name="d_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200913" />
-            <CANopenSubObject subIndex="14" name="q_kp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200914" />
-            <CANopenSubObject subIndex="15" name="q_ki" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200915" />
-            <CANopenSubObject subIndex="16" name="q_kd" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200916" />
-            <CANopenSubObject subIndex="17" name="q_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200917" />
-            <CANopenSubObject subIndex="18" name="vel_kp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200918" />
-            <CANopenSubObject subIndex="19" name="vel_ki" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200919" />
-            <CANopenSubObject subIndex="1A" name="vel_kd" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091A" />
-            <CANopenSubObject subIndex="1B" name="vel_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091B" />
-            <CANopenSubObject subIndex="1C" name="pos_kp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091C" />
-            <CANopenSubObject subIndex="1D" name="pos_ki" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091D" />
-            <CANopenSubObject subIndex="1E" name="pos_kd" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091E" />
-            <CANopenSubObject subIndex="1F" name="pos_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091F" />
-            <CANopenSubObject subIndex="20" name="rs" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200920" />
-            <CANopenSubObject subIndex="21" name="ls" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200921" />
+            <CANopenSubObject subIndex="01" name="direction" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200901" />
+            <CANopenSubObject subIndex="02" name="encoder_resolution" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200902" />
+            <CANopenSubObject subIndex="03" name="encoder_offset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200903" />
+            <CANopenSubObject subIndex="04" name="encoder_offset_frac" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200904" />
+            <CANopenSubObject subIndex="05" name="a_chn_offset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200905" />
+            <CANopenSubObject subIndex="06" name="b_chn_offset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200906" />
+            <CANopenSubObject subIndex="07" name="c_chn_offset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200907" />
+            <CANopenSubObject subIndex="08" name="gain_phase" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200908" />
+            <CANopenSubObject subIndex="09" name="gain_i_bus" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200909" />
+            <CANopenSubObject subIndex="0A" name="gain_v_bus" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090A" />
+            <CANopenSubObject subIndex="0B" name="acc_max" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090B" />
+            <CANopenSubObject subIndex="0C" name="vmax" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090C" />
+            <CANopenSubObject subIndex="0D" name="d_kp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090D" />
+            <CANopenSubObject subIndex="0E" name="d_ki" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090E" />
+            <CANopenSubObject subIndex="0F" name="d_kd" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20090F" />
+            <CANopenSubObject subIndex="10" name="d_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200910" />
+            <CANopenSubObject subIndex="11" name="q_kp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200911" />
+            <CANopenSubObject subIndex="12" name="q_ki" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200912" />
+            <CANopenSubObject subIndex="13" name="q_kd" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200913" />
+            <CANopenSubObject subIndex="14" name="q_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200914" />
+            <CANopenSubObject subIndex="15" name="vel_kp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200915" />
+            <CANopenSubObject subIndex="16" name="vel_ki" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200916" />
+            <CANopenSubObject subIndex="17" name="vel_kd" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200917" />
+            <CANopenSubObject subIndex="18" name="vel_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200918" />
+            <CANopenSubObject subIndex="19" name="pos_kp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200919" />
+            <CANopenSubObject subIndex="1A" name="pos_ki" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091A" />
+            <CANopenSubObject subIndex="1B" name="pos_kd" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091B" />
+            <CANopenSubObject subIndex="1C" name="pos_limit" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091C" />
+            <CANopenSubObject subIndex="1D" name="rs" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091D" />
+            <CANopenSubObject subIndex="1E" name="ls" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091E" />
+            <CANopenSubObject subIndex="1F" name="pole_pairs" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_20091F" />
+            <CANopenSubObject subIndex="20" name="wheel_radius" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200920" />
+            <CANopenSubObject subIndex="21" name="gear_ratio" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200921" />
             <CANopenSubObject subIndex="22" name="is_calibrated" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200922" />
             <CANopenSubObject subIndex="23" name="crc16" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200923" />
           </CANopenObject>

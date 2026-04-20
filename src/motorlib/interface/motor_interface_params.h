@@ -13,9 +13,6 @@
  * @brief 反馈参数配置结构体
  */
 struct feedback_param {
-	float wheel_radius;          /**< @brief 轮子半径，单位：mm */
-	float gear_ratio;            /**< @brief 减速比 */
-	float pole_pairs;            /**< @brief 极对数 */
 	float direction;             /**< @brief 旋转方向，1或-1 */
 	uint16_t encoder_resolution; /**< @brief 编码器分辨率（CPR） */
 	uint16_t encoder_offset;     /**< @brief 编码器零位偏移（整数部分） */
@@ -65,6 +62,9 @@ struct foc_param {
 struct motor_electrical_param {
 	float rs;
 	float ls;
+	float pole_pairs;   /**< @brief 极对数 */
+	float wheel_radius; /**< @brief 轮子半径，单位：mm */
+	float gear_ratio;   /**< @brief 减速比 */
 };
 /**
  * @brief 电机扩展参数结构体

@@ -16,7 +16,7 @@
 
         Created:      2020/11/23 19:00:00
         Created By:   
-        Modified:     2026/4/17 2:07:02
+        Modified:     2026/4/21 1:34:49
         Modified By:  
 
     Device Info:
@@ -238,9 +238,6 @@ typedef struct {
     } x1200_SDOServerParameter;
     struct {
         uint8_t highestSub_indexSupported;
-        float32_t wheel_radius;
-        float32_t gear_ratio;
-        float32_t pole_pairs;
         float32_t direction;
         uint16_t encoder_resolution;
         uint16_t encoder_offset;
@@ -271,6 +268,9 @@ typedef struct {
         float32_t pos_limit;
         float32_t rs;
         float32_t ls;
+        float32_t pole_pairs;
+        float32_t wheel_radius;
+        float32_t gear_ratio;
         uint8_t is_calibrated;
         uint16_t crc16;
     } x2009_motorlib_params;

@@ -40,9 +40,8 @@ void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
 		return;
 	}
 	struct inverter *inverter = &motor->inverter;
-	struct feedback *feedback = &motor->feedback;
 	if (hw->encoder) {
-		feedback_bind_encoder(feedback, hw->encoder);
+		feedback_bind_encoder(motor, hw->encoder);
 	}
 
 	if (hw->inverter) {
@@ -64,9 +63,8 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
 		return;
 	}
 	struct currsmp *currsmp = &motor->currsmp;
-	struct feedback *feedback = &motor->feedback;
 	motor->param_ext = param_ext;
-	feedback_bind_encoder_param(feedback, &param_ext->feedback_param);
+	feedback_bind_encoder_param(motor, &param_ext->feedback_param);
 	currsmp_bind_param(currsmp, &param_ext->currsmp_param);
 	trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param);
 }
@@ -87,14 +85,13 @@ void motor_init(struct motor *motor)
 
 	struct statemachine *sm = &motor->sm;
 	struct statemachine *sm_mode = &motor->sm_mode;
-	struct feedback *fb = &motor->feedback;
 	struct currsmp *currsmp = &motor->currsmp;
 	struct motor_param_ext *params = motor->param_ext;
-	if (!sm || !fb || !currsmp) {
+	if (!sm || !currsmp) {
 		/* 关键指针为空，无法初始化 */
 		return;
 	}
-	feedback_init(fb);
+	feedback_init(motor);
 	if (params->is_calibrated) {
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
 	} else {
@@ -104,7 +101,7 @@ void motor_init(struct motor *motor)
 	statemachine_init(sm_mode, motor, motor_mode_none, NULL, 0);
 	struct foc *foc = &motor->foc;
 
-	foc_bind(foc, fb, currsmp, &motor->param_ext->foc_param);
+	foc_bind(foc, &motor->feedback, currsmp, &motor->param_ext->foc_param);
 
 	motor_protection_init(motor);
 	anticogging_init(motor);
@@ -136,7 +133,6 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 		return;
 	}
 
-	struct feedback *feedback = &motor->feedback;
 	struct currsmp *currsmp = &motor->currsmp;
 	struct statemachine *sm = &motor->sm;
 	struct motor_param_ext *params = motor->param_ext;
@@ -146,7 +142,7 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 #if MOTORLIB_DEBUG_ENABLED
 	t_raw_start = DWT_CYCCNT;
 #endif
-	feedback_update_raw(feedback);
+	feedback_update_raw(motor);
 #if MOTORLIB_DEBUG_ENABLED
 	t_raw_end = DWT_CYCCNT;
 #endif
@@ -157,7 +153,7 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 #if MOTORLIB_DEBUG_ENABLED
 		t_fb_start = DWT_CYCCNT;
 #endif
-		feedback_update(feedback, CONTROL_PERIOD_DT);
+		feedback_update(motor, CONTROL_PERIOD_DT);
 #if MOTORLIB_DEBUG_ENABLED
 		t_fb_end = DWT_CYCCNT;
 #endif
@@ -259,8 +255,8 @@ void motor_get_info(const struct motor *motor, struct motor_info *state)
 	}
 	struct foc *foc = (struct foc *)&motor->foc;
 
-	state->actual_pos = foc->meas.fd_out->odometer;
-	state->actual_vel = foc->meas.fd_out->line_velocity_mm_s;
+	// state->actual_pos = foc->meas.fd_out->odometer;
+	// state->actual_vel = foc->meas.fd_out->line_velocity_mm_s;
 
 	state->errorcode = motor->data.errorcode;
 	state->flags = motor->data.flags;

@@ -13,53 +13,42 @@
 #include "motor_interface_params.h"
 #include "motorlib_constants.h"
 
+/* 前向声明，避免循环包含 */
+struct motor;
+
 /* PLL默认带宽（Hz） */
 #ifndef FEEDBACK_PLL_BANDWIDTH
 #define FEEDBACK_PLL_BANDWIDTH 1000.0f /* 与ODrive默认值一致 */
 #endif
 
-/** @brief 反馈错误码枚举 */
-enum feedback_error_code {
-	FEEDBACK_ERROR_NONE = 0,       /**< @brief 无错误 */
-	FEEDBACK_ERROR_HW_FAILURE = 1, /**< @brief 硬件故障 */
-	FEEDBACK_ERROR_PARAM = 2,      /**< @brief 参数错误 */
-};
-
-/** @brief 反馈状态枚举 */
-enum feedback_state {
-	FEEDBACK_STATE_OK = 0,             /**< @brief 正常状态 */
-	FEEDBACK_STATE_NOT_CALIBRATED = 1, /**< @brief 未校准状态 */
-};
-
 /**
  * @brief 反馈原始数据与中间计算数据结构体
  */
 struct feedback_data {
-	volatile uint16_t raw;          /**< @brief 原始编码器读数 */
-	volatile uint16_t prev_raw;     /**< @brief 上一次原始读数（用于溢出检测） */
-	volatile int32_t total_counts;  /**< @brief 累积计数（shadow_count） */
-	float odometer_offset_mangle;   /**< @brief 里程计零点偏移角度，单位：rad */
+	volatile uint16_t raw;         /**< @brief 原始编码器读数 */
+	volatile uint16_t prev_raw;    /**< @brief 上一次原始读数（用于溢出检测） */
+	volatile int32_t total_counts; /**< @brief 累积计数（shadow_count） */
+	float odometer_offset_mangle;  /**< @brief 里程计零点偏移角度，单位：rad */
 
 	/* PLL状态变量（与ODrive保持一致） */
-	float pos_estimate_counts;      /**< @brief 位置估计（编码器计数） */
-	float pos_cpr_counts;           /**< @brief CPR内位置估计（0~CPR-1） */
-	float vel_estimate_counts;      /**< @brief 速度估计（计数/秒） */
-	float pll_kp;                   /**< @brief PLL比例增益 */
-	float pll_ki;                   /**< @brief PLL积分增益 */
-	float delta_pos_cpr_counts;     /**< @brief 相位检测器输出（调试用） */
+	float pos_estimate_counts;  /**< @brief 位置估计（编码器计数） */
+	float pos_cpr_counts;       /**< @brief CPR内位置估计（0~CPR-1） */
+	float vel_estimate_counts;  /**< @brief 速度估计（计数/秒） */
+	float pll_kp;               /**< @brief PLL比例增益 */
+	float pll_ki;               /**< @brief PLL积分增益 */
+	float delta_pos_cpr_counts; /**< @brief 相位检测器输出（调试用） */
 
 	/* 电角度插值（ODrive方案） */
-	float phase_interp;             /**< @brief [0,1) 编码器计数内插值 */
+	float phase_interp; /**< @brief [0,1) 编码器计数内插值 */
 };
 
 /**
  * @brief 反馈输出数据结构体
  */
 struct feedback_output {
-	float eangle_rad;         /**< @brief 电角度，单位：rad */
-	float velocity_rad_s;     /**< @brief 机械角速度，单位：rad/s */
-	float odometer;           /**< @brief 里程（累积线位移），单位：m */
-	float line_velocity_mm_s; /**< @brief 机械线速度，单位：mm/s */
+	float eangle_rad;     /**< @brief 电角度，单位：rad */
+	float mangle_rad;     /**< @brief 机械角度，单位：rad */
+	float velocity_rad_s; /**< @brief 机械角速度，单位：rad/s */
 };
 
 /**
@@ -70,7 +59,6 @@ struct feedback {
 	struct feedback_param *param;  /**< @brief 反馈参数指针 */
 	struct feedback_output output; /**< @brief 输出数据 */
 	struct feedback_data data;     /**< @brief 原始数据与中间计算数据 */
-	enum feedback_state state;     /**< @brief 当前状态 */
 };
 
 /**
@@ -79,41 +67,42 @@ struct feedback {
  * @param[in] ops 编码器操作接口
  * @return 无
  */
-void feedback_bind_encoder(struct feedback *feedback, const struct encoder_ops *ops);
+void feedback_bind_encoder(struct motor *motor, const struct encoder_ops *ops);
 
 /**
  * @brief 绑定反馈参数
- * @param[in] feedback 反馈实例
+ * @param[in] motor 电机实例
  * @param[in] param 反馈参数
  * @return 无
  */
-void feedback_bind_encoder_param(struct feedback *feedback, struct feedback_param *param);
+void feedback_bind_encoder_param(struct motor *motor, struct feedback_param *param);
 
 /**
  * @brief 初始化反馈模块
- * @param[in] feedback 反馈实例
+ * @param[in] motor 电机实例
  * @return feedback_error_code 错误码
  * @retval FEEDBACK_ERROR_NONE 初始化成功
  * @retval FEEDBACK_ERROR_PARAM 参数错误
  * @retval FEEDBACK_ERROR_HW_FAILURE 硬件故障
  */
-enum feedback_error_code feedback_init(struct feedback *feedback);
+void feedback_init(struct motor *motor);
+void feedback_reset_encoder(struct motor *motor);
 
 /**
  * @brief 更新反馈数据
- * @param[in] feedback 反馈实例
+ * @param[in] motor 电机实例
  * @param[in] dt 采样周期，单位：s
  * @return 无
  * @details 执行编码器读取、角度计算、速度计算
  */
-void feedback_update(struct feedback *feedback, float dt);
+void feedback_update(struct motor *motor, float dt);
 
 /**
  * @brief 更新反馈原始数据
- * @param[in] feedback 反馈实例
+ * @param[in] motor 电机实例
  * @return 无
  */
-void feedback_update_raw(struct feedback *feedback);
+void feedback_update_raw(struct motor *motor);
 
 /**
  * @brief 获取编码器原始值
@@ -143,64 +132,6 @@ static inline float feedback_get_elec_angle(struct feedback *fb)
 static inline float feedback_get_velocity(struct feedback *fb)
 {
 	return fb->output.velocity_rad_s;
-}
-
-/**
- * @brief 获取线速度
- * @param[in] fb 反馈实例
- * @return float 线速度，单位：m/s
- */
-static inline float feedback_get_line_velocity(struct feedback *fb)
-{
-	return fb->output.velocity_rad_s * fb->param->wheel_radius / fb->param->gear_ratio;
-}
-
-/* 以下函数为内部参数更新函数，以 _ 开头 */
-
-/**
- * @brief 更新轮子半径参数
- * @param[in] feedback 反馈实例
- * @param[in] wheel_radius 轮子半径，单位：m
- * @return 无
- */
-static inline void _feedback_update_param_wheel_radius(struct feedback *feedback,
-						       float wheel_radius)
-{
-	if (!feedback) {
-		return;
-	}
-
-	feedback->param->wheel_radius = wheel_radius;
-}
-
-/**
- * @brief 更新减速比参数
- * @param[in] feedback 反馈实例
- * @param[in] gear_ratio 减速比
- * @return 无
- */
-static inline void _feedback_update_param_gear_ratio(struct feedback *feedback, float gear_ratio)
-{
-	if (!feedback) {
-		return;
-	}
-
-	feedback->param->gear_ratio = gear_ratio;
-}
-
-/**
- * @brief 更新极对数参数
- * @param[in] feedback 反馈实例
- * @param[in] pole_pairs 极对数
- * @return 无
- */
-static inline void _feedback_update_param_pole_pairs(struct feedback *feedback, float pole_pairs)
-{
-	if (!feedback) {
-		return;
-	}
-
-	feedback->param->pole_pairs = pole_pairs;
 }
 
 /**
@@ -267,8 +198,8 @@ static inline void feedback_reset_odometer(struct feedback *feedback)
 	/* 使用PLL位置估计计算当前机械角度作为里程零点 */
 	const float cpr = (float)feedback->param->encoder_resolution;
 	feedback->data.odometer_offset_mangle =
-		(feedback->data.pos_estimate_counts - feedback->param->encoder_offset - feedback->param->encoder_offset_frac)
-		* (MOTORLIB_TWOPI / cpr) * feedback->param->direction;
-	feedback->output.odometer = 0.0f;
+		(feedback->data.pos_estimate_counts - feedback->param->encoder_offset -
+		 feedback->param->encoder_offset_frac) *
+		(MOTORLIB_TWOPI / cpr) * feedback->param->direction;
 }
 #endif /* FEEDBACK_H */
