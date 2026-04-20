@@ -10,21 +10,7 @@
 
 #include "feedback.h"
 #include "motorlib_constants.h"
-
-/**
- * @brief 整数取模运算，确保结果在 [0, m-1] 范围内
- * @param[in] a 被除数
- * @param[in] m 除数（正数）
- * @return 取模结果
- */
-static int32_t mod(int32_t a, int32_t m)
-{
-	int32_t r = a % m;
-	if (r < 0) {
-		r += m;
-	}
-	return r;
-}
+#include "stdbool.h"
 
 /**
  * @brief 将角度包装到 [-π, π] 范围内
@@ -64,29 +50,6 @@ static float fmodf_pos(float angle, float period)
 static int32_t encoder_model(float internal_pos)
 {
 	return (int32_t)floorf(internal_pos);
-}
-
-/**
- * @brief 更新PLL增益（与ODrive保持一致）
- * @param[in] feedback 反馈实例
- * @param[in] dt 控制周期，单位：s
- */
-static void feedback_update_pll_gains(struct feedback *feedback, float dt)
-{
-	struct feedback_data *data = &feedback->data;
-
-	/* ODrive公式：pll_kp = 2.0f * bandwidth */
-	data->pll_kp = 2.0f * FEEDBACK_PLL_BANDWIDTH;
-
-	/* 临界阻尼：pll_ki = 0.25f * (pll_kp * pll_kp) */
-	data->pll_ki = 0.25f * (data->pll_kp * data->pll_kp);
-
-	/* 检查离散时间近似是否稳定（与ODrive相同检查） */
-	if (!(dt * data->pll_kp < 1.0f)) {
-		/* 增益不稳定，使用保守值 */
-		data->pll_kp = 0.9f / dt;
-		data->pll_ki = 0.25f * (data->pll_kp * data->pll_kp);
-	}
 }
 
 /**
@@ -205,80 +168,24 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
 	data->raw = 0;
 	data->prev_raw = 0;
 	data->total_counts = 0;
-	data->accumulated_mangle_rad = 0.0f;
 	data->odometer_offset_mangle = 0.0f; /* 初始无偏移 */
+	data->phase_interp = 0.5f;           /* 静止时插值位于计数中点 */
 
 	/* 初始化PLL状态 */
-	const int32_t cpr = (int32_t)param->encoder_resolution;
 	data->pos_estimate_counts = 0.0f;
 	data->pos_cpr_counts = 0.0f;
 	data->vel_estimate_counts = 0.0f;
 	data->delta_pos_cpr_counts = 0.0f;
 
-	/* 初始化PLL增益（需要dt，但此时未知，暂设为0） */
-	data->pll_kp = 0.0f;
-	data->pll_ki = 0.0f;
+	/* 初始化PLL增益（基于带宽一次性计算，运行时不改变） */
+	data->pll_kp = 2.0f * FEEDBACK_PLL_BANDWIDTH;
+	data->pll_ki = 0.25f * (data->pll_kp * data->pll_kp);
 
 	feedback->output.eangle_rad = 0.0f;
 	feedback->output.velocity_rad_s = 0.0f;
 	feedback->output.odometer = 0.0f;
 
 	return FEEDBACK_ERROR_NONE;
-}
-
-/**
- * @brief 计算累积机械角度，处理编码器溢出
- * @param[in] feedback 反馈实例
- * @param[in] raw 原始编码器读数
- * @param[in] adjusted_raw 偏移校正后的编码器读数（未使用，保留用于接口兼容）
- * @return 无
- * @details 检测越过CPR边界的溢出并计算累积机械角度
- * @note 使用原始值计算差分，偏移量在角度计算时处理，避免负数存入uint16_t
- */
-static void feedback_calc_accumulated_mangle(struct feedback *feedback, uint16_t raw,
-					     int32_t adjusted_raw)
-{
-	struct feedback_param *param = feedback->param;
-	struct feedback_data *data = &feedback->data;
-
-	const float two_pi = MOTORLIB_TWOPI;
-	const int32_t cpr = (int32_t)param->encoder_resolution;
-
-	/* 计算原始差值（使用原始值，偏移在差分中抵消） */
-	int32_t delta = (int32_t)raw - (int32_t)data->prev_raw;
-
-	/* 处理越过CPR边界的溢出 */
-	if (delta > cpr / 2) {
-		delta -= cpr;
-	} else if (delta < -cpr / 2) {
-		delta += cpr;
-	}
-
-	/* 更新累积计数 */
-	data->total_counts += delta;
-
-	/* 计算累积机械角度（考虑编码器零位偏移） */
-	data->accumulated_mangle_rad =
-		(two_pi / (float)cpr) *
-		(float)(data->total_counts - (int32_t)param->encoder_offset) * param->direction;
-
-	/* 保存原始值供下次使用（避免负数存入uint16_t导致的抖动问题） */
-	data->prev_raw = raw;
-
-	(void)adjusted_raw; /* 显式标记未使用，避免编译器警告 */
-}
-
-/**
- * @brief 计算电角度（机械角度 * 极对数，归一化到 [0, 2π]）
- * @param[in] feedback 反馈实例
- * @param[in] mangle 机械角度，单位：rad
- * @return float 电角度，单位：rad
- */
-static float feedback_calc_elec_angle(struct feedback *feedback, float mangle)
-{
-	struct feedback_param *param = feedback->param;
-	float eangle = mangle * param->pole_pairs;
-	return normalize_angle(eangle);
 }
 
 /**
@@ -300,7 +207,8 @@ void feedback_update_raw(struct feedback *feedback)
  * @param[in] feedback 反馈实例
  * @param[in] dt 采样周期，单位：s
  * @return 无
- * @details 执行编码器读取、零位偏移校正、累积角度计算、电角度计算、速度计算和里程更新
+ * @details 执行编码器读取、PLL速度估计、电角度插值计算和里程更新
+ * @note 电角度采用ODrive方案：编码器整数计数 + PLL速度插值
  */
 void feedback_update(struct feedback *feedback, float dt)
 {
@@ -310,51 +218,75 @@ void feedback_update(struct feedback *feedback, float dt)
 
 	struct feedback_param *param = feedback->param;
 	struct feedback_data *data = &feedback->data;
+	const int32_t cpr = (int32_t)param->encoder_resolution;
 
 	/* 1. 读取原始编码器值 */
 	uint16_t raw = data->raw;
 
-	/* 2. 应用零位偏移 */
-	int32_t adjusted_raw = (int32_t)raw - (int32_t)param->encoder_offset;
-
-	/* 3. 计算累积机械角度（处理溢出） */
-	feedback_calc_accumulated_mangle(feedback, raw, adjusted_raw);
-	float cur_mangle = data->accumulated_mangle_rad;
-
-	/* 4. 计算电角度 */
-	feedback->output.eangle_rad = feedback_calc_elec_angle(feedback, cur_mangle);
-
-	/* 5. 计算机械角速度（使用PLL） */
-	const int32_t cpr = (int32_t)param->encoder_resolution;
-
-	/* 第一次运行时初始化PLL增益 */
-	if (data->pll_kp == 0.0f && data->pll_ki == 0.0f) {
-		feedback_update_pll_gains(feedback, dt);
+	/* 2. 计算 delta_enc（处理溢出，与ODrive一致） */
+	int32_t delta_enc = (int32_t)raw - (int32_t)data->prev_raw;
+	if (delta_enc > cpr / 2) {
+		delta_enc -= cpr;
+	} else if (delta_enc < -cpr / 2) {
+		delta_enc += cpr;
 	}
 
-	/* 计算当前CPR内的计数（0~CPR-1） */
+	/* 3. 更新 shadow_count */
+	data->total_counts += delta_enc;
+	data->prev_raw = raw;
+
+	/* 4. 计算 CPR 内计数 */
 	int32_t count_in_cpr = data->total_counts % cpr;
 	if (count_in_cpr < 0) {
 		count_in_cpr += cpr;
 	}
 
-	/* 运行PLL更新 */
-	feedback->output.velocity_rad_s =
+	/* 5. 运行PLL */
+	float mech_omega_rad_s =
 		feedback_pll_update(feedback, dt, count_in_cpr, data->total_counts);
-
+	feedback->output.velocity_rad_s = mech_omega_rad_s;
 	feedback->output.line_velocity_mm_s =
-		feedback->output.velocity_rad_s * param->wheel_radius / param->gear_ratio;
+		mech_omega_rad_s * param->wheel_radius / param->gear_ratio;
 
-	/* 6. 应用小数偏移到电角度输出	小数偏移用于子计数精度的相位对齐 */
-	if (param->encoder_offset_frac != 0.0f) {
-		/* 将小数偏移转换为电角度弧度 */
-		float frac_eangle_offset = param->encoder_offset_frac * MOTORLIB_TWOPI /
-					   (float)param->encoder_resolution * param->pole_pairs;
-		feedback->output.eangle_rad =
-			normalize_angle(feedback->output.eangle_rad - frac_eangle_offset);
+	/* 6. 电角度插值（ODrive方案） */
+	bool snap_to_zero_vel = (data->vel_estimate_counts == 0.0f);
+	int32_t corrected_enc = count_in_cpr - (int32_t)param->encoder_offset;
+
+	if (snap_to_zero_vel) {
+		/* 状态A：静止 — 插值锁定在计数中点，防止边界抖动 */
+		data->phase_interp = 0.5f;
+	} else {
+		/* 非静止状态，判断编码器是否跳变 */
+		if (delta_enc > 0) {
+			/* 状态B：编码器正向跳变 — 以新计数为起点 */
+			data->phase_interp = 0.0f;
+		} else {
+			if (delta_enc < 0) {
+				/* 状态C：编码器反向跳变 — 以新计数为终点 */
+				data->phase_interp = 1.0f;
+			} else {
+				/* 状态D：正常运行 — 用PLL速度预测插值 */
+				data->phase_interp += dt * data->vel_estimate_counts;
+				if (data->phase_interp > 1.0f) {
+					data->phase_interp = 1.0f;
+				} else if (data->phase_interp < 0.0f) {
+					data->phase_interp = 0.0f;
+				}
+			}
+		}
 	}
 
-	/* 7. 更新里程（应用偏移，实现相对零点） */
-	float relative_mangle = data->accumulated_mangle_rad - data->odometer_offset_mangle;
+	float interpolated_enc = (float)corrected_enc + data->phase_interp;
+
+	/* 7. 计算电角度 */
+	float elec_rad_per_enc = param->pole_pairs * MOTORLIB_TWOPI / (float)cpr;
+	float ph = elec_rad_per_enc * (interpolated_enc - param->encoder_offset_frac);
+	feedback->output.eangle_rad = normalize_angle(ph) * param->direction;
+
+	/* 8. 更新里程（使用PLL位置估计，扣除零位偏移） */
+	float mangle_rad =
+		(data->pos_estimate_counts - param->encoder_offset - param->encoder_offset_frac) *
+		(MOTORLIB_TWOPI / (float)cpr) * param->direction;
+	float relative_mangle = mangle_rad - data->odometer_offset_mangle;
 	feedback->output.odometer = relative_mangle * param->wheel_radius / param->gear_ratio;
 }

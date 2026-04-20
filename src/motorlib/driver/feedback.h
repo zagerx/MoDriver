@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "motor_interface_driver.h"
 #include "motor_interface_params.h"
+#include "motorlib_constants.h"
 
 /* PLL默认带宽（Hz） */
 #ifndef FEEDBACK_PLL_BANDWIDTH
@@ -34,19 +35,21 @@ enum feedback_state {
  * @brief 反馈原始数据与中间计算数据结构体
  */
 struct feedback_data {
-	volatile uint16_t raw;                 /**< @brief 原始编码器读数 */
-	volatile uint16_t prev_raw;            /**< @brief 上一次原始读数（用于差分） */
-	volatile int32_t total_counts;         /**< @brief 累积计数（考虑溢出） */
-	volatile float accumulated_mangle_rad; /**< @brief 累积机械角度，单位：rad */
-	float odometer_offset_mangle;    /**< @brief 里程计零点偏移角度，单位：rad */
+	volatile uint16_t raw;          /**< @brief 原始编码器读数 */
+	volatile uint16_t prev_raw;     /**< @brief 上一次原始读数（用于溢出检测） */
+	volatile int32_t total_counts;  /**< @brief 累积计数（shadow_count） */
+	float odometer_offset_mangle;   /**< @brief 里程计零点偏移角度，单位：rad */
 
 	/* PLL状态变量（与ODrive保持一致） */
-	float pos_estimate_counts;  /**< @brief 位置估计（编码器计数） */
-	float pos_cpr_counts;       /**< @brief CPR内位置估计（0~CPR-1） */
-	float vel_estimate_counts;  /**< @brief 速度估计（计数/秒） */
-	float pll_kp;               /**< @brief PLL比例增益 */
-	float pll_ki;               /**< @brief PLL积分增益 */
-	float delta_pos_cpr_counts; /**< @brief 相位检测器输出（调试用） */
+	float pos_estimate_counts;      /**< @brief 位置估计（编码器计数） */
+	float pos_cpr_counts;           /**< @brief CPR内位置估计（0~CPR-1） */
+	float vel_estimate_counts;      /**< @brief 速度估计（计数/秒） */
+	float pll_kp;                   /**< @brief PLL比例增益 */
+	float pll_ki;                   /**< @brief PLL积分增益 */
+	float delta_pos_cpr_counts;     /**< @brief 相位检测器输出（调试用） */
+
+	/* 电角度插值（ODrive方案） */
+	float phase_interp;             /**< @brief [0,1) 编码器计数内插值 */
 };
 
 /**
@@ -261,8 +264,11 @@ static inline void feedback_reset_odometer(struct feedback *feedback)
 		return;
 	}
 
-	/* 这样可保持电角度和速度计算的连续性，避免FOC控制紊乱 */
-	feedback->data.odometer_offset_mangle = feedback->data.accumulated_mangle_rad;
+	/* 使用PLL位置估计计算当前机械角度作为里程零点 */
+	const float cpr = (float)feedback->param->encoder_resolution;
+	feedback->data.odometer_offset_mangle =
+		(feedback->data.pos_estimate_counts - feedback->param->encoder_offset - feedback->param->encoder_offset_frac)
+		* (MOTORLIB_TWOPI / cpr) * feedback->param->direction;
 	feedback->output.odometer = 0.0f;
 }
 #endif /* FEEDBACK_H */

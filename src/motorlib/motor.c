@@ -94,7 +94,7 @@ void motor_init(struct motor *motor)
 		/* 关键指针为空，无法初始化 */
 		return;
 	}
-
+	feedback_init(fb);
 	if (params->is_calibrated) {
 		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
 	} else {
