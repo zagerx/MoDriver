@@ -2,8 +2,15 @@
 """
 test.py - 目标位置速度随机测试工具
 
+该工具会在开始随机测试前自动发送初始化指令:
+1. "state:1.0" - 设置状态为1.0
+2. 等待20ms
+3. "mode:1" - 设置模式为1
+4. 等待20ms
+5. 开始持续发送随机位置速度指令
+
 用法:
-    # 随机测试：持续发送随机位置速度指令
+    # 随机测试：先发送初始化指令，然后持续发送随机位置速度指令
     python3 test.py
     
     # 自定义串口
@@ -12,10 +19,10 @@ test.py - 目标位置速度随机测试工具
     # 限制发送次数
     python3 test.py --count 10
 
-指令格式: "tar:200.0,100.0" (位置mm,速度mm/s)
-位置范围: -20000 到 20000 mm
-速度范围: 200 到 15000 mm/s
-间隔时间: 10ms 到 5s 随机
+随机指令格式: "tar:200.0,100.0" (位置mm,速度mm/s)
+位置范围: -8000.0 到 8000.0 mm
+速度范围: 50.0 到 5000.0 mm/s
+间隔时间: 10ms 到 3s 随机
 """
 
 import sys
@@ -29,10 +36,10 @@ DEFAULT_PORT = '/dev/ttyACM0'
 DEFAULT_BAUDRATE = 115200
 MIN_POSITION = -8000.0
 MAX_POSITION = 8000.0
-MIN_VELOCITY = 200.0
-MAX_VELOCITY = 15000.0
+MIN_VELOCITY = 50.0
+MAX_VELOCITY = 5000.0
 MIN_INTERVAL = 0.01  # 10ms
-MAX_INTERVAL = 2.0   # 5s
+MAX_INTERVAL = 3.0   # 5s
 
 def check_and_open_serial(port=DEFAULT_PORT, baudrate=DEFAULT_BAUDRATE):
     """
@@ -124,6 +131,26 @@ def send_command(ser, command):
         response = ser.readline().decode('utf-8', errors='ignore').strip()
         print(f"[{time.strftime('%H:%M:%S')}] 设备响应: {response}")
 
+
+def send_initialization_commands(ser):
+    """
+    发送初始化指令序列
+    
+    Args:
+        ser: 已打开的串口对象
+    """
+    print("\n=== 发送初始化指令 ===")
+    
+    # 发送 state:1.0
+    send_command(ser, "state:1.0")
+    time.sleep(0.02)  # 等待20ms
+    
+    # 发送 mode:1
+    send_command(ser, "mode:1")
+    time.sleep(0.02)  # 等待20ms
+    
+    print("=== 初始化指令发送完成 ===")
+
 def generate_random_command():
     """
     生成随机的位置速度指令
@@ -137,13 +164,19 @@ def generate_random_command():
 
 def random_test_mode(ser, count=None):
     """
-    随机测试模式：持续发送随机指令
+    随机测试模式：先发送初始化指令，然后持续发送随机指令
     
     Args:
         ser: 已打开的串口对象
         count: 发送次数限制，None表示无限发送
     """
     print("进入随机测试模式...")
+    
+    # 首先发送初始化指令
+    send_initialization_commands(ser)
+    
+    print("=== 开始随机测试 ===\n")
+    
     print(f"位置范围: {MIN_POSITION} 到 {MAX_POSITION} mm")
     print(f"速度范围: {MIN_VELOCITY} 到 {MAX_VELOCITY} mm/s")
     print(f"间隔时间: {MIN_INTERVAL} 到 {MAX_INTERVAL} 秒")

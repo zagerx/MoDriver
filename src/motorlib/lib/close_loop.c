@@ -20,7 +20,9 @@ void motor_position_temp_loop(struct motor *motor, float tar_pos, float dt)
 	struct foc_pid *position_pi = &foc->ctrl.position;
 	struct foc_measurement *meas = &foc->meas;
 	/* 获取轨迹规划的位置和速度（单位转换：mm -> m） */
-	float current_pos = meas->fd_out->odometer;
+	// float current_pos = meas->fd_out->odometer;
+	float current_pos = meas->fd_out->odometer / motor->feedback.param->wheel_radius;
+
 	/* 位置环PID计算，输出作为速度环的目标输入 */
 	foc->ref.velocity = foc_pid_positionloop_run(position_pi, tar_pos, current_pos, dt);
 }
@@ -41,7 +43,9 @@ void motor_position_loop(struct motor *motor, float dt)
 
 	/* 获取轨迹规划的位置和速度（单位转换：mm -> m） */
 	float plan_position = trajectory_planner_get_pos(traj_plan);
-	float plan_velocity = trajectory_planner_get_vel(traj_plan);
+	struct feedback *feedback = &motor->feedback;
+	float plan_velocity = trajectory_planner_get_vel(traj_plan) /
+			      feedback->param->wheel_radius; // 速度前馈系数（根据实际系统调整）
 	float current_pos = meas->fd_out->odometer;
 
 	/* 位置环PID计算，输出作为速度环的目标输入 */
@@ -90,8 +94,8 @@ void motor_velocity_loop(struct motor *motor, float target_vel)
 	struct foc_measurement *meas = &foc->meas;
 
 	/* 获取实际速度（单位：mm/s） */
-	float vel = meas->fd_out->line_velocity_mm_s;
-
+	// float vel = meas->fd_out->line_velocity_mm_s;
+	float vel = meas->fd_out->velocity_rad_s;
 	/* 速度环PI计算，输出q轴电流参考值 */
 	foc->ref.i_q = foc_pid_velocityloop_run(velocity_pi, target_vel, vel, SPEED_PERIOD_DT);
 	foc->ref.i_d = 0.0f; /* Id=0控制策略 */

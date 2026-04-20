@@ -11,10 +11,6 @@
 #include "feedback.h"
 #include "motorlib_constants.h"
 
-/** @brief 低通滤波系数（0~1，越大响应越快） */
-#define VELOCITY_LPF_ALPHA 0.08f
-
-#if FEEDBACK_USE_PLL
 /**
  * @brief 整数取模运算，确保结果在 [0, m-1] 范围内
  * @param[in] a 被除数
@@ -137,8 +133,6 @@ static float feedback_pll_update(struct feedback *feedback, float dt, int32_t co
 
 	return mech_omega_rad_s;
 }
-#endif /* FEEDBACK_USE_PLL */
-
 /**
  * @brief 角度归一化到 [0, 2PI]
  * @param[in] angle 输入角度，单位：rad
@@ -212,11 +206,8 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
 	data->prev_raw = 0;
 	data->total_counts = 0;
 	data->accumulated_mangle_rad = 0.0f;
-	data->prev_mangle_rad = 0.0f;
-	data->mech_omega_rad_s = 0.0f;
 	data->odometer_offset_mangle = 0.0f; /* 初始无偏移 */
 
-#if FEEDBACK_USE_PLL
 	/* 初始化PLL状态 */
 	const int32_t cpr = (int32_t)param->encoder_resolution;
 	data->pos_estimate_counts = 0.0f;
@@ -227,7 +218,6 @@ enum feedback_error_code feedback_init(struct feedback *feedback)
 	/* 初始化PLL增益（需要dt，但此时未知，暂设为0） */
 	data->pll_kp = 0.0f;
 	data->pll_ki = 0.0f;
-#endif
 
 	feedback->output.eangle_rad = 0.0f;
 	feedback->output.velocity_rad_s = 0.0f;
@@ -292,43 +282,6 @@ static float feedback_calc_elec_angle(struct feedback *feedback, float mangle)
 }
 
 /**
- * @brief 差分法计算机械角速度，带低通滤波
- * @param[in] feedback 反馈实例
- * @param[in] dt 采样周期，单位：s
- * @param[in] cur_mangle 当前机械角度，单位：rad
- * @return float 机械角速度，单位：rad/s
- * @note 使用差分法计算速度，并应用一阶低通滤波
- */
-static float feedback_calc_velocity(struct feedback *feedback, float dt, float cur_mangle)
-{
-	struct feedback_data *data = &feedback->data;
-
-	if (dt <= 0.0f) {
-		return data->mech_omega_rad_s;
-	}
-
-	/* 计算角度差（处理跨越 2π 边界） */
-	float dtheta = cur_mangle - data->prev_mangle_rad;
-	if (dtheta > MOTORLIB_PI) {
-		dtheta -= MOTORLIB_TWOPI;
-	} else if (dtheta < -MOTORLIB_PI) {
-		dtheta += MOTORLIB_TWOPI;
-	}
-
-	/* 原始速度计算 */
-	float speed_raw = dtheta / dt;
-
-	/* 一阶低通滤波 */
-	data->mech_omega_rad_s = (1.0f - VELOCITY_LPF_ALPHA) * data->mech_omega_rad_s +
-				 VELOCITY_LPF_ALPHA * speed_raw;
-
-	/* 保存当前角度供下次差分使用 */
-	data->prev_mangle_rad = cur_mangle;
-
-	return data->mech_omega_rad_s;
-}
-
-/**
  * @brief 更新反馈原始数据
  * @param[in] feedback 反馈实例
  * @return 无
@@ -371,9 +324,7 @@ void feedback_update(struct feedback *feedback, float dt)
 	/* 4. 计算电角度 */
 	feedback->output.eangle_rad = feedback_calc_elec_angle(feedback, cur_mangle);
 
-	/* 5. 计算机械角速度（根据宏选择PLL或差分法） */
-#if FEEDBACK_USE_PLL
-	/* 使用PLL（与ODrive保持一致） */
+	/* 5. 计算机械角速度（使用PLL） */
 	const int32_t cpr = (int32_t)param->encoder_resolution;
 
 	/* 第一次运行时初始化PLL增益 */
@@ -391,13 +342,6 @@ void feedback_update(struct feedback *feedback, float dt)
 	feedback->output.velocity_rad_s =
 		feedback_pll_update(feedback, dt, count_in_cpr, data->total_counts);
 
-	/* 更新机械角速度状态（保持兼容性） */
-	data->mech_omega_rad_s = feedback->output.velocity_rad_s;
-#else
-	/* 使用差分法（原有实现） */
-	feedback->output.velocity_rad_s = feedback_calc_velocity(feedback, dt, cur_mangle);
-#endif
-
 	feedback->output.line_velocity_mm_s =
 		feedback->output.velocity_rad_s * param->wheel_radius / param->gear_ratio;
 
@@ -411,7 +355,6 @@ void feedback_update(struct feedback *feedback, float dt)
 	}
 
 	/* 7. 更新里程（应用偏移，实现相对零点） */
-	/* 使用相对角度计算里程，支持Home模式下动态重置而不破坏角度连续性 */
 	float relative_mangle = data->accumulated_mangle_rad - data->odometer_offset_mangle;
 	feedback->output.odometer = relative_mangle * param->wheel_radius / param->gear_ratio;
 }
