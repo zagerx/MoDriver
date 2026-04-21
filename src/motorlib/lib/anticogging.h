@@ -12,13 +12,25 @@
 #include <stdbool.h>
 
 /* 齿槽校准配置 */
-#define ANTICOGGING_POINTS_PER_REV 3600 /* 每转采样点数，与ODrive一致 */
-#define ANTICOGGING_POS_THRESHOLD  1.0f /* 位置稳定阈值（编码器计数） */
-#define ANTICOGGING_VEL_THRESHOLD  0.1f /* 速度稳定阈值（rad/s） */
-#define ANTICOGGING_STABLE_TIME    0.1f /* 稳定时间要求（秒） */
+#define ANTICOGGING_POINTS_PER_REV  360   /* 每转采样点数，1°分辨率（步进大，避免齿槽振荡卡死） */
+#define ANTICOGGING_POS_THRESHOLD   0.01f /* 位置稳定阈值（rad），约0.57° */
+#define ANTICOGGING_VEL_THRESHOLD   1.0f  /* 速度稳定阈值（rad/s），约5.7°/s */
+#define ANTICOGGING_STABLE_TIME     0.5f  /* 稳定时间（秒），确保 PID 收敛 */
+#define ANTICOGGING_POINT_TIMEOUT_S 5.0f  /* 单点超时（秒），跳不过就跳过 */
 
 struct motor;
 struct statemachine;
+
+/**
+ * @brief 齿槽校准错误码定义（按位组合）
+ */
+enum anticogging_error {
+	ANTICOGGING_ERROR_NONE = 0U,
+	ANTICOGGING_ERROR_PARAM = 1U << 0,          /**< @brief 参数错误（如编码器分辨率为零） */
+	ANTICOGGING_ERROR_TIMEOUT = 1U << 1,        /**< @brief 单点稳定超时 */
+	ANTICOGGING_ERROR_NOT_CALIBRATED = 1U << 2, /**< @brief 尚未完成校准 */
+	ANTICOGGING_ERROR_ABORTED = 1U << 3,        /**< @brief 校准被外部中断 */
+};
 
 /**
  * @brief 齿槽校准数据结构
@@ -32,18 +44,24 @@ struct anticogging {
 	bool is_valid;          /* 校准数据有效标志 */
 
 	/* 校准控制 */
-	float tar_pos;        /* 目标位置（转） */
+	float tar_pos;        /* 目标位置（rad），相对于start_mangle_rad的偏移 */
 	float stable_counter; /* 稳定计时器（秒） */
-	bool position_stable; /* 位置稳定标志 */
-	bool velocity_stable; /* 速度稳定标志 */
 
 	/* 补偿数据 */
 	float cogging_map[ANTICOGGING_POINTS_PER_REV]; /* 3600点补偿表（A） */
 
 	/* 配置参数（可运行时调整） */
-	float pos_threshold; /* 位置稳定阈值（编码器计数） */
+	float pos_threshold; /* 位置稳定阈值（rad） */
 	float vel_threshold; /* 速度稳定阈值（rad/s） */
 	float stable_time;   /* 稳定时间要求（秒） */
+
+	/* 校准基准 */
+	float start_mangle_rad; /* 校准起始机械角度（rad），用于计算各点目标位置 */
+
+	/* 调试/错误信息 */
+	uint32_t errorcode;    /* 错误码组合值，按 anticogging_error 位定义 */
+	float point_wait_time; /* 当前点已等待时间（秒），用于超时检测 */
+	uint32_t sample_index; /* 最近一次成功采样的索引 */
 };
 
 /**
@@ -68,12 +86,6 @@ float anticogging_get_compensation(struct motor *motor, float pos_estimate);
  * @param[in] motor 电机实例
  */
 void anticogging_init(struct motor *motor);
-
-/**
- * @brief 开始齿槽校准
- * @param[in] motor 电机实例
- */
-void anticogging_start_calibration(struct motor *motor);
 
 /**
  * @brief 检查校准是否完成

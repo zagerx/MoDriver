@@ -125,20 +125,22 @@ void motor_mode_PV(struct statemachine *sm)
 
 	struct motor *motor = (struct motor *)(sm->data);
 	(void)motor;
-	struct trajectory_plan *traj_plan = &motor->traj_plan;
+	// struct trajectory_plan *traj_plan = &motor->traj_plan;
 
 	switch (sm->phase) {
 	case ENTER:
 		sm->count = 0;
 		motor_velocity_loop_reset(motor);
+		motor->data.debug.test_value2 = 0.0f;
 		sm->phase = RUNING;
 		break;
 
 	case RUNING:
 		if (sm->count++ > SPEED_LOOP_INTERVAL) {
 			sm->count = 0;
-			trajectory_planner_action(traj_plan, SPEED_PERIOD_DT);
-			float target_vel = trajectory_planner_get_vel(&motor->traj_plan);
+			// trajectory_planner_action(traj_plan, SPEED_PERIOD_DT);
+			// float target_vel = trajectory_planner_get_vel(&motor->traj_plan);
+			float target_vel = motor->data.debug.test_value2;
 			motor_velocity_loop(motor, target_vel);
 		}
 		motor_currment_loop(motor);

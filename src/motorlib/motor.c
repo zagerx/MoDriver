@@ -253,7 +253,7 @@ void motor_get_info(const struct motor *motor, struct motor_info *state)
 	if (!motor || !state) {
 		return;
 	}
-	struct foc *foc = (struct foc *)&motor->foc;
+	// struct foc *foc = (struct foc *)&motor->foc;
 
 	// state->actual_pos = foc->meas.fd_out->odometer;
 	// state->actual_vel = foc->meas.fd_out->line_velocity_mm_s;

@@ -80,6 +80,15 @@ void motor_velocity_loop(struct motor *motor, float target_vel)
 	float vel = meas->fd_out->velocity_rad_s;
 	/* 速度环PI计算，输出q轴电流参考值 */
 	foc->ref.i_q = foc_pid_velocityloop_run(velocity_pi, target_vel, vel, SPEED_PERIOD_DT);
+
+	/* 叠加齿槽补偿电流（前馈） */
+	if (motor->anticoggings.is_valid) {
+		float pos_turns = foc->meas.fd_out->mangle_rad / MOTORLIB_TWOPI;
+		volatile static float last_comp = 0.0f;
+		last_comp = anticogging_get_compensation(motor, pos_turns);
+		foc->ref.i_q += anticogging_get_compensation(motor, pos_turns);
+	}
+
 	foc->ref.i_d = 0.0f; /* Id=0控制策略 */
 }
 
