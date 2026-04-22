@@ -160,9 +160,7 @@ void motor_runing_state(struct statemachine *sm)
 		inverter_set_voltage(inverter, 0.0f, 0.0f, 0.0f);
 		inverter_enable(inverter);
 
-		if (sm_mode->current_state != motor_mode_none) {
-			sm_transition(sm_mode, motor_mode_none);
-		}
+		sm_transition_sync(sm_mode, motor_mode_none);
 		sm->phase = RUNNING;
 		sm->count = 0;
 		break;
@@ -172,9 +170,7 @@ void motor_runing_state(struct statemachine *sm)
 		break;
 
 	case EXIT:
-		if (sm_mode->current_state != motor_mode_none) {
-			sm_transition(sm_mode, motor_mode_none);
-		}
+		sm_transition_sync(sm_mode, motor_mode_none);
 		break;
 
 	default:
