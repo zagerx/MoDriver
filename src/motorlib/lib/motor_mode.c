@@ -16,6 +16,10 @@
 
 #include <math.h>
 #include "open_loop.h"
+
+#define TARGET_REACHED_POS_TOL 0.1f /* 位置容差：0.1 mm */
+#define TARGET_REACHED_VEL_TOL 5.0f /* 速度容差：5 mm/s */
+
 extern int motor_is_command_set(const struct motor *motor, enum motor_command_bits bit);
 extern int motor_clear_command(struct motor *motor, enum motor_command_bits bit);
 
@@ -27,7 +31,7 @@ extern int motor_clear_command(struct motor *motor, enum motor_command_bits bit)
 void motor_mode_none(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
@@ -35,10 +39,10 @@ void motor_mode_none(struct statemachine *sm)
 
 	switch (sm->phase) {
 	case ENTER:
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		break;
 
-	case RUNING:
+	case RUNNING:
 
 		break;
 
@@ -58,7 +62,7 @@ void motor_mode_none(struct statemachine *sm)
 void motor_mode_PP(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 	};
 	struct motor *motor = (struct motor *)(sm->data);
 	struct trajectory_plan *traj_plan = &motor->traj_plan;
@@ -69,17 +73,14 @@ void motor_mode_PP(struct statemachine *sm)
 	float wheel_radius = param_ext->electrical_param.wheel_radius; /* 轮子半径，单位mm */
 	switch (sm->phase) {
 	case ENTER:
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		sm->count = 0;
 		start_pos = foc->meas.fd_out->mangle_rad * wheel_radius; /* 当前位置作为起始位置 */
 		trajectory_planner_init(traj_plan, start_pos, 0.0f, 0.0f, POSITION_PERIOD_DT);
 		motor_position_loop_reset(motor);
 		break;
 
-	case RUNING:
-#define TARGET_REACHED_POS_TOL 0.1f // 位置容差：0.1 mm
-#define TARGET_REACHED_VEL_TOL 5.0f // 速度容差：1 mm/s
-
+	case RUNNING:
 		/* 判断目标到达 */
 		plan_target = trajectory_planner_read_plantarget(traj_plan); // 目标位置
 		actual_pos = foc->meas.fd_out->mangle_rad * wheel_radius;    // 实际位置
@@ -100,7 +101,7 @@ void motor_mode_PP(struct statemachine *sm)
 			float plan_velocity = trajectory_planner_get_vel(traj_plan) / wheel_radius;
 			motor_velocity_loop(motor, foc->ref.velocity + plan_velocity);
 		}
-		motor_currment_loop(motor);
+		motor_current_loop(motor);
 		sm->count++;
 		break;
 
@@ -120,7 +121,7 @@ void motor_mode_PP(struct statemachine *sm)
 void motor_mode_PV(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
@@ -132,10 +133,10 @@ void motor_mode_PV(struct statemachine *sm)
 		sm->count = 0;
 		motor_velocity_loop_reset(motor);
 		motor->data.debug.test_value2 = 0.0f;
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		break;
 
-	case RUNING:
+	case RUNNING:
 		if (sm->count++ > SPEED_LOOP_INTERVAL) {
 			sm->count = 0;
 			// trajectory_planner_action(traj_plan, SPEED_PERIOD_DT);
@@ -143,7 +144,7 @@ void motor_mode_PV(struct statemachine *sm)
 			float target_vel = motor->data.debug.test_value2;
 			motor_velocity_loop(motor, target_vel);
 		}
-		motor_currment_loop(motor);
+		motor_current_loop(motor);
 		break;
 
 	case EXIT:
@@ -162,7 +163,7 @@ void motor_mode_PV(struct statemachine *sm)
 void motor_mode_HOMING(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 		WAIT_COMMAND,
 		IDLE,
 	};
@@ -186,12 +187,12 @@ void motor_mode_HOMING(struct statemachine *sm)
 		/* 等待外部命令触发原点回归动作 */
 		if (motor_is_command_set(motor, MOTOR_CMD_HOMING)) {
 			motor_clear_command(motor, MOTOR_CMD_HOMING);
-			sm->phase = RUNING;
+			sm->phase = RUNNING;
 		}
 
 		break;
 
-	case RUNING:
+	case RUNNING:
 		elec_angle = foc->meas.fd_out->eangle_rad;
 		if (fabsf(elec_angle) < CAPTURE_THRESHOLD ||
 		    fabsf(elec_angle - (3.141592653f * 2.0f)) < CAPTURE_THRESHOLD) {
@@ -208,7 +209,7 @@ void motor_mode_HOMING(struct statemachine *sm)
 			sm->count = 0;
 			motor_velocity_loop(motor, 5.0f);
 		}
-		motor_currment_loop(motor);
+		motor_current_loop(motor);
 		break;
 
 	case EXIT:
@@ -228,9 +229,9 @@ void motor_mode_HOMING(struct statemachine *sm)
 void motor_mode_debug(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 		ALIGN,
-		RUNING2,
+		RUNNING2,
 		IDLE,
 	};
 
@@ -242,7 +243,7 @@ void motor_mode_debug(struct statemachine *sm)
 	case ENTER:
 		inverter_enable(inverter);
 		sm->count = 0;
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		break;
 
 	case ALIGN:
@@ -254,7 +255,7 @@ void motor_mode_debug(struct statemachine *sm)
 		}
 		break;
 
-	case RUNING:
+	case RUNNING:
 
 		if (++sm->count > 500) {
 			test_flag = -test_flag; // 反转目标位置
@@ -269,7 +270,7 @@ void motor_mode_debug(struct statemachine *sm)
 			foc_pid_reset(&motor->foc.ctrl.d_axis); // 重置PID控制器状态
 			break;
 		}
-		currment_debug(motor, target);
+		current_debug(motor, target);
 		break;
 
 	case EXIT:
@@ -283,7 +284,7 @@ void motor_mode_debug(struct statemachine *sm)
 void motor_mode_debug_posvel(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
@@ -293,10 +294,10 @@ void motor_mode_debug_posvel(struct statemachine *sm)
 		sm->count = 0;
 		motor_position_loop_reset(motor);
 		motor->data.debug.test_value1 = foc->meas.fd_out->mangle_rad;
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		break;
 
-	case RUNING:
+	case RUNNING:
 		/* 执行控制环 */
 		if (sm->count % (uint16_t)POSITION_LOOP_INTERVAL == 0) {
 			/* 位置环 */
@@ -308,7 +309,7 @@ void motor_mode_debug_posvel(struct statemachine *sm)
 			motor_velocity_loop(motor, foc->ref.velocity);
 		}
 		/* 电流环 */
-		motor_currment_loop(motor);
+		motor_current_loop(motor);
 		sm->count++;
 		break;
 
@@ -364,44 +365,31 @@ void motor_tran_mode(struct motor *motor, enum motor_mode new_mode)
 	struct statemachine *sm_mode = &motor->sm_mode;
 	switch (new_mode) {
 	case MODE_NONE:
-		if (sm_mode->current_state != motor_mode_none) {
-			TRAN_STATE(sm_mode, motor_mode_none);
-		}
+		sm_transition(sm_mode, motor_mode_none);
 		break;
 
 	case MODE_PP:
-		if (sm_mode->current_state != motor_mode_PP) {
-			TRAN_STATE(sm_mode, motor_mode_PP);
-		}
-
+		sm_transition(sm_mode, motor_mode_PP);
 		break;
 
 	case MODE_PV:
-		if (sm_mode->current_state != motor_mode_PV) {
-			TRAN_STATE(sm_mode, motor_mode_PV);
-		}
+		sm_transition(sm_mode, motor_mode_PV);
 		break;
 
 	case MODE_HM:
-		if (sm_mode->current_state != motor_mode_HOMING) {
-			TRAN_STATE(sm_mode, motor_mode_HOMING);
-		}
+		sm_transition(sm_mode, motor_mode_HOMING);
 		break;
-	case MODE_DEBUG: {
-		if (sm_mode->current_state != motor_mode_debug) {
-			TRAN_STATE(sm_mode, motor_mode_debug);
-		}
-	} break;
-	case MODE_ANTICOGGING_CALIB: {
-		if (sm_mode->current_state != motor_mode_anticogging_calib) {
-			TRAN_STATE(sm_mode, motor_mode_anticogging_calib);
-		}
-	} break;
-	case MODE_DEBUG_POSVEL: {
-		if (sm_mode->current_state != motor_mode_debug_posvel) {
-			TRAN_STATE(sm_mode, motor_mode_debug_posvel);
-		}
-	} break;
+	case MODE_DEBUG:
+		sm_transition(sm_mode, motor_mode_debug);
+
+		break;
+	case MODE_ANTICOGGING_CALIB:
+		sm_transition(sm_mode, motor_mode_anticogging_calib);
+		break;
+
+	case MODE_DEBUG_POSVEL:
+		sm_transition(sm_mode, motor_mode_debug_posvel);
+		break;
 	default:
 		break;
 	}

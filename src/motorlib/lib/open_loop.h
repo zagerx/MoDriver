@@ -51,6 +51,6 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage);
  * @param[in] tar 目标电流值
  * @return 无
  */
-void currment_debug(struct motor *motor, float tar);
+void current_debug(struct motor *motor, float tar);
 
 #endif

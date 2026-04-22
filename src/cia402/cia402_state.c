@@ -358,7 +358,7 @@ void cia402_pds_switched_on_state(struct statemachine *sm)
 void cia402_pds_operation_enabled_state(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 		WAIT_COMMAND,
 	};
 
@@ -378,7 +378,7 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm)
 		set_statusword(inst, CIA402_STATE_OPERATION_ENABLED);
 		inst->halt_active = false;
 		/* TODO: 使能电机输出 */
-		motor_tran_state(motor, MOTOR_STATUS_RUNING);
+		motor_tran_state(motor, MOTOR_STATUS_RUNNING);
 		sm->count = 0;
 		sm->phase = WAIT_COMMAND;
 		break;
@@ -388,10 +388,10 @@ void cia402_pds_operation_enabled_state(struct statemachine *sm)
 		}
 		motor_tran_mode(motor, *inst->modes_of_operation);
 		sm->count = 0;
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		break;
 	}
-	case RUNING:
+	case RUNNING:
 		/* 检查 Halt 请求 (bit8) */
 		if (is_halt_requested(cw)) {
 			inst->halt_active = true;

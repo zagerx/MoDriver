@@ -139,7 +139,7 @@ void process_data(uint8_t *data, uint16_t len)
 						motor_tran_state(motor_1, MOTOR_STATUS_IDLE);
 					} else if (input[0] == 1) {
 						// 进入运行状态
-						motor_tran_state(motor_1, MOTOR_STATUS_RUNING);
+						motor_tran_state(motor_1, MOTOR_STATUS_RUNNING);
 					}
 				} else if (cmd_map[i].data_index == INDEX_MODE) {
 					// 处理模式命令

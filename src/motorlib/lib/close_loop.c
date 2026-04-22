@@ -84,8 +84,6 @@ void motor_velocity_loop(struct motor *motor, float target_vel)
 	/* 叠加齿槽补偿电流（前馈） */
 	if (motor->anticoggings.is_valid) {
 		float pos_turns = foc->meas.fd_out->mangle_rad / MOTORLIB_TWOPI;
-		volatile static float last_comp = 0.0f;
-		last_comp = anticogging_get_compensation(motor, pos_turns);
 		foc->ref.i_q += anticogging_get_compensation(motor, pos_turns);
 	}
 
@@ -125,7 +123,7 @@ void motor_velocity_loop_reset(struct motor *motor)
  *          4. 输出到逆变器
  * @note 电流环是三环控制的最内环，执行频率最高
  */
-void motor_currment_loop(struct motor *motor)
+void motor_current_loop(struct motor *motor)
 {
 	struct foc *foc = &motor->foc;
 	struct foc_measurement *meas = &foc->meas;

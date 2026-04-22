@@ -71,7 +71,7 @@ void currsmp_update_raw(struct currsmp *currsmp, uint16_t *adc_raw)
  * @return 无
  * @details 使用原始值和参数计算相电流
  */
-void currsmp_update_phase_currment(struct currsmp *currsmp)
+void currsmp_update_phase_current(struct currsmp *currsmp)
 {
 	if (!currsmp) {
 		return;

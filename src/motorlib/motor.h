@@ -91,7 +91,7 @@ enum motor_status motor_get_status(const struct motor *motor);
  * @param[in] motor 电机实例
  * @param[in] new_state 新的电机主状态
  * @return 无
- * @details 用于状态机切换电机主运行状态（INIT/CALIB/IDLE/RUNING）
+ * @details 用于状态机切换电机主运行状态（INIT/CALIB/IDLE/RUNNING）
  */
 void motor_tran_state(struct motor *motor, enum motor_status new_state);
 

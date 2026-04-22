@@ -93,12 +93,12 @@ void motor_init(struct motor *motor)
 	}
 	feedback_init(motor);
 	if (params->is_calibrated) {
-		statemachine_init(sm, motor, motor_idle_state, NULL, 0);
+		statemachine_init(sm, motor, motor_idle_state);
 	} else {
-		statemachine_init(sm, motor, motor_calib_state, NULL, 0);
+		statemachine_init(sm, motor, motor_calib_state);
 	}
 
-	statemachine_init(sm_mode, motor, motor_mode_none, NULL, 0);
+	statemachine_init(sm_mode, motor, motor_mode_none);
 	struct foc *foc = &motor->foc;
 
 	foc_bind(foc, &motor->feedback, currsmp, &motor->param_ext->foc_param);
@@ -123,15 +123,15 @@ void motor_init(struct motor *motor)
 
 void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 {
-	motor->data.debug.test_tim3 = (DWT_CYCCNT - motor->data.debug.test_conut1) / 168.0f;
-	motor->data.debug.test_conut1 = DWT_CYCCNT;
-#if MOTORLIB_DEBUG_ENABLED
-	uint32_t t_raw_start = 0, t_raw_end = 0, t_fb_start = 0, t_fb_end = 0;
-#endif
-
 	if (!motor) {
 		return;
 	}
+
+#if MOTORLIB_DEBUG_ENABLED
+	motor->data.debug.test_tim3 = (DWT_CYCCNT - motor->data.debug.test_count1) / 168.0f;
+	motor->data.debug.test_count1 = DWT_CYCCNT;
+	uint32_t t_raw_start = 0, t_raw_end = 0, t_fb_start = 0, t_fb_end = 0;
+#endif
 
 	struct currsmp *currsmp = &motor->currsmp;
 	struct statemachine *sm = &motor->sm;
@@ -148,8 +148,8 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 #endif
 
 	/* 仅在非校准状态下执行完整的反馈更新和状态机调度，校准状态下可能需要特殊处理 */
-	if (params->is_calibrated) {
-		currsmp_update_phase_currment(currsmp);
+	if (params && params->is_calibrated) {
+		currsmp_update_phase_current(currsmp);
 #if MOTORLIB_DEBUG_ENABLED
 		t_fb_start = DWT_CYCCNT;
 #endif

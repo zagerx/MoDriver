@@ -2,7 +2,7 @@
 /**
  * @file rl_calibration.c
  * @brief 电机相电阻/相电感校准实现
- * @details 基于ODrive的校准算法，使用电流闭环测量电阻，方波电压测量电感
+ * @details 使用电流闭环测量电阻，方波电压测量电感
  * 纯逻辑实现，不维护状态，由 calibration.c 统一状态管理
  */
 
@@ -281,7 +281,7 @@ void rl_calib_apply(struct motor *motor)
 	param_ext->electrical_param.rs = rl->measured_resistance;
 	param_ext->electrical_param.ls = rl->measured_inductance;
 
-	/* ODrive 风格极点配置：带宽 × 电感 = kp，带宽 × 电阻 = ki */
+	/* 极点配置：带宽 × 电感 = kp，带宽 × 电阻 = ki */
 	kp = CURRENT_CONTROL_BANDWIDTH * param_ext->electrical_param.ls;
 	ki = CURRENT_CONTROL_BANDWIDTH * param_ext->electrical_param.rs;
 

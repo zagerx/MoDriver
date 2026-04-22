@@ -56,7 +56,7 @@ void cia402_init(struct cia402_instance *instance)
 	instance->halt_active = false;
 	instance->fault_code = 0;
 	/* 初始化 PDS 状态机 */
-	statemachine_init(&instance->pds_sm, instance, cia402_pds_not_ready_state, NULL, 0);
+	statemachine_init(&instance->pds_sm, instance, cia402_pds_not_ready_state);
 }
 
 void cia402_update(struct cia402_instance *instance, float dt)

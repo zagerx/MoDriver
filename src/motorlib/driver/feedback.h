@@ -18,7 +18,7 @@ struct motor;
 
 /* PLL默认带宽（Hz） */
 #ifndef FEEDBACK_PLL_BANDWIDTH
-#define FEEDBACK_PLL_BANDWIDTH 1000.0f /* 与ODrive默认值一致 */
+#define FEEDBACK_PLL_BANDWIDTH 1000.0f
 #endif
 
 /**
@@ -30,7 +30,7 @@ struct feedback_data {
 	volatile int32_t total_counts; /**< @brief 累积计数（shadow_count） */
 	float odometer_offset_mangle;  /**< @brief 里程计零点偏移角度，单位：rad */
 
-	/* PLL状态变量（与ODrive保持一致） */
+	/* PLL状态变量 */
 	float pos_estimate_counts;  /**< @brief 位置估计（编码器计数） */
 	float pos_cpr_counts;       /**< @brief CPR内位置估计（0~CPR-1） */
 	float vel_estimate_counts;  /**< @brief 速度估计（计数/秒） */
@@ -38,7 +38,7 @@ struct feedback_data {
 	float pll_ki;               /**< @brief PLL积分增益 */
 	float delta_pos_cpr_counts; /**< @brief 相位检测器输出（调试用） */
 
-	/* 电角度插值（ODrive方案） */
+	/* 电角度插值 */
 	float phase_interp; /**< @brief [0,1) 编码器计数内插值 */
 };
 

@@ -47,8 +47,8 @@ struct motor_debug {
 	volatile float test_tim3;
 	volatile float test_tim4;
 
-	uint32_t test_conut1;
-	uint32_t test_conut2;
+	uint32_t test_count1;
+	uint32_t test_count2;
 	uint16_t test_flag1; /**< @brief 调试：标志1 */
 	uint16_t test_flag2; /**< @brief 调试：标志2 */
 };

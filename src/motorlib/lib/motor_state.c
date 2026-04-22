@@ -53,7 +53,7 @@ void motor_calib_state(struct statemachine *sm)
 			if (motor->calib.state == CAL_STATE_SUCCESS) {
 				feedback_reset_encoder(motor);
 				motor->param_ext->is_calibrated = 1;
-				TRAN_STATE(sm, motor_idle_state);
+				sm_transition(sm, motor_idle_state);
 			} else {
 				/* 校准失败 */
 				sm->phase = CALIBRA_FALUT_FAIL;
@@ -85,7 +85,7 @@ void motor_calib_state(struct statemachine *sm)
 void motor_init_state(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
@@ -93,10 +93,10 @@ void motor_init_state(struct statemachine *sm)
 
 	switch (sm->phase) {
 	case ENTER:
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		break;
 
-	case RUNING:
+	case RUNNING:
 		break;
 
 	case EXIT:
@@ -117,7 +117,7 @@ void motor_init_state(struct statemachine *sm)
 void motor_idle_state(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
@@ -125,10 +125,10 @@ void motor_idle_state(struct statemachine *sm)
 
 	switch (sm->phase) {
 	case ENTER:
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		break;
 
-	case RUNING:
+	case RUNNING:
 		break;
 
 	case EXIT:
@@ -149,7 +149,7 @@ void motor_idle_state(struct statemachine *sm)
 void motor_runing_state(struct statemachine *sm)
 {
 	enum {
-		RUNING = USER_STATUS,
+		RUNNING = USER_STATUS,
 	};
 
 	struct motor *motor = (struct motor *)(sm->data);
@@ -161,19 +161,19 @@ void motor_runing_state(struct statemachine *sm)
 		inverter_enable(inverter);
 
 		if (sm_mode->current_state != motor_mode_none) {
-			TRAN_STATE(sm_mode, motor_mode_none);
+			sm_transition(sm_mode, motor_mode_none);
 		}
-		sm->phase = RUNING;
+		sm->phase = RUNNING;
 		sm->count = 0;
 		break;
 
-	case RUNING:
+	case RUNNING:
 		sm_dispatch(sm_mode);
 		break;
 
 	case EXIT:
 		if (sm_mode->current_state != motor_mode_none) {
-			TRAN_STATE(sm_mode, motor_mode_none);
+			sm_transition(sm_mode, motor_mode_none);
 		}
 		break;
 
@@ -196,7 +196,7 @@ enum motor_status motor_get_status(const struct motor *motor)
 
 	sm_state_t state = motor->sm.current_state;
 	if (state == motor_runing_state) {
-		return MOTOR_STATUS_RUNING;
+		return MOTOR_STATUS_RUNNING;
 	}
 	if (state == motor_idle_state) {
 		return MOTOR_STATUS_IDLE;
@@ -223,26 +223,21 @@ void motor_tran_state(struct motor *motor, enum motor_status new_state)
 
 	switch (new_state) {
 	case MOTOR_STATUS_INIT:
-		if (sm->current_state != motor_init_state) {
-			TRAN_STATE(sm, motor_init_state);
-		}
+		sm_transition(sm, motor_init_state);
 		break;
 
 	case MOTOR_STATUS_CALIB:
-		if (sm->current_state != motor_calib_state) {
-			TRAN_STATE(sm, motor_calib_state);
-		}
+		sm_transition(sm, motor_calib_state);
 		break;
+
 	case MOTOR_STATUS_IDLE:
-		if (sm->current_state != motor_idle_state) {
-			TRAN_STATE(sm, motor_idle_state);
-		}
+		sm_transition(sm, motor_idle_state);
 		break;
-	case MOTOR_STATUS_RUNING:
-		if (sm->current_state != motor_runing_state) {
-			TRAN_STATE(sm, motor_runing_state);
-		}
+
+	case MOTOR_STATUS_RUNNING:
+		sm_transition(sm, motor_runing_state);
 		break;
+
 	default:
 		break;
 	}

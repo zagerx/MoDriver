@@ -22,7 +22,7 @@ void anticogging_init(struct motor *motor)
 	struct anticogging *anticog = &motor->anticoggings;
 
 	anticog->current_index = 0;
-	anticog->conut = 0;
+	anticog->count = 0;
 	anticog->is_calibrating = false;
 	anticog->is_calibrated = false;
 	anticog->is_valid = false;
@@ -54,7 +54,7 @@ static void anticogging_start_calibration(struct motor *motor)
 	struct anticogging *anticog = &motor->anticoggings;
 
 	anticog->current_index = 0;
-	anticog->conut = 0;
+	anticog->count = 0;
 	anticog->is_calibrating = true;
 	anticog->is_calibrated = false;
 	anticog->is_valid = false;
@@ -127,7 +127,7 @@ void motor_mode_anticogging_calib(struct statemachine *sm)
 		if (sm->count % (uint16_t)SPEED_LOOP_INTERVAL == 0) {
 			motor_velocity_loop(motor, foc->ref.velocity);
 		}
-		motor_currment_loop(motor);
+		motor_current_loop(motor);
 
 		anticog->point_wait_time += CONTROL_PERIOD_DT;
 		if (anticog->point_wait_time >= 2.0f) {
@@ -165,7 +165,7 @@ void motor_mode_anticogging_calib(struct statemachine *sm)
 			motor_velocity_loop(motor, foc->ref.velocity);
 		}
 		/* 电流环 */
-		motor_currment_loop(motor);
+		motor_current_loop(motor);
 
 		/* 检查稳定条件 */
 		bool pos_stable = check_position_stable(motor, target_mangle_rad);
@@ -203,7 +203,7 @@ void motor_mode_anticogging_calib(struct statemachine *sm)
 		anticog->sample_index = anticog->current_index;
 
 		/* 采样计数增加 */
-		anticog->conut++;
+		anticog->count++;
 
 		/* 进入下一个点 */
 		sm->phase = AC_NEXT_POINT;
@@ -300,7 +300,7 @@ bool anticogging_is_calibration_done(struct motor *motor)
  * @param[in] motor 电机实例
  * @param[in] target_mangle_rad 目标机械角度（rad）
  * @return true 位置稳定，false 未稳定
- * @note ODrive风格：位置误差转换为编码器计数后与阈值比较
+ * @note 位置误差转换为编码器计数后与阈值比较
  */
 static bool check_position_stable(struct motor *motor, float target_mangle_rad)
 {
@@ -317,7 +317,7 @@ static bool check_position_stable(struct motor *motor, float target_mangle_rad)
  * @brief 检查速度是否稳定
  * @param[in] motor 电机实例
  * @return true 速度稳定，false 未稳定
- * @note ODrive风格：使用PLL速度估计（编码器计数/秒）与阈值比较
+ * @note 使用PLL速度估计（编码器计数/秒）与阈值比较
  */
 static bool check_velocity_stable(struct motor *motor)
 {

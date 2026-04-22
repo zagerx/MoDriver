@@ -1,7 +1,7 @@
 /**
  * @file anticogging.h
  * @brief 电机齿槽效应补偿校准模块头文件
- * @details 实现基于位置环的齿槽扭矩测量与补偿表生成，参考ODrive算法
+ * @details 实现基于位置环的齿槽扭矩测量与补偿表生成
  * 采用状态机驱动，在20kHz控制循环中执行
  */
 
@@ -38,7 +38,7 @@ enum anticogging_error {
 struct anticogging {
 	/* 校准状态 */
 	uint32_t current_index; /* 当前校准点索引（0~3599） */
-	uint32_t conut;         /* 通用计数（兼容原有代码） */
+	uint32_t count;         /* 通用计数（兼容原有代码） */
 	bool is_calibrating;    /* 正在校准标志 */
 	bool is_calibrated;     /* 校准完成标志 */
 	bool is_valid;          /* 校准数据有效标志 */

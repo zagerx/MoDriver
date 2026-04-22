@@ -137,7 +137,7 @@ void open_loop_encoder(struct motor *motor, float q_axis_voltage)
  * @return 无
  * @details 使用FOC电流环PID控制，输出d轴电压
  */
-void currment_debug(struct motor *motor, float tar)
+void current_debug(struct motor *motor, float tar)
 {
 	if (!motor)
 	{

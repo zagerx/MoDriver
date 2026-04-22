@@ -72,7 +72,7 @@ float foc_pid_positionloop_run(struct foc_pid *pid, float target, float meas, fl
 	// 3. 输出预测
 	float output = p_term + i_term_predict;
 
-	// 4. 动态抗饱和 (Dynamic Clamping) - ODrive 风格
+	// 4. 动态抗饱和 (Dynamic Clamping)
 	// 如果输出已经饱和，并且误差试图让输出继续超出饱和区，则停止积分累加
 	// 或者：直接限制积分项，使其为了配合 P 项而不让总输出超限
 
@@ -117,6 +117,11 @@ void foc_currentpid_saturation(struct foc_pid *pid, float output_real, float out
 		return;
 	}
 
+	// 防止除零
+	if (fabsf(output_desire) < 1e-6f) {
+		return;
+	}
+
 	float scale = output_real / output_desire;
 
 	pid->integral *= scale;
@@ -136,15 +141,13 @@ float foc_pid_velocityloop_run(struct foc_pid *pid, float target, float meas, fl
 	const float ki = pid->params->ki;
 	const float limit = pid->params->limit;
 	const float int_limit = 3.0f;
-	const float ff = 0.000f;
 	const float tau_aw = 1.5f;
 
 	float error = target - meas;
 
-	// 1. 前馈 + P项
-	float vel_ff = ff * target;
+	// 1. P项
 	float p_term = kp * error;
-	float output_pre = p_term + pid->integral + vel_ff;
+	float output_pre = p_term + pid->integral;
 
 	// 2. 条件积分（防止继续饱和）
 	bool saturate_high = (output_pre > limit);
@@ -164,8 +167,7 @@ float foc_pid_velocityloop_run(struct foc_pid *pid, float target, float meas, fl
 
 	// 3. 时间常数化抗饱和
 	if (saturate_high || saturate_low) {
-		float desired_integral =
-			saturate_high ? (limit - p_term - vel_ff) : (-limit - p_term - vel_ff);
+		float desired_integral = saturate_high ? (limit - p_term) : (-limit - p_term);
 
 		// 一阶低通向目标值收敛
 		float alpha = dt / (tau_aw + dt);
@@ -175,7 +177,7 @@ float foc_pid_velocityloop_run(struct foc_pid *pid, float target, float meas, fl
 	// 4. 限幅与输出
 	pid->integral = fmaxf(fminf(pid->integral, int_limit), -int_limit);
 
-	float output = p_term + pid->integral + vel_ff;
+	float output = p_term + pid->integral;
 	return fmaxf(fminf(output, limit), -limit);
 }
 /**
@@ -206,7 +208,7 @@ float foc_currentloop_pid_run(struct foc_pid *pid, float target, float meas, flo
 	// 3. 输出预测
 	float output = p_term + i_term_predict;
 
-	// 4. 动态抗饱和 (Dynamic Clamping) - ODrive 风格
+	// 4. 动态抗饱和 (Dynamic Clamping)
 	// 如果输出已经饱和，并且误差试图让输出继续超出饱和区，则停止积分累加
 	// 或者：直接限制积分项，使其为了配合 P 项而不让总输出超限
 
@@ -237,5 +239,3 @@ float foc_currentloop_pid_run(struct foc_pid *pid, float target, float meas, flo
 
 	return output;
 }
-
-

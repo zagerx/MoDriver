@@ -45,7 +45,7 @@ static float fmodf_pos(float angle, float period)
 }
 
 /**
- * @brief 编码器模型函数（简单向下取整，与ODrive保持一致）
+ * @brief 编码器模型函数
  * @param[in] internal_pos 内部位置估计
  * @return 编码器计数
  */
@@ -73,21 +73,21 @@ static float feedback_pll_update(struct feedback *feedback, float dt, int32_t co
 	data->pos_estimate_counts += dt * data->vel_estimate_counts;
 	data->pos_cpr_counts += dt * data->vel_estimate_counts;
 
-	/* 2. 离散相位检测器（与ODrive相同） */
+	/* 2. 离散相位检测器 */
 	float delta_pos_counts = (float)(shadow_count - encoder_model(data->pos_estimate_counts));
 	float delta_pos_cpr_counts = (float)(count_in_cpr - encoder_model(data->pos_cpr_counts));
 	delta_pos_cpr_counts = wrap_pm(delta_pos_cpr_counts, (float)cpr);
 
-	/* 调试变量（与ODrive相同） */
+	/* 调试变量 */
 	data->delta_pos_cpr_counts += 0.1f * (delta_pos_cpr_counts - data->delta_pos_cpr_counts);
 
-	/* 3. PLL反馈（与ODrive相同） */
+	/* 3. PLL反馈 */
 	data->pos_estimate_counts += dt * data->pll_kp * delta_pos_counts;
 	data->pos_cpr_counts += dt * data->pll_kp * delta_pos_cpr_counts;
 	data->pos_cpr_counts = fmodf_pos(data->pos_cpr_counts, (float)cpr);
 	data->vel_estimate_counts += dt * data->pll_ki * delta_pos_cpr_counts;
 
-	/* 4. 零速对齐（与ODrive相同，防止抖动） */
+	/* 4. 零速对齐（防止抖动） */
 	if (fabsf(data->vel_estimate_counts) < 0.5f * dt * data->pll_ki) {
 		data->vel_estimate_counts = 0.0f;
 	}
@@ -234,7 +234,7 @@ void feedback_update_raw(struct motor *motor)
  * @param[in] dt 采样周期，单位：s
  * @return 无
  * @details 执行编码器读取、角度计算、速度计算
- * @note 电角度采用ODrive方案：编码器整数计数 + PLL速度插值
+ * @note 电角度：编码器整数计数 + PLL速度插值
  */
 void feedback_update(struct motor *motor, float dt)
 {
@@ -252,7 +252,7 @@ void feedback_update(struct motor *motor, float dt)
 	/* 1. 读取原始编码器值 */
 	uint16_t raw = data->raw;
 
-	/* 2. 计算 delta_enc（处理溢出，与ODrive一致） */
+	/* 2. 计算 delta_enc（处理溢出） */
 	int32_t delta_enc = (int32_t)raw - (int32_t)data->prev_raw;
 	if (delta_enc > cpr / 2) {
 		delta_enc -= cpr;
@@ -275,7 +275,7 @@ void feedback_update(struct motor *motor, float dt)
 		feedback_pll_update(feedback, dt, count_in_cpr, data->total_counts);
 	feedback->output.velocity_rad_s = mech_omega_rad_s;
 
-	/* 6. 电角度插值（ODrive方案） */
+	/* 6. 电角度插值 */
 	bool snap_to_zero_vel = (data->vel_estimate_counts == 0.0f);
 	int32_t corrected_enc = count_in_cpr - (int32_t)param->encoder_offset;
 

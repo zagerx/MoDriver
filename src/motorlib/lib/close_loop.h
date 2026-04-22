@@ -50,7 +50,7 @@ void motor_velocity_loop_reset(struct motor *motor);
  * @details 执行电流闭环控制，计算电压指令（d/q轴电压），经SVPWM输出到逆变器
  * @note 包含电压限幅和前馈解耦，是三环控制的最内环
  */
-void motor_currment_loop(struct motor *motor);
+void motor_current_loop(struct motor *motor);
 
 /**
  * @brief 复位电流环控制器
