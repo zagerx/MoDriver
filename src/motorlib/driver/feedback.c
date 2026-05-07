@@ -12,7 +12,6 @@
 #include "motor_interface_params.h"
 #include "motorlib_constants.h"
 #include "stdbool.h"
-#include "_motorlib_internal.h"
 
 /**
  * @brief 将角度包装到 [-π, π] 范围内
@@ -119,12 +118,11 @@ static float normalize_angle(float angle)
  * @param[in] ops 编码器操作接口
  * @return 无
  */
-void feedback_bind_encoder(struct motor *motor, const struct encoder_ops *ops)
+void feedback_bind_encoder(struct feedback *feedback, const struct encoder_ops *ops)
 {
-	if (!motor) {
+	if (!feedback) {
 		return;
 	}
-	struct feedback *feedback = &motor->feedback;
 	feedback->ops = ops;
 }
 
@@ -134,27 +132,24 @@ void feedback_bind_encoder(struct motor *motor, const struct encoder_ops *ops)
  * @param[in] param 反馈参数
  * @return 无
  */
-void feedback_bind_encoder_param(struct motor *motor, struct feedback_param *param)
+void feedback_bind_encoder_param(struct feedback *feedback, struct feedback_param *param)
 {
-	if (!motor) {
+	if (!feedback) {
 		return;
 	}
-	struct feedback *feedback = &motor->feedback;
 	feedback->param = param;
 }
 
 /**
  * @brief 初始化反馈模块，校验参数合法性
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @note
  */
-void feedback_init(struct motor *motor)
+void feedback_init(struct feedback *feedback)
 {
-	if (!motor) {
+	if (!feedback) {
 		return;
 	}
-
-	struct feedback *feedback = &motor->feedback;
 	if (!feedback->ops || !feedback->ops->read) {
 		return;
 	}
@@ -181,12 +176,11 @@ void feedback_init(struct motor *motor)
 	feedback->output.velocity_rad_s = 0.0f;
 	return;
 }
-void feedback_reset_encoder(struct motor *motor)
+void feedback_reset_encoder(struct feedback *feedback)
 {
-	if (!motor) {
+	if (!feedback) {
 		return;
 	}
-	struct feedback *feedback = &motor->feedback;
 	struct feedback_param *param = feedback->param;
 	const int32_t cpr = (int32_t)param->encoder_resolution;
 
@@ -216,35 +210,31 @@ void feedback_reset_encoder(struct motor *motor)
 }
 /**
  * @brief 更新反馈原始数据
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @return 无
  */
-void feedback_update_raw(struct motor *motor)
+void feedback_update_raw(struct feedback *feedback)
 {
-	if (!motor) {
+	if (!feedback) {
 		return;
 	}
-	struct feedback *feedback = &motor->feedback;
 	feedback->data.raw = feedback_get_raw(feedback);
 }
 
 /**
  * @brief 更新反馈数据（编码器读取 + 角度/速度/电角度计算）
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @param[in] dt 采样周期，单位：s
+ * @param[in] pole_pairs 极对数
  * @return 无
  * @details 执行编码器读取、角度计算、速度计算
  * @note 电角度：编码器整数计数 + PLL速度插值
  */
-void feedback_update(struct motor *motor, float dt)
+void feedback_update(struct feedback *feedback, float dt, float pole_pairs)
 {
-	if (!motor) {
+	if (!feedback) {
 		return;
 	}
-	struct feedback *feedback = &motor->feedback;
-
-	struct motor_electrical_param *elec_param = &motor->param_ext->electrical_param;
-	float pairs = elec_param->pole_pairs;
 	struct feedback_param *param = feedback->param;
 	struct feedback_data *data = &feedback->data;
 	const int32_t cpr = (int32_t)param->encoder_resolution;
@@ -306,7 +296,7 @@ void feedback_update(struct motor *motor, float dt)
 	float interpolated_enc = (float)corrected_enc + data->phase_interp;
 
 	/* 7. 计算电角度 */
-	float elec_rad_per_enc = pairs * MOTORLIB_TWOPI / (float)cpr;
+	float elec_rad_per_enc = pole_pairs * MOTORLIB_TWOPI / (float)cpr;
 	float ph = elec_rad_per_enc * (interpolated_enc - param->encoder_offset_frac);
 	feedback->output.eangle_rad = normalize_angle(ph) * param->direction;
 	/* 8. 更新里程（使用PLL位置估计，扣除零位偏移） */

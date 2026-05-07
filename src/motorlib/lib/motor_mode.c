@@ -248,7 +248,7 @@ void motor_mode_debug(struct statemachine *sm)
 
 	case ALIGN:
 		open_loop_encoder(motor, ALIGN_VOLTAGE);
-		if (++sm->count > 30000) // 1秒后切换到运行状态
+		if (++sm->count > 300000) // 1秒后切换到运行状态
 		{
 			sm->count = 0;
 			sm->phase = IDLE;
@@ -281,7 +281,12 @@ void motor_mode_debug(struct statemachine *sm)
 		break;
 	}
 }
-void motor_mode_debug_posvel(struct statemachine *sm)
+/**
+ * @brief 位置模式
+ * @param[in] sm 状态机实例
+ * @details 目标位置的范围为0～2pi
+ */
+void motor_mode_P(struct statemachine *sm)
 {
 	enum {
 		RUNNING = USER_STATUS,
@@ -348,8 +353,8 @@ enum motor_mode motor_get_mode(const struct motor *motor)
 	if (state == motor_mode_anticogging_calib) {
 		return MODE_ANTICOGGING_CALIB;
 	}
-	if (state == motor_mode_debug_posvel) {
-		return MODE_DEBUG_POSVEL;
+	if (state == motor_mode_P) {
+		return MODE_CSP;
 	}
 	return MODE_NONE;
 }
@@ -387,8 +392,8 @@ void motor_tran_mode(struct motor *motor, enum motor_mode new_mode)
 		sm_transition(sm_mode, motor_mode_anticogging_calib);
 		break;
 
-	case MODE_DEBUG_POSVEL:
-		sm_transition(sm_mode, motor_mode_debug_posvel);
+	case MODE_CSP:
+		sm_transition(sm_mode, motor_mode_P);
 		break;
 	default:
 		break;

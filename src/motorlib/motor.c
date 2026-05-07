@@ -39,9 +39,10 @@ void motor_bind_hardware(struct motor *motor, const struct motor_hw_ops *hw)
 	if (!motor || !hw) {
 		return;
 	}
+	struct feedback *feedback = &motor->feedback;
 	struct inverter *inverter = &motor->inverter;
 	if (hw->encoder) {
-		feedback_bind_encoder(motor, hw->encoder);
+		feedback_bind_encoder(feedback, hw->encoder);
 	}
 
 	if (hw->inverter) {
@@ -62,9 +63,10 @@ void motor_bind_param_ext(struct motor *motor, struct motor_param_ext *param_ext
 	if (!motor || !param_ext) {
 		return;
 	}
+	struct feedback *feedback = &motor->feedback;
 	struct currsmp *currsmp = &motor->currsmp;
 	motor->param_ext = param_ext;
-	feedback_bind_encoder_param(motor, &param_ext->feedback_param);
+	feedback_bind_encoder_param(feedback, &param_ext->feedback_param);
 	currsmp_bind_param(currsmp, &param_ext->currsmp_param);
 	trajectory_planner_bind_param(&motor->traj_plan, &param_ext->traj_param);
 }
@@ -83,6 +85,7 @@ void motor_init(struct motor *motor)
 		return;
 	}
 
+	struct feedback *feedback = &motor->feedback;
 	struct statemachine *sm = &motor->sm;
 	struct statemachine *sm_mode = &motor->sm_mode;
 	struct currsmp *currsmp = &motor->currsmp;
@@ -91,12 +94,13 @@ void motor_init(struct motor *motor)
 		/* 关键指针为空，无法初始化 */
 		return;
 	}
-	feedback_init(motor);
+	feedback_init(feedback);
 	if (params->is_calibrated) {
 		statemachine_init(sm, motor, motor_idle_state);
 	} else {
 		statemachine_init(sm, motor, motor_calib_state);
 	}
+	statemachine_init(sm, motor, motor_calib_state);
 
 	statemachine_init(sm_mode, motor, motor_mode_none);
 	struct foc *foc = &motor->foc;
@@ -127,46 +131,33 @@ void motor_highfreq_task(struct motor *motor, uint16_t *adc_raw)
 		return;
 	}
 
-#if MOTORLIB_DEBUG_ENABLED
-	motor->data.debug.test_tim3 = (DWT_CYCCNT - motor->data.debug.test_count1) / 168.0f;
-	motor->data.debug.test_count1 = DWT_CYCCNT;
-	uint32_t t_raw_start = 0, t_raw_end = 0, t_fb_start = 0, t_fb_end = 0;
-#endif
-
+	struct feedback *feedback = &motor->feedback;
 	struct currsmp *currsmp = &motor->currsmp;
 	struct statemachine *sm = &motor->sm;
 	struct motor_param_ext *params = motor->param_ext;
 	currsmp_update_raw(currsmp, adc_raw);
 	currsmp_update_bus(currsmp);
-
-#if MOTORLIB_DEBUG_ENABLED
-	t_raw_start = DWT_CYCCNT;
-#endif
-	feedback_update_raw(motor);
-#if MOTORLIB_DEBUG_ENABLED
-	t_raw_end = DWT_CYCCNT;
-#endif
+	feedback_update_raw(feedback);
 
 	/* 仅在非校准状态下执行完整的反馈更新和状态机调度，校准状态下可能需要特殊处理 */
 	if (params && params->is_calibrated) {
 		currsmp_update_phase_current(currsmp);
-#if MOTORLIB_DEBUG_ENABLED
-		t_fb_start = DWT_CYCCNT;
-#endif
-		feedback_update(motor, CONTROL_PERIOD_DT);
-#if MOTORLIB_DEBUG_ENABLED
-		t_fb_end = DWT_CYCCNT;
-#endif
+
+		feedback_update(feedback, CONTROL_PERIOD_DT, params->electrical_param.pole_pairs);
 		foc_update_idiq(&motor->foc);
+
 		motor_protection_update(motor, CONTROL_PERIOD_DT);
 	}
+#if MOTORLIB_DEBUG_ENABLED
+	uint32_t t_fb_start = 0, t_fb_end = 0;
+	t_fb_start = DWT_CYCCNT;
+#endif
+
 	sm_dispatch(sm);
 
 #if MOTORLIB_DEBUG_ENABLED
-	/* feedback_update_raw (含 encoder_getraw) 耗时，单位 us */
-	motor->data.debug.test_tim1 = (float)(t_raw_end - t_raw_start) / 170.0f;
-	/* feedback_update 耗时，单位 us */
-	motor->data.debug.test_tim2 = (float)(t_fb_end - t_fb_start) / 170.0f;
+	t_fb_end = DWT_CYCCNT;
+	motor->data.debug.test_tim1 = (float)(t_fb_end - t_fb_start) / 168.0f;
 #endif
 }
 

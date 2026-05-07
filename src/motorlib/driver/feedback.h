@@ -13,8 +13,6 @@
 #include "motor_interface_params.h"
 #include "motorlib_constants.h"
 
-/* 前向声明，避免循环包含 */
-struct motor;
 
 /* PLL默认带宽（Hz） */
 #ifndef FEEDBACK_PLL_BANDWIDTH
@@ -63,50 +61,51 @@ struct feedback {
 
 /**
  * @brief 绑定编码器操作接口
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @param[in] ops 编码器操作接口
  * @return 无
  */
-void feedback_bind_encoder(struct motor *motor, const struct encoder_ops *ops);
+void feedback_bind_encoder(struct feedback *feedback, const struct encoder_ops *ops);
 
 /**
  * @brief 绑定反馈参数
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @param[in] param 反馈参数
  * @return 无
  */
-void feedback_bind_encoder_param(struct motor *motor, struct feedback_param *param);
+void feedback_bind_encoder_param(struct feedback *feedback, struct feedback_param *param);
 
 /**
  * @brief 初始化反馈模块
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @return 无
  */
-void feedback_init(struct motor *motor);
+void feedback_init(struct feedback *feedback);
 
 /**
  * @brief 重置编码器内部状态
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @return 无
  * @note 校准后调用，将当前编码器位置作为新零点，丢弃校准期间的位移
  */
-void feedback_reset_encoder(struct motor *motor);
+void feedback_reset_encoder(struct feedback *feedback);
 
 /**
  * @brief 更新反馈数据
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @param[in] dt 采样周期，单位：s
+ * @param[in] pole_pairs 极对数
  * @return 无
  * @details 执行编码器读取、角度计算、速度计算
  */
-void feedback_update(struct motor *motor, float dt);
+void feedback_update(struct feedback *feedback, float dt, float pole_pairs);
 
 /**
  * @brief 更新反馈原始数据
- * @param[in] motor 电机实例
+ * @param[in] feedback 反馈实例
  * @return 无
  */
-void feedback_update_raw(struct motor *motor);
+void feedback_update_raw(struct feedback *feedback);
 
 /**
  * @brief 获取编码器原始值

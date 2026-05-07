@@ -40,7 +40,7 @@ enum motor_mode {
 	/* 制造商特定 (0x7F-0xFF 保留) */
 	MODE_DEBUG = 0X7F,             // 调试模式
 	MODE_ANTICOGGING_CALIB = 0x80, // 齿槽补偿校准模式
-	MODE_DEBUG_POSVEL = 0x81,      // 位置速度调试模式
+	MODE_P = 0x81,                 // 位置模式
 	MODE_MANUFACTURER = 0xFF,      /*!< 制造商特定模式 */
 };
 
