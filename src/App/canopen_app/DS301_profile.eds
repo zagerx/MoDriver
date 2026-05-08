@@ -8,8 +8,8 @@ Description=
 CreationTime=7:00PM
 CreationDate=11-23-2020
 CreatedBy=
-ModificationTime=1:34AM
-ModificationDate=04-21-2026
+ModificationTime=12:17AM
+ModificationDate=05-09-2026
 ModifiedBy=
 
 [DeviceInfo]
@@ -1809,7 +1809,7 @@ PDOMapping=1
 ParameterName=Profile Velocity
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0004
+DataType=0x0007
 AccessType=rww
 DefaultValue=0
 PDOMapping=1

@@ -244,10 +244,10 @@ void motor_get_info(const struct motor *motor, struct motor_info *state)
 	if (!motor || !state) {
 		return;
 	}
-	// struct foc *foc = (struct foc *)&motor->foc;
-
-	// state->actual_pos = foc->meas.fd_out->odometer;
-	// state->actual_vel = foc->meas.fd_out->line_velocity_mm_s;
+	struct foc *foc = (struct foc *)&motor->foc;
+	float wheel_radius = motor->param_ext->electrical_param.wheel_radius; /* 轮子半径，单位mm */
+	state->actual_pos = foc->meas.fd_out->mangle_rad * wheel_radius;      // 实际位置 单位mm
+	state->actual_vel = foc->meas.fd_out->velocity_rad_s * wheel_radius;  // 实际速度 单位mm/s
 
 	state->errorcode = motor->data.errorcode;
 	state->flags = motor->data.flags;

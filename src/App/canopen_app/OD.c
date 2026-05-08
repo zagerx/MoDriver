@@ -244,7 +244,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
     .x6071_targetTorque = 0,
     .x6077_torque = 0,
     .x607A_targetPosition = 0,
-    .x6081_profileVelocity = 0,
+    .x6081_profileVelocity = 0x00000000,
     .x60FF_targetVelocity = 0,
     .x6502_supportedDriveModes = 0x00000065
 };

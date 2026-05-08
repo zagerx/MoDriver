@@ -10,7 +10,8 @@ void cia402_params_bind(struct cia402_instance *instance, struct motor *motor,
 			uint16_t *controlword, uint16_t *statusword, int8_t *modes_of_operation,
 			int8_t *mode_display, int32_t *target_velocity, int32_t *actual_velocity,
 			uint16_t *error_code, int32_t *target_position, int16_t *target_torque,
-			int32_t *actual_position, int16_t *actual_torque, int32_t *profile_velocity)
+			int32_t *actual_position, int16_t *actual_torque,
+			uint32_t *profile_velocity)
 {
 	if (!instance || !motor) {
 		return;
@@ -75,13 +76,10 @@ void cia402_update(struct cia402_instance *instance, float dt)
 	instance->cache_mode = (uint8_t)(*instance->modes_of_operation);
 
 	struct motor *motor = instance->motor;
-	struct motor_info state;
-	motor_get_info(motor, &state);
-
-	instance->fault_code = state.errorcode;
-	// instance->actual_position = state.actual_pos;
-	// instance->actual_velocity = state.actual_vel;
-	*instance->mode_display = (int8_t)state.mode;
-	*instance->actual_position = (int32_t)(state.actual_pos * 1000); /* 转换为整数，单位0.001 */
-	*instance->actual_velocity = (int32_t)(state.actual_vel * 1000); /* 转换为整数，单位0.001 */
+	struct motor_info motor_info;
+	motor_get_info(motor, &motor_info);
+	instance->fault_code = motor_info.errorcode;
+	*instance->mode_display = (int8_t)motor_info.mode;
+	*instance->actual_position = (int32_t)(motor_info.actual_pos * 10000);
+	*instance->actual_velocity = (int32_t)(motor_info.actual_vel * 10000);
 }

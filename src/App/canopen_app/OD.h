@@ -11,12 +11,12 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: DS301_profile.xpd
+        Project File: DS301_profile.xdd
         File Version: 1
 
         Created:      2020/11/23 19:00:00
         Created By:   
-        Modified:     2026/4/21 1:34:49
+        Modified:     2026/5/9 0:17:39
         Modified By:  
 
     Device Info:
@@ -284,7 +284,7 @@ typedef struct {
     int16_t x6071_targetTorque;
     int16_t x6077_torque;
     int32_t x607A_targetPosition;
-    int32_t x6081_profileVelocity;
+    uint32_t x6081_profileVelocity;
     int32_t x60FF_targetVelocity;
     uint32_t x6502_supportedDriveModes;
 } OD_RAM_t;

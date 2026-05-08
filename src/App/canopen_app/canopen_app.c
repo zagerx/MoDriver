@@ -170,7 +170,8 @@ void canopen_app_process(struct canopen_app *app, uint32_t dt_ms)
 		case CO_RESET_NOT: {
 			CO_NMT_internalState_t nmt_state = CO_NMT_getInternalState(app->co->NMT);
 			if (nmt_state == CO_NMT_OPERATIONAL ||
-			    nmt_state == CO_NMT_PRE_OPERATIONAL) {
+			    nmt_state == CO_NMT_PRE_OPERATIONAL ||
+			    nmt_state == CO_NMT_OPERATIONAL) {
 				cia402_update(&app->cia402_inst, dt_ms);
 			}
 		} break;
