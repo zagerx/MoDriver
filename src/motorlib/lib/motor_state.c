@@ -41,6 +41,7 @@ void motor_calib_state(struct statemachine *sm)
 	case ENTER:
 		/* 进入校准状态 */
 		calibration_init(motor);
+		motor->param_ext->is_calibrated = 0; /* 重置校准标志 */
 		sm->phase = CALIBRATING;
 		break;
 
@@ -53,7 +54,7 @@ void motor_calib_state(struct statemachine *sm)
 			if (motor->calib.state == CAL_STATE_SUCCESS) {
 				struct feedback *feedback = &motor->feedback;
 				feedback_reset_encoder(feedback);
-				motor->param_ext->is_calibrated = 1;
+				motor->param_ext->is_calibrated = 1; /* 标记校准完成 */
 				sm_transition(sm, motor_idle_state);
 			} else {
 				/* 校准失败 */

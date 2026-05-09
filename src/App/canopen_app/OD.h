@@ -16,7 +16,7 @@
 
         Created:      2020/11/23 19:00:00
         Created By:   
-        Modified:     2026/5/9 0:17:39
+        Modified:     2026/5/9 16:50:54
         Modified By:  
 
     Device Info:
@@ -274,6 +274,11 @@ typedef struct {
         uint8_t is_calibrated;
         uint16_t crc16;
     } x2009_motorlib_params;
+    struct {
+        uint8_t highestSub_indexSupported;
+        uint8_t cmd_id;
+        float32_t arg1;
+    } x3000_driveCommand;
     uint16_t x603F_errorCode;
     uint16_t x6040_controlword;
     uint16_t x6041_statusword;
@@ -342,19 +347,20 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A02 &OD->list[31]
 #define OD_ENTRY_H1A03 &OD->list[32]
 #define OD_ENTRY_H2009 &OD->list[33]
-#define OD_ENTRY_H603F &OD->list[34]
-#define OD_ENTRY_H6040 &OD->list[35]
-#define OD_ENTRY_H6041 &OD->list[36]
-#define OD_ENTRY_H6060 &OD->list[37]
-#define OD_ENTRY_H6061 &OD->list[38]
-#define OD_ENTRY_H6064 &OD->list[39]
-#define OD_ENTRY_H606C &OD->list[40]
-#define OD_ENTRY_H6071 &OD->list[41]
-#define OD_ENTRY_H6077 &OD->list[42]
-#define OD_ENTRY_H607A &OD->list[43]
-#define OD_ENTRY_H6081 &OD->list[44]
-#define OD_ENTRY_H60FF &OD->list[45]
-#define OD_ENTRY_H6502 &OD->list[46]
+#define OD_ENTRY_H3000 &OD->list[34]
+#define OD_ENTRY_H603F &OD->list[35]
+#define OD_ENTRY_H6040 &OD->list[36]
+#define OD_ENTRY_H6041 &OD->list[37]
+#define OD_ENTRY_H6060 &OD->list[38]
+#define OD_ENTRY_H6061 &OD->list[39]
+#define OD_ENTRY_H6064 &OD->list[40]
+#define OD_ENTRY_H606C &OD->list[41]
+#define OD_ENTRY_H6071 &OD->list[42]
+#define OD_ENTRY_H6077 &OD->list[43]
+#define OD_ENTRY_H607A &OD->list[44]
+#define OD_ENTRY_H6081 &OD->list[45]
+#define OD_ENTRY_H60FF &OD->list[46]
+#define OD_ENTRY_H6502 &OD->list[47]
 
 
 /*******************************************************************************
@@ -394,19 +400,20 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[31]
 #define OD_ENTRY_H1A03_TPDOMappingParameter &OD->list[32]
 #define OD_ENTRY_H2009_motorlib_params &OD->list[33]
-#define OD_ENTRY_H603F_errorCode &OD->list[34]
-#define OD_ENTRY_H6040_controlword &OD->list[35]
-#define OD_ENTRY_H6041_statusword &OD->list[36]
-#define OD_ENTRY_H6060_modeworld &OD->list[37]
-#define OD_ENTRY_H6061_modeDisplay &OD->list[38]
-#define OD_ENTRY_H6064_position &OD->list[39]
-#define OD_ENTRY_H606C_velocity &OD->list[40]
-#define OD_ENTRY_H6071_targetTorque &OD->list[41]
-#define OD_ENTRY_H6077_torque &OD->list[42]
-#define OD_ENTRY_H607A_targetPosition &OD->list[43]
-#define OD_ENTRY_H6081_profileVelocity &OD->list[44]
-#define OD_ENTRY_H60FF_targetVelocity &OD->list[45]
-#define OD_ENTRY_H6502_supportedDriveModes &OD->list[46]
+#define OD_ENTRY_H3000_driveCommand &OD->list[34]
+#define OD_ENTRY_H603F_errorCode &OD->list[35]
+#define OD_ENTRY_H6040_controlword &OD->list[36]
+#define OD_ENTRY_H6041_statusword &OD->list[37]
+#define OD_ENTRY_H6060_modeworld &OD->list[38]
+#define OD_ENTRY_H6061_modeDisplay &OD->list[39]
+#define OD_ENTRY_H6064_position &OD->list[40]
+#define OD_ENTRY_H606C_velocity &OD->list[41]
+#define OD_ENTRY_H6071_targetTorque &OD->list[42]
+#define OD_ENTRY_H6077_torque &OD->list[43]
+#define OD_ENTRY_H607A_targetPosition &OD->list[44]
+#define OD_ENTRY_H6081_profileVelocity &OD->list[45]
+#define OD_ENTRY_H60FF_targetVelocity &OD->list[46]
+#define OD_ENTRY_H6502_supportedDriveModes &OD->list[47]
 
 
 /*******************************************************************************

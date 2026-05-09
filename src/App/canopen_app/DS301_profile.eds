@@ -8,7 +8,7 @@ Description=
 CreationTime=7:00PM
 CreationDate=11-23-2020
 CreatedBy=
-ModificationTime=12:17AM
+ModificationTime=4:50PM
 ModificationDate=05-09-2026
 ModifiedBy=
 
@@ -1833,8 +1833,9 @@ DefaultValue=0x65
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=1
+SupportedObjects=2
 1=0x2009
+2=0x3000
 
 [2009]
 ParameterName=motorlib_params
@@ -2162,6 +2163,39 @@ ParameterName=crc16
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[3000]
+ParameterName=driveCommand
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[3000sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x02
+PDOMapping=0
+
+[3000sub1]
+ParameterName=cmd_id
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[3000sub2]
+ParameterName=arg1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0008
 AccessType=rw
 DefaultValue=0
 PDOMapping=0

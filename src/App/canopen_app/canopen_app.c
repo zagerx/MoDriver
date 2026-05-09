@@ -12,6 +12,7 @@
 #include "motor.h"
 #include "motor_interface_params.h"
 #include "CO_storageBlank.h"
+#include "drive_command.h"
 
 #define DEFAULT_FIRST_HB_TIME        500
 #define DEFAULT_SDO_SRV_TIMEOUT_TIME 1000
@@ -104,6 +105,11 @@ int canopen_app_init(struct canopen_app *app, struct motor *motor)
 
 	cia402_init(&app->cia402_inst);
 
+	drive_command_params_bind(&app->drive_cmd, motor,
+				  &OD_RAM.x3000_driveCommand.cmd_id,
+				  &OD_RAM.x3000_driveCommand.arg1);
+	drive_command_init(&app->drive_cmd);
+
 	return 0;
 }
 
@@ -173,6 +179,7 @@ void canopen_app_process(struct canopen_app *app, uint32_t dt_ms)
 			    nmt_state == CO_NMT_PRE_OPERATIONAL ||
 			    nmt_state == CO_NMT_OPERATIONAL) {
 				cia402_update(&app->cia402_inst, dt_ms);
+				drive_command_update(&app->drive_cmd);
 			}
 		} break;
 		default:

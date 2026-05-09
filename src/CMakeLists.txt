@@ -91,6 +91,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     App/it.c
     App/canopen_app/canopen_app.c
     App/canopen_app/OD.c
+    App/canopen_app/drive_command.c
     App/canopen_app/CO_storageBlank.c  # 添加这一行
 )
 

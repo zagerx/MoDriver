@@ -298,7 +298,7 @@ void motor_mode_P(struct statemachine *sm)
 	case ENTER:
 		sm->count = 0;
 		motor_position_loop_reset(motor);
-		motor->data.debug.test_value1 = foc->meas.fd_out->mangle_rad;
+		motor->data.debug.test_value2 = foc->meas.fd_out->mangle_rad;
 		sm->phase = RUNNING;
 		break;
 
@@ -306,7 +306,7 @@ void motor_mode_P(struct statemachine *sm)
 		/* 执行控制环 */
 		if (sm->count % (uint16_t)POSITION_LOOP_INTERVAL == 0) {
 			/* 位置环 */
-			float target_linear = motor->data.debug.test_value1;
+			float target_linear = motor->data.debug.test_value2;
 			foc->ref.velocity =
 				motor_position_loop(motor, target_linear, POSITION_PERIOD_DT);
 		}
@@ -316,6 +316,43 @@ void motor_mode_P(struct statemachine *sm)
 		/* 电流环 */
 		motor_current_loop(motor);
 		sm->count++;
+		break;
+
+	case EXIT:
+		break;
+
+	default:
+		break;
+	}
+}
+/**
+ * @brief 速度模式
+ * @param[in] sm 状态机实例
+ * @details 目标速度的范围为-1000～1000 rad/s
+ */
+void motor_mode_V(struct statemachine *sm)
+{
+	enum {
+		RUNNING = USER_STATUS,
+	};
+
+	struct motor *motor = (struct motor *)(sm->data);
+	// struct foc *foc = &motor->foc;
+	switch (sm->phase) {
+	case ENTER:
+		sm->count = 0;
+		motor_velocity_loop_reset(motor);
+		motor->data.debug.test_value1 = 0.0f;
+		sm->phase = RUNNING;
+		break;
+
+	case RUNNING:
+		if (sm->count++ > SPEED_LOOP_INTERVAL) {
+			sm->count = 0;
+			float target_vel = motor->data.debug.test_value1;
+			motor_velocity_loop(motor, target_vel);
+		}
+		motor_current_loop(motor);
 		break;
 
 	case EXIT:
@@ -354,7 +391,10 @@ enum motor_mode motor_get_mode(const struct motor *motor)
 		return MODE_ANTICOGGING_CALIB;
 	}
 	if (state == motor_mode_P) {
-		return MODE_CSP;
+		return MODE_P;
+	}
+	if (state == motor_mode_V) {
+		return MODE_CSV;
 	}
 	return MODE_NONE;
 }
@@ -392,8 +432,11 @@ void motor_tran_mode(struct motor *motor, enum motor_mode new_mode)
 		sm_transition(sm_mode, motor_mode_anticogging_calib);
 		break;
 
-	case MODE_CSP:
+	case MODE_P:
 		sm_transition(sm_mode, motor_mode_P);
+		break;
+	case MODE_V:
+		sm_transition(sm_mode, motor_mode_V);
 		break;
 	default:
 		break;

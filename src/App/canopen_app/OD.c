@@ -234,6 +234,11 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .is_calibrated = 0x00,
         .crc16 = 0x0000
     },
+    .x3000_driveCommand = {
+        .highestSub_indexSupported = 0x02,
+        .cmd_id = 0x00,
+        .arg1 = 0
+    },
     .x603F_errorCode = 0x0000,
     .x6040_controlword = 0x0000,
     .x6041_statusword = 0x0000,
@@ -289,6 +294,7 @@ typedef struct {
     OD_obj_record_t o_1A02_TPDOMappingParameter[9];
     OD_obj_record_t o_1A03_TPDOMappingParameter[9];
     OD_obj_record_t o_2009_motorlib_params[36];
+    OD_obj_record_t o_3000_driveCommand[3];
     OD_obj_var_t o_603F_errorCode;
     OD_obj_var_t o_6040_controlword;
     OD_obj_var_t o_6041_statusword;
@@ -1351,6 +1357,26 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 2
         }
     },
+    .o_3000_driveCommand = {
+        {
+            .dataOrig = &OD_RAM.x3000_driveCommand.highestSub_indexSupported,
+            .subIndex = 0,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x3000_driveCommand.cmd_id,
+            .subIndex = 1,
+            .attribute = ODA_SDO_RW,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x3000_driveCommand.arg1,
+            .subIndex = 2,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        }
+    },
     .o_603F_errorCode = {
         .dataOrig = &OD_RAM.x603F_errorCode,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
@@ -1457,6 +1483,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1A02, 0x09, ODT_REC, &ODObjs.o_1A02_TPDOMappingParameter, NULL},
     {0x1A03, 0x09, ODT_REC, &ODObjs.o_1A03_TPDOMappingParameter, NULL},
     {0x2009, 0x24, ODT_REC, &ODObjs.o_2009_motorlib_params, NULL},
+    {0x3000, 0x03, ODT_REC, &ODObjs.o_3000_driveCommand, NULL},
     {0x603F, 0x01, ODT_VAR, &ODObjs.o_603F_errorCode, NULL},
     {0x6040, 0x01, ODT_VAR, &ODObjs.o_6040_controlword, NULL},
     {0x6041, 0x01, ODT_VAR, &ODObjs.o_6041_statusword, NULL},

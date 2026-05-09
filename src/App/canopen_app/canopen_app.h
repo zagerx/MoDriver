@@ -13,6 +13,7 @@
 #include "CANopen.h"
 #include "storage/CO_storage.h"
 #include "cia402.h"
+#include "drive_command.h"
 /*============================================================================
  * 应用上下文结构体
  *===========================================================================*/
@@ -26,8 +27,9 @@ struct canopen_app {
 	uint8_t node_id;       /**< 节点 ID (1-127) */
 	uint16_t heartbeat_ms; /**< 心跳周期 (ms) */
 
-	struct cia402_instance cia402_inst; /**< CiA 402 实例 */
-	CO_t *co;                           /**< CANopen 协议栈实例 */
+	struct cia402_instance cia402_inst;      /**< CiA 402 实例 */
+	struct drive_command_instance drive_cmd; /**< 驱动器专有指令实例 */
+	CO_t *co;                                /**< CANopen 协议栈实例 */
 	bool initialized;                   /**< 初始化标志 */
 	CO_ReturnError_t last_err;          /**< 最后一次错误码 */
 

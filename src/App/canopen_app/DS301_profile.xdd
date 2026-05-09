@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xdd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModifiedBy="" fileModificationDate="2026-05-09" fileModificationTime="00:17:39.5927801+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xdd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModifiedBy="" fileModificationDate="2026-05-09" fileModificationTime="16:50:54.1466261+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName></q1:vendorName>
         <q1:vendorID></q1:vendorID>
@@ -714,6 +714,17 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="crc16" uniqueID="UID_RECSUB_200923">
               <UINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="driveCommand" uniqueID="UID_REC_3000">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_300000">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="cmd_id" uniqueID="UID_RECSUB_300001">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="arg1" uniqueID="UID_RECSUB_300002">
+              <REAL />
             </q1:varDeclaration>
           </q1:struct>
         </q1:dataTypeList>
@@ -2526,6 +2537,25 @@ The life time factor multiplied with the guard time gives the life time for the 
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_3000">
+            <label lang="en">driveCommand</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_3000" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_300000">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x02" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_300001" access="readWrite">
+            <label lang="en">cmd_id</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_300002" access="readWrite">
+            <label lang="en">arg1</label>
+            <REAL />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_603F">
             <label lang="en">ErrorCode</label>
             <UINT />
@@ -2608,7 +2638,7 @@ The life time factor multiplied with the guard time gives the life time for the 
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xdd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModificationDate="2026-05-09" fileModificationTime="00:17:39.5927801+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="DS301_profile.xdd" fileCreator="" fileCreationDate="2020-11-23" fileCreationTime="19:00:00.0000000+08:00" fileModificationDate="2026-05-09" fileModificationTime="16:50:54.1466261+08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -2953,6 +2983,11 @@ The life time factor multiplied with the guard time gives the life time for the 
             <CANopenSubObject subIndex="21" name="gear_ratio" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200921" />
             <CANopenSubObject subIndex="22" name="is_calibrated" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200922" />
             <CANopenSubObject subIndex="23" name="crc16" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200923" />
+          </CANopenObject>
+          <CANopenObject index="3000" name="driveCommand" objectType="9" uniqueIDRef="UID_OBJ_3000" subNumber="3">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_300000" />
+            <CANopenSubObject subIndex="01" name="cmd_id" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_300001" />
+            <CANopenSubObject subIndex="02" name="arg1" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_300002" />
           </CANopenObject>
           <CANopenObject index="603F" name="ErrorCode" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_603F" />
           <CANopenObject index="6040" name="Controlword" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_OBJ_6040" />
