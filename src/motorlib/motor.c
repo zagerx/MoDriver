@@ -91,7 +91,6 @@ void motor_init(struct motor *motor)
 	struct currsmp *currsmp = &motor->currsmp;
 	struct motor_param_ext *params = motor->param_ext;
 	if (!sm || !currsmp) {
-		/* 关键指针为空，无法初始化 */
 		return;
 	}
 	feedback_init(feedback);
@@ -100,7 +99,6 @@ void motor_init(struct motor *motor)
 	} else {
 		statemachine_init(sm, motor, motor_calib_state);
 	}
-	statemachine_init(sm, motor, motor_calib_state);
 
 	statemachine_init(sm_mode, motor, motor_mode_none);
 	struct foc *foc = &motor->foc;

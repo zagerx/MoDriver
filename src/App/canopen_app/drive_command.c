@@ -65,7 +65,9 @@ void drive_command_update(struct drive_command_instance *inst)
 	case DCMD_MOTOR_RAN_MODE_V:
 		motor_tran_mode(inst->motor, MODE_V);
 		break;
-
+	case DCMD_MOTOR_TRAN_ANTICOGGING:
+		motor_tran_mode(inst->motor, MODE_ANTICOGGING_CALIB);
+		break;
 	case DCMD_SET_VELEOIVER_TARVAL:
 		/* TODO: 速度目标值设定 */
 		motor_set_test_target(inst->motor, arg1, 0.0f);

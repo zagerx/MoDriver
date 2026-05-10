@@ -21,14 +21,15 @@ struct drive_command_instance {
 };
 
 /* 指令码定义：一码一令，扁平化 */
-#define DCMD_MOTOR_TRAN_RUNING     0x01U /*!< 电机进入运行状态指令 */
-#define DCMD_MOTOR_TARN_IDLE       0x02U /*!< 电机进入空闲状态指令 */
-#define DCMD_MOTOR_TARN_CALIB      0x03U /*!< 电机进入校准状态指令 */
-#define DCMD_MOTOR_TARN_MODE_DEBUG 0x04U /*!< 电机进入调试模式指令 */
-#define DCMD_MOTOR_RAN_MODE_V      0x06U /*!< 电机进入位置模式指令 */
-#define DCMD_MOTOR_RAN_MODE_P      0x07U /*!< 电机进入速度模式指令 */
-#define DCMD_SET_VELEOIVER_TARVAL  0x10U /*!< 设置目标速度指令 */
-#define DCMD_SET_POSITON_TARVAL    0x11U /*!< 设置目标位置指令 */
+#define DCMD_MOTOR_TRAN_RUNING      0x01U /*!< 电机进入运行状态指令 */
+#define DCMD_MOTOR_TARN_IDLE        0x02U /*!< 电机进入空闲状态指令 */
+#define DCMD_MOTOR_TARN_CALIB       0x03U /*!< 电机进入校准状态指令 */
+#define DCMD_MOTOR_TARN_MODE_DEBUG  0x04U /*!< 电机进入调试模式指令 */
+#define DCMD_MOTOR_RAN_MODE_V       0x06U /*!< 电机进入位置模式指令 */
+#define DCMD_MOTOR_RAN_MODE_P       0x07U /*!< 电机进入速度模式指令 */
+#define DCMD_MOTOR_TRAN_ANTICOGGING 0x08U /*!< 电机进入齿槽补偿校准模式指令 */
+#define DCMD_SET_VELEOIVER_TARVAL   0x10U /*!< 设置目标速度指令 */
+#define DCMD_SET_POSITON_TARVAL     0x11U /*!< 设置目标位置指令 */
 
 /**
  * @brief 绑定驱动器指令参数

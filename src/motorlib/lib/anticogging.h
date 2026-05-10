@@ -12,7 +12,7 @@
 #include <stdbool.h>
 
 /* 齿槽校准配置 */
-#define ANTICOGGING_POINTS_PER_REV  360   /* 每转采样点数，1°分辨率（步进大，避免齿槽振荡卡死） */
+#define ANTICOGGING_POINTS_PER_REV  3600  /* 每转采样点数，1°分辨率（步进大，避免齿槽振荡卡死） */
 #define ANTICOGGING_POS_THRESHOLD   0.01f /* 位置稳定阈值（rad），约0.57° */
 #define ANTICOGGING_VEL_THRESHOLD   1.0f  /* 速度稳定阈值（rad/s），约5.7°/s */
 #define ANTICOGGING_STABLE_TIME     0.5f  /* 稳定时间（秒），确保 PID 收敛 */
