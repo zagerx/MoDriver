@@ -105,8 +105,7 @@ int canopen_app_init(struct canopen_app *app, struct motor *motor)
 
 	cia402_init(&app->cia402_inst);
 
-	drive_command_params_bind(&app->drive_cmd, motor,
-				  &OD_RAM.x3000_driveCommand.cmd_id,
+	drive_command_params_bind(&app->drive_cmd, motor, &OD_RAM.x3000_driveCommand.cmd_id,
 				  &OD_RAM.x3000_driveCommand.arg1);
 	drive_command_init(&app->drive_cmd);
 

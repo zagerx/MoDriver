@@ -197,7 +197,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .COB_IDServerToClientTx = 0x00000580
     },
     .x2009_motorlib_params = {
-        .highestSub_indexSupported = 0x23,
+        .highestSub_indexSupported = 0x20,
         .direction = 0.0,
         .encoder_resolution = 0x0000,
         .encoder_offset = 0x0000,
@@ -205,9 +205,6 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .A_chn_offset = 0x0000,
         .B_chn_offset = 0x0000,
         .C_chn_offset = 0x0000,
-        .gain_phase = 0.006855,
-        .gain_i_bus = 0.0,
-        .gain_v_bus = 0.01059,
         .acc_max = 9800.0,
         .vmax = 5000.0,
         .D_kp = 0.1,
@@ -293,7 +290,7 @@ typedef struct {
     OD_obj_record_t o_1A01_TPDOMappingParameter[9];
     OD_obj_record_t o_1A02_TPDOMappingParameter[9];
     OD_obj_record_t o_1A03_TPDOMappingParameter[9];
-    OD_obj_record_t o_2009_motorlib_params[36];
+    OD_obj_record_t o_2009_motorlib_params[33];
     OD_obj_record_t o_3000_driveCommand[3];
     OD_obj_var_t o_603F_errorCode;
     OD_obj_var_t o_6040_controlword;
@@ -1189,170 +1186,152 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.gain_phase,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.acc_max,
             .subIndex = 8,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.gain_i_bus,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vmax,
             .subIndex = 9,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.gain_v_bus,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.D_kp,
             .subIndex = 10,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.acc_max,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.D_ki,
             .subIndex = 11,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.vmax,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.D_kd,
             .subIndex = 12,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.D_kp,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.D_limit,
             .subIndex = 13,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.D_ki,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_kp,
             .subIndex = 14,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.D_kd,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_ki,
             .subIndex = 15,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.D_limit,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_kd,
             .subIndex = 16,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_kp,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_limit,
             .subIndex = 17,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_ki,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_kp,
             .subIndex = 18,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_kd,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_ki,
             .subIndex = 19,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.Q_limit,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_kd,
             .subIndex = 20,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_kp,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_limit,
             .subIndex = 21,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_ki,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_kp,
             .subIndex = 22,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_kd,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_ki,
             .subIndex = 23,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.vel_limit,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_kd,
             .subIndex = 24,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_kp,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_limit,
             .subIndex = 25,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_ki,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.rs,
             .subIndex = 26,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_kd,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.ls,
             .subIndex = 27,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.pos_limit,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.pole_pairs,
             .subIndex = 28,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.rs,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.wheel_radius,
             .subIndex = 29,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.ls,
+            .dataOrig = &OD_RAM.x2009_motorlib_params.gear_ratio,
             .subIndex = 30,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.pole_pairs,
-            .subIndex = 31,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.wheel_radius,
-            .subIndex = 32,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x2009_motorlib_params.gear_ratio,
-            .subIndex = 33,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
             .dataOrig = &OD_RAM.x2009_motorlib_params.is_calibrated,
-            .subIndex = 34,
+            .subIndex = 31,
             .attribute = ODA_SDO_R,
             .dataLength = 1
         },
         {
             .dataOrig = &OD_RAM.x2009_motorlib_params.crc16,
-            .subIndex = 35,
+            .subIndex = 32,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 2
         }
@@ -1482,7 +1461,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1A01, 0x09, ODT_REC, &ODObjs.o_1A01_TPDOMappingParameter, NULL},
     {0x1A02, 0x09, ODT_REC, &ODObjs.o_1A02_TPDOMappingParameter, NULL},
     {0x1A03, 0x09, ODT_REC, &ODObjs.o_1A03_TPDOMappingParameter, NULL},
-    {0x2009, 0x24, ODT_REC, &ODObjs.o_2009_motorlib_params, NULL},
+    {0x2009, 0x21, ODT_REC, &ODObjs.o_2009_motorlib_params, NULL},
     {0x3000, 0x03, ODT_REC, &ODObjs.o_3000_driveCommand, NULL},
     {0x603F, 0x01, ODT_VAR, &ODObjs.o_603F_errorCode, NULL},
     {0x6040, 0x01, ODT_VAR, &ODObjs.o_6040_controlword, NULL},

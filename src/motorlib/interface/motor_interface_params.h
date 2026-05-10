@@ -27,9 +27,9 @@ struct currsmp_param {
 	uint16_t b_chn_offset; /**< @brief b轴电流采样通道偏移 */
 	uint16_t c_chn_offset; /**< @brief c轴电流采样通道偏移 */
 
-	float gain_phase; /**< @brief 相电流增益 */
-	float gain_i_bus; /**< @brief 母线电流增益 */
-	float gain_v_bus; /**< @brief 母线电压增益 */
+	// float gain_phase; /**< @brief 相电流增益 */
+	// float gain_i_bus; /**< @brief 母线电流增益 */
+	// float gain_v_bus; /**< @brief 母线电压增益 */
 };
 
 /**

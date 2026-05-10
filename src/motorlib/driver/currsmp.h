@@ -114,28 +114,4 @@ void currsmp_get_raw(struct currsmp *currsmp, struct currsmp_input *input);
  */
 void currsmp_update_offset(struct currsmp *currsmp, uint16_t *adc_raw);
 
-/**
- * @brief 更新相电流增益
- * @param[in] currsmp 电流采样实例
- * @param[in] gain_phase 相电流增益系数
- * @return 无
- */
-void currsmp_update_phase_gain(struct currsmp *currsmp, float gain_phase);
-
-/**
- * @brief 更新母线电流增益
- * @param[in] currsmp 电流采样实例
- * @param[in] gain_i_bus 母线电流增益系数
- * @return 无
- */
-void currsmp_update_i_bus_gain(struct currsmp *currsmp, float gain_i_bus);
-
-/**
- * @brief 更新母线电压增益
- * @param[in] currsmp 电流采样实例
- * @param[in] gain_v_bus 母线电压增益系数
- * @return 无
- */
-void currsmp_update_v_bus_gain(struct currsmp *currsmp, float gain_v_bus);
-
 #endif /* CURRSMP_H */

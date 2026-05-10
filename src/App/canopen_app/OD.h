@@ -16,7 +16,7 @@
 
         Created:      2020/11/23 19:00:00
         Created By:   
-        Modified:     2026/5/9 16:50:54
+        Modified:     2026/5/10 23:28:03
         Modified By:  
 
     Device Info:
@@ -245,9 +245,6 @@ typedef struct {
         uint16_t A_chn_offset;
         uint16_t B_chn_offset;
         uint16_t C_chn_offset;
-        float32_t gain_phase;
-        float32_t gain_i_bus;
-        float32_t gain_v_bus;
         float32_t acc_max;
         float32_t vmax;
         float32_t D_kp;

@@ -6,7 +6,7 @@
  */
 
 #include "currsmp.h"
-
+#include "motorlib_control_param.h"
 /**
  * @brief 绑定电流采样参数
  * @param[in] currsmp 电流采样实例
@@ -78,12 +78,12 @@ void currsmp_update_phase_current(struct currsmp *currsmp)
 	}
 
 	/* 转换为物理量 */
-	currsmp->output.i_a = (currsmp->input.i_a_raw - currsmp->param->a_chn_offset) *
-			      currsmp->param->gain_phase;
-	currsmp->output.i_b = (currsmp->input.i_b_raw - currsmp->param->b_chn_offset) *
-			      currsmp->param->gain_phase;
-	currsmp->output.i_c = (currsmp->input.i_c_raw - currsmp->param->c_chn_offset) *
-			      currsmp->param->gain_phase;
+	currsmp->output.i_a =
+		(currsmp->input.i_a_raw - currsmp->param->a_chn_offset) * PHASE_CURRENT_GAIN;
+	currsmp->output.i_b =
+		(currsmp->input.i_b_raw - currsmp->param->b_chn_offset) * PHASE_CURRENT_GAIN;
+	currsmp->output.i_c =
+		(currsmp->input.i_c_raw - currsmp->param->c_chn_offset) * PHASE_CURRENT_GAIN;
 }
 
 /**
@@ -98,8 +98,8 @@ void currsmp_update_bus(struct currsmp *currsmp)
 		return;
 	}
 
-	currsmp->output.v_bus = (currsmp->input.v_bus_raw) * currsmp->param->gain_v_bus;
-	currsmp->output.i_bus = (currsmp->input.i_bus_raw) * currsmp->param->gain_i_bus;
+	currsmp->output.v_bus = (currsmp->input.v_bus_raw) * BUS_VOLTAGE_GAIN;
+	currsmp->output.i_bus = (currsmp->input.i_bus_raw) * BUS_CURRENT_GAIN;
 }
 
 /**
@@ -148,49 +148,4 @@ void currsmp_update_offset(struct currsmp *currsmp, uint16_t *adc_raw)
 	currsmp->param->a_chn_offset = adc_raw[0];
 	currsmp->param->b_chn_offset = adc_raw[1];
 	currsmp->param->c_chn_offset = adc_raw[2];
-}
-
-/**
- * @brief 更新相电流增益
- * @param[in] currsmp 电流采样实例
- * @param[in] gain_phase 相电流增益系数
- * @return 无
- */
-void currsmp_update_phase_gain(struct currsmp *currsmp, float gain_phase)
-{
-	if (!currsmp || !currsmp->param) {
-		return;
-	}
-
-	currsmp->param->gain_phase = gain_phase;
-}
-
-/**
- * @brief 更新母线电流增益
- * @param[in] currsmp 电流采样实例
- * @param[in] gain_i_bus 母线电流增益系数
- * @return 无
- */
-void currsmp_update_i_bus_gain(struct currsmp *currsmp, float gain_i_bus)
-{
-	if (!currsmp || !currsmp->param) {
-		return;
-	}
-
-	currsmp->param->gain_i_bus = gain_i_bus;
-}
-
-/**
- * @brief 更新母线电压增益
- * @param[in] currsmp 电流采样实例
- * @param[in] gain_v_bus 母线电压增益系数
- * @return 无
- */
-void currsmp_update_v_bus_gain(struct currsmp *currsmp, float gain_v_bus)
-{
-	if (!currsmp || !currsmp->param) {
-		return;
-	}
-
-	currsmp->param->gain_v_bus = gain_v_bus;
 }

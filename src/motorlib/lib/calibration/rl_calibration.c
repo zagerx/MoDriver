@@ -43,8 +43,7 @@
 static inline float get_I_alpha(struct motor *motor)
 {
 	struct currsmp *currsmp = &motor->currsmp;
-	float i_a = (currsmp->input.i_a_raw - currsmp->param->a_chn_offset) *
-		    currsmp->param->gain_phase;
+	float i_a = (currsmp->input.i_a_raw - currsmp->param->a_chn_offset) * PHASE_CURRENT_GAIN;
 	return i_a;
 }
 
@@ -54,10 +53,8 @@ static inline float get_I_alpha(struct motor *motor)
 static inline float get_I_beta(struct motor *motor)
 {
 	struct currsmp *currsmp = &motor->currsmp;
-	float i_a = (currsmp->input.i_a_raw - currsmp->param->a_chn_offset) *
-		    currsmp->param->gain_phase;
-	float i_b = (currsmp->input.i_b_raw - currsmp->param->b_chn_offset) *
-		    currsmp->param->gain_phase;
+	float i_a = (currsmp->input.i_a_raw - currsmp->param->a_chn_offset) * PHASE_CURRENT_GAIN;
+	float i_b = (currsmp->input.i_b_raw - currsmp->param->b_chn_offset) * PHASE_CURRENT_GAIN;
 	/* Clarke变换：I_beta = (i_a + 2*i_b) / sqrt(3) */
 	return (i_a + 2.0f * i_b) * 0.577350269f;
 }
