@@ -30,7 +30,7 @@
 #define CURRENT_CONTROL_BANDWIDTH (6283.185f) /* 电流环带宽 1000Hz [rad/s] */
 
 #define RL_RES_MIN_VALID       (0.005f)   /* 最小有效电阻 [Ohm] */
-#define RL_RES_MAX_VALID       (5.0f)     /* 最大有效电阻 [Ohm] */
+#define RL_RES_MAX_VALID       (8.0f)     /* 最大有效电阻 [Ohm] */
 #define RL_IND_MIN_VALID       (2e-6f)    /* 最小有效电感 [H] */
 #define RL_IND_MAX_VALID       (4000e-6f) /* 最大有效电感 [H] */
 #define RL_UNBALANCE_THRESHOLD (0.2f)     /* 相不平衡阈值 */
