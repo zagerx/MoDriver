@@ -4,12 +4,15 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "hardware.h"
 #include "motor.h"
 #include "motor_interface_params.h"
 #include "canopen_app/canopen_app.h"
 #include "OD.h"
+#include "stm32g4xx_hal_gpio.h" //TODO
+#include "gpio.h"               //TODO
 /*============================================================================
  * 电机 1 硬件接口配置
  *===========================================================================*/
@@ -59,11 +62,19 @@ int main(void)
 	hardware_start_irq();
 	/* 主循环 */
 	uint32_t last_tick = HAL_GetTick();
+	uint32_t last_print_tick = 0;
 	while (1) {
 		HAL_Delay(1);
 		uint32_t current_tick = HAL_GetTick();
 		uint32_t dt_ms = current_tick - last_tick;
 		last_tick = current_tick;
 		canopen_app_process(&canopen_app, dt_ms);
+
+		/* 每 500ms 打印一次 */
+		if (current_tick - last_print_tick >= 500) {
+			last_print_tick = current_tick;
+			HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin); // TODO
+			printf("hello world 01\r\n");
+		}
 	}
 }
