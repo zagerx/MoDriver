@@ -6,6 +6,7 @@
 #include "adc.h"
 #include "tim.h"
 #include "dma.h"
+#include "rtc.h"
 #include "encoder.h"
 static void SystemClock_Config(void);
 static void Error_Handler(void);
@@ -25,6 +26,7 @@ void hardware_init(void)
 	MX_SPI1_Init();
 	encoder_init_pipeline(); /* 预热 AS5047 pipeline */
 	dwt_init();
+	MX_RTC_Init();
 }
 void hardware_start_irq(void)
 {

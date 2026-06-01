@@ -2,8 +2,10 @@
 #include "motor_interface_mode.h"
 #include "tim.h"
 #include "usart.h"
+#include "rtc_time.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 extern uint8_t sg_uartreceive_buff[125];
 // extern struct motor_param_ext m1_param_ext;
 extern struct motor_param_ext *pmotor1_param;
@@ -31,6 +33,7 @@ enum foc_data_index {
 	INDEX_VP_PI,
 	INDEX_STATE,
 	INDEX_MODE,
+	INDEX_RTC_SET,
 	INDEX_MAX,
 };
 
@@ -47,6 +50,7 @@ static const command_map_t cmd_map[] = {
 	{"pid", 2, INDEX_VP_PI},
 	{"state", 1, INDEX_STATE},
 	{"mode", 1, INDEX_MODE},
+	{"rtc_set", 2, INDEX_RTC_SET},
 };
 void process_data(uint8_t *data, uint16_t len)
 {
@@ -106,6 +110,14 @@ void process_data(uint8_t *data, uint16_t len)
 		}
 	}
 
+	/* rtc_get 无参数，提前处理 */
+	if (strcmp(cmd, "rtc_get") == 0) {
+		uint32_t days, ms;
+		rtc_get(&days, &ms);
+		printf("%lu,%lu\r\n", (unsigned long)days, (unsigned long)ms);
+		return;
+	}
+
 	if (param_count == 0) {
 		return;
 	}
@@ -113,6 +125,20 @@ void process_data(uint8_t *data, uint16_t len)
 	for (size_t i = 0; i < sizeof(cmd_map) / sizeof(cmd_map[0]); i++) {
 		if (strcmp(cmd, cmd_map[i].cmd_name) == 0) {
 			if (param_count >= cmd_map[i].min_params) {
+				/* rtc_set 走整数解析，避免 float 精度损失 */
+				if (cmd_map[i].data_index == INDEX_RTC_SET) {
+					char *endptr;
+					uint32_t days = strtoul(params_str, &endptr, 10);
+					if (*endptr == ',') {
+						uint32_t ms = strtoul(endptr + 1, &endptr, 10);
+						int ret = rtc_set(days, ms);
+						printf(ret == 0 ? "OK\r\n" : "ERR\r\n");
+					} else {
+						printf("ERR\r\n");
+					}
+					return;
+				}
+
 				float input[10];
 				uint8_t copy_count = (param_count < 10) ? param_count : 10;
 

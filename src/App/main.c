@@ -74,7 +74,7 @@ int main(void)
 		if (current_tick - last_print_tick >= 500) {
 			last_print_tick = current_tick;
 			HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin); // TODO
-			printf("hello world 01\r\n");
+			// printf("hello world 01\r\n");
 		}
 	}
 }
